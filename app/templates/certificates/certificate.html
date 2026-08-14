@@ -1,0 +1,241 @@
+{% extends "base.html" %}
+
+{% block title %}
+Certificate — CampusHub
+{% endblock %}
+
+
+{% block content %}
+
+<div class="page-header">
+
+    <div>
+
+        <div class="eyebrow">
+            CAMPUSHUB / ACHIEVEMENT
+        </div>
+
+        <h1>
+            Digital Certificate
+        </h1>
+
+        <p>
+            Your verified CampusHub achievement.
+        </p>
+
+    </div>
+
+
+    <a
+        href="{{ url_for('certificate.my_certificates') }}"
+        class="secondary-btn"
+    >
+        ← My Certificates
+    </a>
+
+</div>
+
+
+<div class="certificate-wrapper">
+
+    <div class="certificate-card">
+
+
+        <!-- ============================================
+             HEADER
+        ============================================= -->
+
+        <div class="certificate-top">
+
+            <div class="certificate-brand">
+
+                <span class="certificate-brand-mark">
+                    C
+                </span>
+
+                <span>
+                    Campus<span>Hub</span>
+                </span>
+
+            </div>
+
+
+            <div class="certificate-symbol">
+                ✦
+            </div>
+
+        </div>
+
+
+        <!-- ============================================
+             MAIN CERTIFICATE
+        ============================================= -->
+
+        <div class="certificate-main">
+
+            <div class="certificate-eyebrow">
+                CERTIFICATE OF PARTICIPATION
+            </div>
+
+
+            <h2>
+                This certificate is proudly presented to
+            </h2>
+
+
+            <h1 class="certificate-student-name">
+                {{ certificate.student.name }}
+            </h1>
+
+
+            <div class="certificate-line">
+            </div>
+
+
+            <p class="certificate-text">
+                for successfully participating in
+            </p>
+
+
+            <h3 class="certificate-event-name">
+                {{ certificate.event.title }}
+            </h3>
+
+
+            <p class="certificate-description">
+
+                This certificate recognizes the student's
+                participation and attendance at this
+                CampusHub event.
+
+            </p>
+
+
+            <!-- ========================================
+                 EVENT DETAILS
+            ========================================= -->
+
+            <div class="certificate-details">
+
+                <div>
+
+                    <span>
+                        EVENT TYPE
+                    </span>
+
+                    <strong>
+                        {{ certificate.event.event_type }}
+                    </strong>
+
+                </div>
+
+
+                <div>
+
+                    <span>
+                        DATE
+                    </span>
+
+                    <strong>
+                        {{ certificate.event.date }}
+                    </strong>
+
+                </div>
+
+
+                <div>
+
+                    <span>
+                        VENUE
+                    </span>
+
+                    <strong>
+                        {{ certificate.event.venue }}
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <!-- ========================================
+                 FOOTER
+            ========================================= -->
+
+            <div class="certificate-footer">
+
+                <div class="certificate-signature">
+
+                    <div class="signature-line">
+                    </div>
+
+                    <span>
+                        CampusHub
+                    </span>
+
+                    <small>
+                        Event Management
+                    </small>
+
+                </div>
+
+
+                <div class="certificate-seal">
+                    ✦
+                </div>
+
+
+                <div class="certificate-issued">
+
+                    <span>
+                        CERTIFICATE ID
+                    </span>
+
+                    <strong>
+                        {{ certificate.certificate_code }}
+                    </strong>
+
+                    <small>
+                        Digitally verified
+                    </small>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ================================================
+         ACTIONS
+    ================================================= -->
+
+    <div class="certificate-actions">
+
+        <button
+            type="button"
+            class="primary-btn"
+            onclick="window.print()"
+        >
+            🖨️ Print / Save PDF
+        </button>
+
+
+        <a
+            href="{{ url_for(
+                'certificate.verify',
+                certificate_code=
+                    certificate.certificate_code
+            ) }}"
+            class="secondary-btn"
+        >
+            Verify Certificate →
+        </a>
+
+    </div>
+
+</div>
+
+{% endblock %}

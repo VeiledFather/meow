@@ -1,0 +1,168 @@
+{% extends "base.html" %}
+
+{% block title %}
+Digital Ticket — CampusHub
+{% endblock %}
+
+{% block content %}
+
+<div class="ticket-page">
+
+    <a
+        href="{{ url_for('events.my_registrations') }}"
+        class="text-link"
+    >
+        ← Back to My Registrations
+    </a>
+
+    <div class="ticket-wrapper">
+
+        <div class="ticket-card">
+
+            <div class="ticket-header">
+
+                <div class="ticket-brand">
+                    <span class="ticket-brand-mark">C</span>
+
+                    <span>
+                        Campus<span>Hub</span>
+                    </span>
+                </div>
+
+                <span class="ticket-status">
+                    ✓ REGISTERED
+                </span>
+
+            </div>
+
+
+            <div class="ticket-event">
+
+                <span class="eyebrow">
+                    DIGITAL EVENT TICKET
+                </span>
+
+                <h1>
+                    {{ registration.event.title }}
+                </h1>
+
+                <p>
+                    {{ registration.event.description }}
+                </p>
+
+            </div>
+
+
+            <div class="ticket-info-grid">
+
+                <div class="ticket-info">
+                    <span>DATE</span>
+                    <strong>
+                        📅 {{ registration.event.date }}
+                    </strong>
+                </div>
+
+                <div class="ticket-info">
+                    <span>TIME</span>
+                    <strong>
+                        ⏰
+                        {{ registration.event.start_time }}
+                        –
+                        {{ registration.event.end_time }}
+                    </strong>
+                </div>
+
+                <div class="ticket-info">
+                    <span>VENUE</span>
+                    <strong>
+                        📍 {{ registration.event.venue }}
+                    </strong>
+                </div>
+
+                <div class="ticket-info">
+                    <span>EVENT TYPE</span>
+                    <strong>
+                        {{ registration.event.event_type }}
+                    </strong>
+                </div>
+
+            </div>
+
+
+            <div class="ticket-divider">
+                <span></span>
+                <i></i>
+                <span></span>
+            </div>
+
+
+            <div class="ticket-bottom">
+
+                <div class="ticket-student">
+
+                    <span class="eyebrow">
+                        TICKET HOLDER
+                    </span>
+
+                    <h2>
+                        {{ current_user.name }}
+                    </h2>
+
+                    <p>
+                        {{ current_user.email }}
+                    </p>
+
+                    <div class="ticket-code">
+
+                        <span>
+                            REGISTRATION ID
+                        </span>
+
+                        <strong>
+                            {{ registration.registration_code }}
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+                <div class="ticket-qr">
+
+                    <img
+                        src="{{ url_for(
+                            'events.ticket_qr',
+                            registration_id=registration.id
+                        ) }}"
+                        alt="Unique QR code for {{ registration.registration_code }}"
+                        class="ticket-qr-image"
+                    >
+
+                    <small>
+                        Scan at event entrance
+                    </small>
+
+                </div>
+
+            </div>
+
+
+            <div class="ticket-footer">
+
+                <span>
+                    Powered by CampusHub
+                </span>
+
+                <span>
+                    {{ registration.registration_code }}
+                </span>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

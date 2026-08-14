@@ -1,0 +1,261 @@
+{% extends "base.html" %}
+
+{% block title %}
+My Profile — CampusHub
+{% endblock %}
+
+{% block content %}
+
+<div class="dashboard-page">
+
+    <div class="dashboard-header">
+
+        <div>
+
+            <span class="eyebrow">
+                CAMPUSHUB / STUDENT
+            </span>
+
+            <h1>
+                My Profile
+                <span class="wave">✦</span>
+            </h1>
+
+            <p>
+                Your CampusHub activity and event history.
+            </p>
+
+        </div>
+
+        <a
+            href="{{ url_for('main.dashboard') }}"
+            class="dashboard-action"
+        >
+            ← Dashboard
+        </a>
+
+    </div>
+
+
+    <!-- PROFILE CARD -->
+
+    <div class="profile-card">
+
+        <div class="profile-avatar">
+            {{ current_user.name[0]|upper }}
+        </div>
+
+        <div class="profile-main">
+
+            <span class="eyebrow">
+                STUDENT ACCOUNT
+            </span>
+
+            <h2>
+                {{ current_user.name }}
+            </h2>
+
+            <p>
+                {{ current_user.email }}
+            </p>
+
+            <span class="profile-role">
+                STUDENT
+            </span>
+
+        </div>
+
+    </div>
+
+
+    <!-- STATS -->
+
+    <div class="student-stats">
+
+        <div class="student-stat">
+
+            <div class="stat-icon">
+                ◈
+            </div>
+
+            <div>
+
+                <span>
+                    REGISTRATIONS
+                </span>
+
+                <strong>
+                    {{ registrations|length }}
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        <div class="student-stat">
+
+            <div class="stat-icon">
+                ✓
+            </div>
+
+            <div>
+
+                <span>
+                    ATTENDED
+                </span>
+
+                <strong>
+                    {{ attended_count }}
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        <div class="student-stat">
+
+            <div class="stat-icon">
+                ★
+            </div>
+
+            <div>
+
+                <span>
+                    REVIEWS
+                </span>
+
+                <strong>
+                    {{ review_count }}
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        <div class="student-stat">
+
+            <div class="stat-icon">
+                ✦
+            </div>
+
+            <div>
+
+                <span>
+                    ROLE
+                </span>
+
+                <strong>
+                    Student
+                </strong>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- REGISTRATION HISTORY -->
+
+    <div class="section-header">
+
+        <div>
+
+            <span class="eyebrow">
+                ACTIVITY
+            </span>
+
+            <h2>
+                Event History
+            </h2>
+
+        </div>
+
+    </div>
+
+
+    {% if registrations %}
+
+        <div class="profile-event-list">
+
+            {% for registration in registrations %}
+
+                <div class="profile-event">
+
+                    <div>
+
+                        <span class="event-category">
+                            {{ registration.event.event_type }}
+                        </span>
+
+                        <h3>
+                            {{ registration.event.title }}
+                        </h3>
+
+                        <p>
+                            📅 {{ registration.event.date }}
+                            &nbsp; • &nbsp;
+                            📍 {{ registration.event.venue }}
+                        </p>
+
+                    </div>
+
+
+                    <div class="profile-event-status">
+
+                        {% if registration.checked_in %}
+
+                            <span class="status-success">
+                                ✓ ATTENDED
+                            </span>
+
+                        {% else %}
+
+                            <span class="status-pending">
+                                REGISTERED
+                            </span>
+
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+    {% else %}
+
+        <div class="dashboard-empty">
+
+            <div class="empty-symbol">
+                ◈
+            </div>
+
+            <h3>
+                No event history yet.
+            </h3>
+
+            <p>
+                Register for an event to start building
+                your CampusHub activity.
+            </p>
+
+            <a
+                href="{{ url_for('events.pinboard') }}"
+                class="dashboard-action"
+            >
+                Explore Events →
+            </a>
+
+        </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}

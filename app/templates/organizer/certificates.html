@@ -1,0 +1,272 @@
+{% extends "base.html" %}
+
+{% block title %}
+Certificate Management — CampusHub
+{% endblock %}
+
+{% block content %}
+
+<div class="dashboard-page">
+
+    <div class="dashboard-header">
+
+        <div>
+
+            <span class="eyebrow">
+                CAMPUSHUB / ORGANIZER
+            </span>
+
+            <h1>
+                Certificate Management
+                <span class="wave">✦</span>
+            </h1>
+
+            <p>
+                Track certificates issued for your events.
+            </p>
+
+        </div>
+
+
+        <a
+            href="{{ url_for('organizer.dashboard') }}"
+            class="secondary-btn"
+        >
+            ← Dashboard
+        </a>
+
+    </div>
+
+
+    <!-- SUMMARY -->
+
+    <div class="student-stats">
+
+        <div class="student-stat">
+
+            <div class="stat-icon">
+                ◈
+            </div>
+
+            <div>
+
+                <span>
+                    REGISTERED
+                </span>
+
+                <strong>
+                    {{ total_registered }}
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        <div class="student-stat">
+
+            <div class="stat-icon">
+                ✓
+            </div>
+
+            <div>
+
+                <span>
+                    CHECKED IN
+                </span>
+
+                <strong>
+                    {{ total_checked_in }}
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        <div class="student-stat">
+
+            <div class="stat-icon">
+                🎓
+            </div>
+
+            <div>
+
+                <span>
+                    CERTIFICATES ISSUED
+                </span>
+
+                <strong>
+                    {{ total_certificates }}
+                </strong>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- EVENTS -->
+
+    <div class="section-header">
+
+        <div>
+
+            <span class="eyebrow">
+                YOUR EVENTS
+            </span>
+
+            <h2>
+                Certificate Overview
+            </h2>
+
+        </div>
+
+    </div>
+
+
+    {% if certificate_events %}
+
+        <div class="volunteer-event-list">
+
+            {% for item in certificate_events %}
+
+                <div class="volunteer-event-card">
+
+                    <div class="volunteer-event-main">
+
+                        <div class="event-card-top">
+
+                            <span class="event-category">
+                                {{ item.event.event_type }}
+                            </span>
+
+
+                            {% if item.event.status == "approved" %}
+
+                                <span class="approved-badge">
+                                    APPROVED
+                                </span>
+
+                            {% elif item.event.status == "pending" %}
+
+                                <span class="pending-badge">
+                                    PENDING
+                                </span>
+
+                            {% elif item.event.status == "rejected" %}
+
+                                <span class="rejected-badge">
+                                    REJECTED
+                                </span>
+
+                            {% endif %}
+
+                        </div>
+
+
+                        <h3>
+                            {{ item.event.title }}
+                        </h3>
+
+
+                        <p class="volunteer-description">
+
+                            📅 {{ item.event.date }}
+
+                            &nbsp; · &nbsp;
+
+                            📍 {{ item.event.venue }}
+
+                        </p>
+
+
+                        <div class="volunteer-details">
+
+                            <div>
+
+                                <span>
+                                    REGISTERED
+                                </span>
+
+                                <strong>
+                                    {{ item.registered }}
+                                </strong>
+
+                            </div>
+
+
+                            <div>
+
+                                <span>
+                                    CHECKED IN
+                                </span>
+
+                                <strong>
+                                    {{ item.checked_in }}
+                                </strong>
+
+                            </div>
+
+
+                            <div>
+
+                                <span>
+                                    CERTIFICATES
+                                </span>
+
+                                <strong>
+                                    {{ item.certificates }}
+                                </strong>
+
+                            </div>
+
+
+                            <div>
+
+                                <span>
+                                    NOT YET ISSUED
+                                </span>
+
+                                <strong>
+                                    {{ item.checked_in - item.certificates }}
+                                </strong>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+
+    {% else %}
+
+        <div class="dashboard-empty">
+
+            <div class="empty-symbol">
+                🎓
+            </div>
+
+            <h3>
+                No events yet.
+            </h3>
+
+            <p>
+                Certificate information will appear here
+                after you create events.
+            </p>
+
+        </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}

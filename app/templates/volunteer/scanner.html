@@ -1,0 +1,1085 @@
+{% extends "base.html" %}
+
+{% block title %}
+QR Scanner — CampusHub
+{% endblock %}
+
+{% block content %}
+
+<div class="scanner-page">
+
+    <!-- HEADER -->
+
+    <div class="dashboard-header">
+
+        <div>
+
+            <span class="eyebrow">
+                CAMPUSHUB / VOLUNTEER
+            </span>
+
+            <h1>
+                QR Scanner
+                <span class="wave">✦</span>
+            </h1>
+
+            <p>
+                Scan a student's CampusHub ticket
+                to verify their registration and check them in.
+            </p>
+
+        </div>
+
+        <a
+            href="{{ url_for('volunteer.dashboard') }}"
+            class="dashboard-action"
+        >
+            ← Dashboard
+        </a>
+
+    </div>
+
+
+    <!-- SCANNER CARD -->
+
+    <div class="scanner-layout">
+
+
+        <div class="scanner-card">
+
+            <div class="scanner-card-header">
+
+                <div>
+
+                    <span class="eyebrow">
+                        CAMERA SCANNER
+                    </span>
+
+                    <h2>
+                        Scan ticket
+                    </h2>
+
+                </div>
+
+                <div class="scanner-status">
+                    <span id="camera-dot"></span>
+                    <span id="camera-status">
+                        Camera inactive
+                    </span>
+                </div>
+
+            </div>
+
+
+            <!-- CAMERA -->
+
+            <div
+                id="qr-reader"
+                class="qr-reader"
+            ></div>
+
+
+            <!-- CAMERA CONTROLS -->
+
+            <div class="scanner-controls">
+
+                <button
+                    id="start-camera"
+                    class="primary-btn"
+                    type="button"
+                >
+                    📷 Start Camera
+                </button>
+
+
+                <button
+                    id="stop-camera"
+                    class="secondary-btn"
+                    type="button"
+                    style="display:none;"
+                >
+                    Stop Camera
+                </button>
+
+            </div>
+
+
+            <div
+                id="camera-message"
+                class="scanner-message"
+            >
+                Press <strong>Start Camera</strong> to begin.
+            </div>
+
+        </div>
+
+
+        <!-- RESULT -->
+
+        <div
+            id="scan-result"
+            class="scan-result-card"
+        >
+
+            <div class="scan-result-empty">
+
+                <div class="scanner-result-icon">
+                    ⌗
+                </div>
+
+                <span class="eyebrow">
+                    WAITING FOR SCAN
+                </span>
+
+                <h3>
+                    No ticket scanned
+                </h3>
+
+                <p>
+                    Scan a CampusHub QR ticket to see
+                    the registration information here.
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- SECURITY INFO -->
+
+    <div class="scanner-security">
+
+        <div class="security-icon">
+            🔐
+        </div>
+
+        <div>
+
+            <span class="eyebrow">
+                SECURE CHECK-IN
+            </span>
+
+            <h3>
+                Every ticket is verified server-side.
+            </h3>
+
+            <p>
+                CampusHub checks the registration,
+                event assignment and volunteer authorization
+                before allowing check-in.
+            </p>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     QR SCANNER LIBRARY
+===================================================== -->
+
+<script
+    src="https://unpkg.com/html5-qrcode"
+></script>
+
+
+<script>
+
+let scanner = null;
+
+let scanning = false;
+
+let currentCode = null;
+
+let processing = false;
+
+
+/* =====================================================
+   ELEMENTS
+===================================================== */
+
+const startButton =
+    document.getElementById(
+        "start-camera"
+    );
+
+const stopButton =
+    document.getElementById(
+        "stop-camera"
+    );
+
+const cameraMessage =
+    document.getElementById(
+        "camera-message"
+    );
+
+const cameraStatus =
+    document.getElementById(
+        "camera-status"
+    );
+
+const cameraDot =
+    document.getElementById(
+        "camera-dot"
+    );
+
+const resultBox =
+    document.getElementById(
+        "scan-result"
+    );
+
+
+/* =====================================================
+   CAMERA STATUS
+===================================================== */
+
+function setCameraStatus(
+    active,
+    text
+) {
+
+    cameraStatus.textContent =
+        text;
+
+    if (active) {
+
+        cameraDot.classList.add(
+            "active"
+        );
+
+    } else {
+
+        cameraDot.classList.remove(
+            "active"
+        );
+
+    }
+
+}
+
+
+/* =====================================================
+   CAMERA ERROR MESSAGE
+===================================================== */
+
+function showCameraError(
+    message
+) {
+
+    cameraMessage.innerHTML =
+        `<strong>Camera error:</strong> ${message}`;
+
+    cameraMessage.classList.add(
+        "error"
+    );
+
+}
+
+
+/* =====================================================
+   START CAMERA
+===================================================== */
+
+async function startCamera() {
+
+    if (scanning) {
+        return;
+    }
+
+    cameraMessage.classList.remove(
+        "error"
+    );
+
+    cameraMessage.innerHTML =
+        "Requesting camera permission...";
+
+    try {
+
+        /*
+         * We request the camera explicitly first.
+         * This makes the browser permission prompt
+         * appear on supported devices.
+         */
+
+        const stream =
+            await navigator.mediaDevices.getUserMedia({
+                video: {
+                    facingMode: {
+                        ideal: "environment"
+                    }
+                },
+                audio: false
+            });
+
+        /*
+         * Stop the temporary stream.
+         * html5-qrcode will open the camera itself.
+         */
+
+        stream.getTracks().forEach(
+            track => track.stop()
+        );
+
+
+        scanner =
+            new Html5Qrcode(
+                "qr-reader"
+            );
+
+
+        const config = {
+
+            fps: 10,
+
+            qrbox: function(
+                viewfinderWidth,
+                viewfinderHeight
+            ) {
+
+                const size =
+                    Math.min(
+                        viewfinderWidth,
+                        viewfinderHeight
+                    ) * 0.72;
+
+                return {
+                    width: size,
+                    height: size
+                };
+
+            },
+
+            aspectRatio: 1.0
+
+        };
+
+
+        await scanner.start(
+
+            {
+                facingMode: "environment"
+            },
+
+            config,
+
+            onScanSuccess,
+
+            onScanFailure
+
+        );
+
+
+        scanning = true;
+
+        setCameraStatus(
+            true,
+            "Camera active"
+        );
+
+        startButton.style.display =
+            "none";
+
+        stopButton.style.display =
+            "inline-flex";
+
+        cameraMessage.innerHTML =
+            "Point the camera at a CampusHub QR ticket.";
+
+    } catch (error) {
+
+        console.error(
+            "Camera error:",
+            error
+        );
+
+        setCameraStatus(
+            false,
+            "Camera unavailable"
+        );
+
+
+        if (
+            error.name ===
+            "NotAllowedError"
+        ) {
+
+            showCameraError(
+                "Camera permission was denied. Allow camera access in your browser settings and try again."
+            );
+
+        } else if (
+            error.name ===
+            "NotFoundError"
+        ) {
+
+            showCameraError(
+                "No camera was found on this device."
+            );
+
+        } else {
+
+            showCameraError(
+                "Unable to start the camera. Make sure this page is running on localhost or HTTPS."
+            );
+
+        }
+
+    }
+
+}
+
+
+/* =====================================================
+   QR SCAN SUCCESS
+===================================================== */
+
+async function onScanSuccess(
+    decodedText
+) {
+
+    if (processing) {
+        return;
+    }
+
+    processing = true;
+
+    currentCode =
+        decodedText.trim();
+
+
+    /*
+     * Pause scanning while we validate
+     * the ticket.
+     */
+
+    try {
+
+        await stopScanner();
+
+    } catch (error) {
+
+        console.error(error);
+
+    }
+
+
+    cameraMessage.innerHTML =
+        "Ticket detected. Verifying...";
+
+
+    resultBox.innerHTML = `
+
+        <div class="scan-loading">
+
+            <div class="loading-spinner">
+                ✦
+            </div>
+
+            <span class="eyebrow">
+                VERIFYING
+            </span>
+
+            <h3>
+                Checking ticket...
+            </h3>
+
+            <p>
+                Please wait while CampusHub
+                verifies this registration.
+            </p>
+
+        </div>
+
+    `;
+
+
+    try {
+
+        const response =
+            await fetch(
+                "{{ url_for('volunteer.validate_qr') }}",
+                {
+
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body: JSON.stringify({
+
+                        registration_code:
+                            currentCode
+
+                    })
+
+                }
+            );
+
+
+        const data =
+            await response.json();
+
+
+        if (
+            response.ok &&
+            data.success
+        ) {
+
+            showValidTicket(
+                data.registration
+            );
+
+        } else {
+
+            showInvalidTicket(
+                data.message ||
+                "Invalid ticket."
+            );
+
+        }
+
+    } catch (error) {
+
+        console.error(
+            error
+        );
+
+        showInvalidTicket(
+            "Could not connect to the CampusHub server."
+        );
+
+    }
+
+}
+
+
+/* =====================================================
+   QR SCAN FAILURE
+===================================================== */
+
+function onScanFailure(
+    errorMessage
+) {
+
+    /*
+     * QR scanning continuously reports
+     * "not found" while looking for a QR.
+     *
+     * We intentionally do nothing here.
+     */
+
+}
+
+
+/* =====================================================
+   VALID TICKET
+===================================================== */
+
+function showValidTicket(
+    registration
+) {
+
+    resultBox.innerHTML = `
+
+        <div class="scan-success">
+
+            <div class="result-symbol">
+                ✓
+            </div>
+
+            <span class="eyebrow">
+                VALID TICKET
+            </span>
+
+            <h3>
+                Registration verified
+            </h3>
+
+
+            <div class="ticket-information">
+
+                <div>
+
+                    <span>
+                        STUDENT
+                    </span>
+
+                    <strong>
+                        ${escapeHtml(
+                            registration.student_name
+                        )}
+                    </strong>
+
+                </div>
+
+
+                <div>
+
+                    <span>
+                        EVENT
+                    </span>
+
+                    <strong>
+                        ${escapeHtml(
+                            registration.event_title
+                        )}
+                    </strong>
+
+                </div>
+
+
+                <div>
+
+                    <span>
+                        DATE
+                    </span>
+
+                    <strong>
+                        ${escapeHtml(
+                            registration.event_date
+                        )}
+                    </strong>
+
+                </div>
+
+
+                <div>
+
+                    <span>
+                        TIME
+                    </span>
+
+                    <strong>
+                        ${escapeHtml(
+                            registration.event_time
+                        )}
+                    </strong>
+
+                </div>
+
+
+                <div>
+
+                    <span>
+                        VENUE
+                    </span>
+
+                    <strong>
+                        ${escapeHtml(
+                            registration.venue
+                        )}
+                    </strong>
+
+                </div>
+
+
+                <div>
+
+                    <span>
+                        REGISTRATION CODE
+                    </span>
+
+                    <strong class="code-value">
+                        ${escapeHtml(
+                            registration.registration_code
+                        )}
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <button
+                id="check-in-button"
+                class="check-in-btn"
+                type="button"
+                onclick="performCheckIn()"
+            >
+                ✓ Check In Student
+            </button>
+
+        </div>
+
+    `;
+
+    cameraMessage.innerHTML =
+        "Ticket verified. Confirm check-in below.";
+
+}
+
+
+/* =====================================================
+   INVALID TICKET
+===================================================== */
+
+function showInvalidTicket(
+    message
+) {
+
+    resultBox.innerHTML = `
+
+        <div class="scan-error">
+
+            <div class="result-symbol">
+                !
+            </div>
+
+            <span class="eyebrow">
+                TICKET NOT VALID
+            </span>
+
+            <h3>
+                Scan rejected
+            </h3>
+
+            <p>
+                ${escapeHtml(message)}
+            </p>
+
+
+            <button
+                type="button"
+                class="secondary-btn"
+                onclick="resetScanner()"
+            >
+                Scan Another Ticket
+            </button>
+
+        </div>
+
+    `;
+
+    cameraMessage.innerHTML =
+        "The ticket could not be verified.";
+
+}
+
+
+/* =====================================================
+   CHECK IN
+===================================================== */
+
+async function performCheckIn() {
+
+    if (!currentCode) {
+        return;
+    }
+
+
+    const button =
+        document.getElementById(
+            "check-in-button"
+        );
+
+
+    if (button) {
+
+        button.disabled = true;
+
+        button.innerHTML =
+            "Checking in...";
+
+    }
+
+
+    try {
+
+        const response =
+            await fetch(
+                "{{ url_for('volunteer.check_in') }}",
+                {
+
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body: JSON.stringify({
+
+                        registration_code:
+                            currentCode
+
+                    })
+
+                }
+            );
+
+
+        const data =
+            await response.json();
+
+
+        if (
+            response.ok &&
+            data.success
+        ) {
+
+            resultBox.innerHTML = `
+
+                <div class="scan-success">
+
+                    <div class="result-symbol">
+                        ✓
+                    </div>
+
+                    <span class="eyebrow">
+                        CHECK-IN COMPLETE
+                    </span>
+
+                    <h3>
+                        Student checked in
+                    </h3>
+
+                    <p>
+                        ${escapeHtml(
+                            data.student_name
+                        )}
+                        has been successfully checked in
+                        for
+                        <strong>
+                            ${escapeHtml(
+                                data.event_title
+                            )}
+                        </strong>.
+                    </p>
+
+
+                    <button
+                        type="button"
+                        class="check-in-btn"
+                        onclick="resetScanner()"
+                    >
+                        Scan Next Ticket →
+                    </button>
+
+                </div>
+
+            `;
+
+            cameraMessage.innerHTML =
+                "Check-in complete.";
+
+            currentCode = null;
+
+        } else {
+
+            if (
+                data.already_checked_in
+            ) {
+
+                showInvalidTicket(
+                    "This student has already been checked in."
+                );
+
+            } else {
+
+                showInvalidTicket(
+                    data.message ||
+                    "Check-in failed."
+                );
+
+            }
+
+        }
+
+    } catch (error) {
+
+        console.error(
+            error
+        );
+
+        showInvalidTicket(
+            "Unable to contact the CampusHub server."
+        );
+
+    }
+
+}
+
+
+/* =====================================================
+   STOP CAMERA
+===================================================== */
+
+async function stopScanner() {
+
+    if (
+        scanner &&
+        scanning
+    ) {
+
+        try {
+
+            await scanner.stop();
+
+        } catch (error) {
+
+            console.error(
+                "Scanner stop error:",
+                error
+            );
+
+        }
+
+        try {
+
+            scanner.clear();
+
+        } catch (error) {
+
+            console.error(
+                "Scanner clear error:",
+                error
+            );
+
+        }
+
+    }
+
+    scanner = null;
+
+    scanning = false;
+
+    setCameraStatus(
+        false,
+        "Camera inactive"
+    );
+
+    startButton.style.display =
+        "inline-flex";
+
+    stopButton.style.display =
+        "none";
+
+}
+
+
+/* =====================================================
+   RESET
+===================================================== */
+
+async function resetScanner() {
+
+    currentCode = null;
+
+    processing = false;
+
+
+    resultBox.innerHTML = `
+
+        <div class="scan-result-empty">
+
+            <div class="scanner-result-icon">
+                ⌗
+            </div>
+
+            <span class="eyebrow">
+                WAITING FOR SCAN
+            </span>
+
+            <h3>
+                Ready for another ticket
+            </h3>
+
+            <p>
+                Start the camera and scan
+                another CampusHub QR ticket.
+            </p>
+
+        </div>
+
+    `;
+
+
+    cameraMessage.innerHTML =
+        "Press Start Camera to begin.";
+
+}
+
+
+/* =====================================================
+   HTML ESCAPING
+===================================================== */
+
+function escapeHtml(
+    value
+) {
+
+    return String(value)
+
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+
+        .replace(
+            /</g,
+            "&lt;"
+        )
+
+        .replace(
+            />/g,
+            "&gt;"
+        )
+
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+
+        .replace(
+            /'/g,
+            "&#039;"
+        );
+
+}
+
+
+/* =====================================================
+   BUTTON EVENTS
+===================================================== */
+
+startButton.addEventListener(
+    "click",
+    startCamera
+);
+
+
+stopButton.addEventListener(
+    "click",
+    stopScanner
+);
+
+
+/* =====================================================
+   CLEANUP
+===================================================== */
+
+window.addEventListener(
+    "beforeunload",
+    function() {
+
+        if (scanner && scanning) {
+
+            scanner.stop().catch(
+                () => {}
+            );
+
+        }
+
+    }
+);
+
+</script>
+
+{% endblock %}
+

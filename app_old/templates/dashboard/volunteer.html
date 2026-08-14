@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<title>
+Volunteer — CampusHub
+</title>
+
+<meta
+name="viewport"
+content="width=device-width, initial-scale=1"
+>
+
+<link
+rel="stylesheet"
+href="/static/css/style.css"
+>
+
+</head>
+
+<body>
+
+<div class="dashboard">
+
+<aside class="sidebar">
+
+<div class="sidebar-brand">
+
+<div class="brand-icon">CH</div>
+
+<span>CampusHub</span>
+
+</div>
+
+
+<nav class="sidebar-nav">
+
+<a class="active" href="/auth/volunteer">
+📊 <span>Dashboard</span>
+</a>
+
+<a href="#">
+🎯 <span>Available Events</span>
+</a>
+
+<a href="#">
+📷 <span>QR Scanner</span>
+</a>
+
+<a href="#">
+🚨 <span>Security</span>
+</a>
+
+<a href="/auth/logout">
+↪ <span>Logout</span>
+</a>
+
+</nav>
+
+</aside>
+
+
+<main class="main">
+
+<div class="topbar">
+
+<div>
+
+<h1>
+Volunteer Dashboard
+</h1>
+
+<p>
+Manage your event assignments.
+</p>
+
+</div>
+
+<div class="avatar">
+{{ current_user.name[0] }}
+</div>
+
+</div>
+
+
+<div class="stats">
+
+<div class="stat-card">
+
+<div class="stat-label">
+Assigned Events
+</div>
+
+<div class="stat-value">
+0
+</div>
+
+</div>
+
+
+<div class="stat-card">
+
+<div class="stat-label">
+Check-ins
+</div>
+
+<div class="stat-value">
+0
+</div>
+
+</div>
+
+
+<div class="stat-card">
+
+<div class="stat-label">
+Applications
+</div>
+
+<div class="stat-value">
+0
+</div>
+
+</div>
+
+
+<div class="stat-card">
+
+<div class="stat-label">
+Alerts
+</div>
+
+<div class="stat-value">
+0
+</div>
+
+</div>
+
+</div>
+
+
+<div class="card">
+
+<div class="card-header">
+
+<h2>
+🎯 My Assignments
+</h2>
+
+</div>
+
+<p style="color:#8e96aa">
+
+Your assigned events and volunteer
+responsibilities will appear here.
+
+</p>
+
+</div>
+
+</main>
+
+</div>
+
+</body>
+
+</html>

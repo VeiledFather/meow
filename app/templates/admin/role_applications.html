@@ -1,0 +1,352 @@
+{% extends "base.html" %}
+
+{% block title %}
+Role Applications — CampusHub
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+
+    <div>
+
+        <div class="eyebrow">
+            COLLEGE MANAGEMENT
+        </div>
+
+        <h1>
+            Role Applications
+            <span class="wave">✦</span>
+        </h1>
+
+        <p>
+            Review applications for Volunteer and Organizer access.
+        </p>
+
+    </div>
+
+
+    <a
+        href="{{ url_for('admin.dashboard') }}"
+        class="secondary-btn"
+    >
+        ← Dashboard
+    </a>
+
+</div>
+
+
+{% with messages =
+    get_flashed_messages(
+        with_categories=true
+    )
+%}
+
+    {% for category, message in messages %}
+
+        <div class="alert {{ category }}">
+            {{ message }}
+        </div>
+
+    {% endfor %}
+
+{% endwith %}
+
+
+<div class="stats-grid">
+
+    <div class="stat-card">
+
+        <span>
+            PENDING
+        </span>
+
+        <strong>
+            {{ pending_applications|length }}
+        </strong>
+
+    </div>
+
+
+    <div class="stat-card">
+
+        <span>
+            APPROVED
+        </span>
+
+        <strong>
+            {{ approved_applications|length }}
+        </strong>
+
+    </div>
+
+
+    <div class="stat-card">
+
+        <span>
+            REJECTED
+        </span>
+
+        <strong>
+            {{ rejected_applications|length }}
+        </strong>
+
+    </div>
+
+
+    <div class="stat-card">
+
+        <span>
+            TOTAL
+        </span>
+
+        <strong>
+            {{ applications|length }}
+        </strong>
+
+    </div>
+
+</div>
+
+
+<div class="content-card">
+
+    <div class="section-heading">
+
+        <div>
+
+            <h2>
+                Pending Applications
+            </h2>
+
+            <p>
+                Review student eligibility before granting role access.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    {% for application in pending_applications %}
+
+    <div class="approval-card">
+
+        <div class="approval-info">
+
+            <div class="event-type">
+                {{ application.requested_role|upper }}
+            </div>
+
+
+            <h3>
+                {{ application.user.name }}
+            </h3>
+
+
+            <p>
+                {{ application.user.email }}
+            </p>
+
+
+            <div class="event-meta">
+
+                {% if application.user.registration_profile %}
+
+                    🪪
+                    College ID:
+                    {{ application.user.registration_profile.college_id }}
+
+                    &nbsp; • &nbsp;
+
+                {% endif %}
+
+                🎓
+                CGPA:
+                {{ application.cgpa }}
+
+                &nbsp; • &nbsp;
+
+                📊
+                Attendance:
+                {{ application.attendance }}%
+
+            </div>
+
+
+            {% if application.message %}
+
+            <p>
+                <strong>
+                    Applicant statement:
+                </strong>
+
+                {{ application.message }}
+            </p>
+
+            {% endif %}
+
+
+            <div class="event-meta">
+
+                Submitted:
+                {{ application.created_at }}
+
+            </div>
+
+        </div>
+
+
+        <div class="approval-actions">
+
+            <form
+                method="POST"
+                action="{{ url_for(
+                    'admin.approve_role_application',
+                    application_id=application.id
+                ) }}"
+            >
+
+                <button
+                    type="submit"
+                    class="primary-btn"
+                >
+                    ✓ Approve
+                </button>
+
+            </form>
+
+
+            <form
+                method="POST"
+                action="{{ url_for(
+                    'admin.reject_role_application',
+                    application_id=application.id
+                ) }}"
+            >
+
+                <button
+                    type="submit"
+                    class="danger-btn"
+                >
+                    Reject
+                </button>
+
+            </form>
+
+        </div>
+
+    </div>
+
+    {% else %}
+
+    <div class="empty-state">
+
+        <div>
+            ✓
+        </div>
+
+        <h3>
+            No pending applications
+        </h3>
+
+        <p>
+            All role applications have been reviewed.
+        </p>
+
+    </div>
+
+    {% endfor %}
+
+</div>
+
+
+<div class="content-card">
+
+    <div class="section-heading">
+
+        <div>
+
+            <h2>
+                Application History
+            </h2>
+
+            <p>
+                Previously reviewed role applications.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    {% for application in applications
+       if application.status != "pending" %}
+
+    <div class="approval-card">
+
+        <div class="approval-info">
+
+            <div class="event-type">
+                {{ application.requested_role|upper }}
+            </div>
+
+
+            <h3>
+                {{ application.user.name }}
+            </h3>
+
+
+            <p>
+                {{ application.user.email }}
+            </p>
+
+
+            <div class="event-meta">
+
+                CGPA: {{ application.cgpa }}
+
+                &nbsp; • &nbsp;
+
+                Attendance: {{ application.attendance }}%
+
+            </div>
+
+        </div>
+
+
+        <div class="approval-actions">
+
+            {% if application.status == "approved" %}
+
+                <span class="approved-badge">
+                    APPROVED
+                </span>
+
+            {% else %}
+
+                <span class="rejected-badge">
+                    REJECTED
+                </span>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+    {% else %}
+
+    <div class="empty-state">
+
+        <p>
+            No reviewed applications yet.
+        </p>
+
+    </div>
+
+    {% endfor %}
+
+</div>
+
+{% endblock %}

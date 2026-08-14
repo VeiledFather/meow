@@ -1,0 +1,238 @@
+{% extends "base.html" %}
+
+{% block title %}
+{{ event.title }} — Event Gallery
+{% endblock %}
+
+
+{% block content %}
+
+<div class="page-header">
+
+    <div>
+
+        <div class="eyebrow">
+            EVENT MANAGEMENT / GALLERY
+        </div>
+
+        <h1>
+            Event Gallery
+            <span class="wave">✦</span>
+        </h1>
+
+        <p>
+            {{ event.title }}
+        </p>
+
+    </div>
+
+
+    <a
+        href="{{ url_for('organizer.dashboard') }}"
+        class="secondary-btn"
+    >
+        ← Dashboard
+    </a>
+
+</div>
+
+
+<div class="form-card">
+
+
+    <!-- =================================================
+         UPLOAD SECTION
+    ================================================== -->
+
+    <div class="gallery-upload-header">
+
+        <div>
+
+            <span class="eyebrow">
+                EVENT MEMORIES
+            </span>
+
+            <h2>
+                Upload Photos
+            </h2>
+
+            <p>
+                Add photos from your event for students
+                and attendees to view.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    {% with messages =
+        get_flashed_messages(
+            with_categories=true
+        )
+    %}
+
+        {% for category, message in messages %}
+
+            <div class="alert {{ category }}">
+                {{ message }}
+            </div>
+
+        {% endfor %}
+
+    {% endwith %}
+
+
+    <form
+        method="POST"
+        enctype="multipart/form-data"
+        class="gallery-upload-form"
+    >
+
+        <label
+            for="photos"
+            class="gallery-dropzone"
+        >
+
+            <span class="gallery-upload-icon">
+                ＋
+            </span>
+
+            <strong>
+                Select event photos
+            </strong>
+
+            <small>
+                JPG, JPEG, PNG or WEBP
+            </small>
+
+        </label>
+
+
+        <input
+            id="photos"
+            type="file"
+            name="photos"
+            accept="image/png,image/jpeg,image/webp"
+            multiple
+            required
+        >
+
+
+        <button
+            type="submit"
+            class="primary-btn"
+        >
+            Upload Photos →
+        </button>
+
+    </form>
+
+
+    <!-- =================================================
+         PHOTO GALLERY
+    ================================================== -->
+
+    <div class="section-header gallery-section-header">
+
+        <div>
+
+            <span class="eyebrow">
+                GALLERY
+            </span>
+
+            <h2>
+                Event Photos
+            </h2>
+
+        </div>
+
+
+        <span>
+            {{ photos|length }} photos
+        </span>
+
+    </div>
+
+
+    {% if photos %}
+
+    <div class="gallery-grid">
+
+        {% for photo in photos %}
+
+        <div class="gallery-card">
+
+            <img
+                src="{{ url_for(
+                    'static',
+                    filename='uploads/events/' ~ photo.filename
+                ) }}"
+                alt="{{ event.title }}"
+                loading="lazy"
+            >
+
+
+            <div class="gallery-card-footer">
+
+                <span>
+                    {{ photo.original_filename }}
+                </span>
+
+
+                <form
+                    method="POST"
+                    action="{{ url_for(
+                        'organizer.delete_gallery_photo',
+                        event_id=event.id,
+                        photo_id=photo.id
+                    ) }}"
+                >
+
+                    <button
+                        type="submit"
+                        class="gallery-delete"
+                        onclick="
+                            return confirm(
+                                'Delete this photo?'
+                            );
+                        "
+                    >
+                        Delete
+                    </button>
+
+                </form>
+
+            </div>
+
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+
+    {% else %}
+
+    <div class="dashboard-empty">
+
+        <div class="empty-symbol">
+            ✦
+        </div>
+
+        <h3>
+            No photos yet.
+        </h3>
+
+        <p>
+            Upload your first event photo above.
+        </p>
+
+    </div>
+
+    {% endif %}
+
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,320 @@
+{% extends "base.html" %}
+
+{% block title %}
+Admin Analytics — CampusHub
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+
+    <div>
+
+        <div class="eyebrow">
+            COLLEGE MANAGEMENT
+        </div>
+
+        <h1>
+            Campus Analytics
+            <span class="wave">✦</span>
+        </h1>
+
+        <p>
+            A college-wide overview of CampusHub activity.
+        </p>
+
+    </div>
+
+
+    <a
+        href="{{ url_for('admin.dashboard') }}"
+        class="secondary-btn"
+    >
+        ← Dashboard
+    </a>
+
+</div>
+
+
+<!-- =====================================================
+     USERS
+====================================================== -->
+
+<div class="section-heading">
+
+    <div>
+
+        <h2>
+            👥 Community
+        </h2>
+
+        <p>
+            Registered members across CampusHub.
+        </p>
+
+    </div>
+
+</div>
+
+
+<div class="stats-grid">
+
+    <div class="stat-card">
+        <span>TOTAL USERS</span>
+        <strong>{{ total_users }}</strong>
+    </div>
+
+    <div class="stat-card">
+        <span>STUDENTS</span>
+        <strong>{{ total_students }}</strong>
+    </div>
+
+    <div class="stat-card">
+        <span>ORGANIZERS</span>
+        <strong>{{ total_organizers }}</strong>
+    </div>
+
+    <div class="stat-card">
+        <span>VOLUNTEERS</span>
+        <strong>{{ total_volunteers }}</strong>
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     EVENTS
+====================================================== -->
+
+<div class="section-heading">
+
+    <div>
+
+        <h2>
+            📋 Events
+        </h2>
+
+        <p>
+            Current event activity and moderation status.
+        </p>
+
+    </div>
+
+</div>
+
+
+<div class="stats-grid">
+
+    <div class="stat-card">
+        <span>TOTAL EVENTS</span>
+        <strong>{{ total_events }}</strong>
+    </div>
+
+    <div class="stat-card">
+        <span>APPROVED</span>
+        <strong>{{ approved_events }}</strong>
+    </div>
+
+    <div class="stat-card">
+        <span>PENDING</span>
+        <strong>{{ pending_events }}</strong>
+    </div>
+
+    <div class="stat-card">
+        <span>REJECTED</span>
+        <strong>{{ rejected_events }}</strong>
+    </div>
+
+    <div class="stat-card">
+        <span>CANCELLED</span>
+        <strong>{{ cancelled_events }}</strong>
+    </div>
+
+    <div class="stat-card">
+        <span>POSTPONED</span>
+        <strong>{{ postponed_events }}</strong>
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     PARTICIPATION
+====================================================== -->
+
+<div class="section-heading">
+
+    <div>
+
+        <h2>
+            🎟 Participation
+        </h2>
+
+        <p>
+            Registration and attendance activity.
+        </p>
+
+    </div>
+
+</div>
+
+
+<div class="stats-grid">
+
+    <div class="stat-card">
+        <span>REGISTRATIONS</span>
+        <strong>{{ total_registrations }}</strong>
+    </div>
+
+    <div class="stat-card">
+        <span>CHECK-INS</span>
+        <strong>{{ total_checkins }}</strong>
+    </div>
+
+    <div class="stat-card">
+        <span>ATTENDANCE RATE</span>
+        <strong>{{ attendance_rate }}%</strong>
+    </div>
+
+    <div class="stat-card">
+        <span>CERTIFICATES</span>
+        <strong>{{ total_certificates }}</strong>
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     FEEDBACK + VOLUNTEERS
+====================================================== -->
+
+<div class="section-heading">
+
+    <div>
+
+        <h2>
+            ✦ Engagement
+        </h2>
+
+        <p>
+            Feedback and volunteer participation.
+        </p>
+
+    </div>
+
+</div>
+
+
+<div class="stats-grid">
+
+    <div class="stat-card">
+        <span>REVIEWS</span>
+        <strong>{{ total_reviews }}</strong>
+    </div>
+
+    <div class="stat-card">
+        <span>AVERAGE RATING</span>
+        <strong>{{ average_rating }}/5</strong>
+    </div>
+
+    <div class="stat-card">
+        <span>VOLUNTEER APPLICATIONS</span>
+        <strong>{{ total_volunteer_applications }}</strong>
+    </div>
+
+    <div class="stat-card">
+        <span>APPROVED VOLUNTEERS</span>
+        <strong>{{ approved_volunteer_applications }}</strong>
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     TOP EVENTS
+====================================================== -->
+
+<div class="content-card">
+
+    <div class="section-heading">
+
+        <div>
+
+            <h2>
+                🏆 Most Registered Events
+            </h2>
+
+            <p>
+                Events receiving the highest number of registrations.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    {% if top_events %}
+
+        {% for item in top_events %}
+
+        <div class="approval-card">
+
+            <div class="approval-info">
+
+                <div class="event-type">
+                    {{ item.event.event_type }}
+                </div>
+
+                <h3>
+                    {{ item.event.title }}
+                </h3>
+
+                <div class="event-meta">
+
+                    📅 {{ item.event.date }}
+
+                    &nbsp; • &nbsp;
+
+                    📍 {{ item.event.venue }}
+
+                </div>
+
+            </div>
+
+
+            <div class="approval-actions">
+
+                <span class="approved-badge">
+                    {{ item.registrations }}
+                    REGISTRATIONS
+                </span>
+
+            </div>
+
+        </div>
+
+        {% endfor %}
+
+    {% else %}
+
+        <div class="empty-state">
+
+            <div>
+                📊
+            </div>
+
+            <h3>
+                No event data yet
+            </h3>
+
+            <p>
+                Analytics will appear as CampusHub receives activity.
+            </p>
+
+        </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}

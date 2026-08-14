@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+    <title>
+        Dashboard | CampusHub
+    </title>
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1"
+    >
+
+    <link
+        rel="stylesheet"
+        href="/static/css/style.css"
+    >
+
+</head>
+
+
+<body class="dashboard-body">
+
+<div style="
+    max-width:1100px;
+    margin:auto;
+    padding:40px 25px;
+">
+
+
+    <h1>
+        Welcome, {{ current_user.name }}
+    </h1>
+
+    <p>
+        You are logged in as
+        <strong>
+            {{ current_user.role }}
+        </strong>.
+    </p>
+
+
+    {% if current_user.role == "student" %}
+
+        <h2>
+            Student Portal
+        </h2>
+
+        <p>
+            Event discovery and registration
+            will appear here.
+        </p>
+
+    {% elif current_user.role == "admin" %}
+
+        <h2>
+            College Management
+        </h2>
+
+        <p>
+            Event approval and university
+            management will appear here.
+        </p>
+
+    {% elif current_user.role == "volunteer" %}
+
+        <h2>
+            Volunteer Portal
+        </h2>
+
+        <p>
+            Your assigned events will appear here.
+        </p>
+
+    {% endif %}
+
+
+    <br>
+
+    <a href="/auth/logout">
+        Logout
+    </a>
+
+
+</div>
+
+</body>
+
+</html>

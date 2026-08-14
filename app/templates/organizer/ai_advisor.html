@@ -1,0 +1,245 @@
+{% extends "base.html" %}
+
+{% block title %}
+AI Event Advisor — CampusHub
+{% endblock %}
+
+
+{% block content %}
+
+<div class="page-header">
+
+    <div>
+
+        <div class="eyebrow">
+            CAMPUSHUB / AI
+        </div>
+
+        <h1>
+            Event Advisor
+            <span class="wave">✦</span>
+        </h1>
+
+        <p>
+            Get intelligent recommendations
+            before creating your event.
+        </p>
+
+    </div>
+
+
+    <a
+        href="{{ url_for('organizer.dashboard') }}"
+        class="secondary-btn"
+    >
+        ← Dashboard
+    </a>
+
+</div>
+
+
+<div class="form-card">
+
+
+    <div class="evai-card">
+
+        <div class="evai-orb">
+            ✦
+        </div>
+
+        <div class="evai-content">
+
+            <span class="evai-label">
+                EVAi • ORGANIZER ASSISTANT
+            </span>
+
+            <h2>
+                Plan your event smarter.
+            </h2>
+
+            <p>
+                Tell CampusHub what you're planning
+                and we'll prepare the information
+                for intelligent recommendations.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <form method="POST">
+
+
+        <div class="form-grid">
+
+
+            <div>
+
+                <label>
+                    Event Type
+                </label>
+
+                <select
+                    name="event_type"
+                    required
+                >
+
+                    <option value="">
+                        Select type
+                    </option>
+
+                    <option value="Technical">
+                        Technical
+                    </option>
+
+                    <option value="Cultural">
+                        Cultural
+                    </option>
+
+                    <option value="Sports">
+                        Sports
+                    </option>
+
+                    <option value="Workshop">
+                        Workshop
+                    </option>
+
+                    <option value="Competition">
+                        Competition
+                    </option>
+
+                    <option value="Seminar">
+                        Seminar
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <div>
+
+                <label>
+                    Expected Attendees
+                </label>
+
+                <input
+                    type="number"
+                    name="expected_attendees"
+                    min="1"
+                    placeholder="300"
+                    required
+                >
+
+            </div>
+
+
+            <div>
+
+                <label>
+                    Preferred Date
+                </label>
+
+                <input
+                    type="date"
+                    name="date"
+                    required
+                >
+
+            </div>
+
+
+        </div>
+
+
+        <button
+            type="submit"
+            class="primary-btn"
+        >
+            ✦ Generate Recommendations →
+        </button>
+
+
+    </form>
+
+
+    {% if recommendation %}
+
+
+    <div class="ai-recommendation">
+
+
+        <div class="recommendation-icon">
+            ✦
+        </div>
+
+
+        <div>
+
+            <span class="eyebrow">
+                AI EVENT ADVISOR
+            </span>
+
+            <h2>
+                Recommendation Preview
+            </h2>
+
+            <p>
+                {{ recommendation.message }}
+            </p>
+
+
+            <div class="recommendation-details">
+
+                <div>
+
+                    <span>
+                        EVENT TYPE
+                    </span>
+
+                    <strong>
+                        {{ recommendation.event_type }}
+                    </strong>
+
+                </div>
+
+
+                <div>
+
+                    <span>
+                        EXPECTED ATTENDEES
+                    </span>
+
+                    <strong>
+                        {{ recommendation.expected_attendees }}
+                    </strong>
+
+                </div>
+
+
+                <div>
+
+                    <span>
+                        DATE
+                    </span>
+
+                    <strong>
+                        {{ recommendation.date }}
+                    </strong>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    {% endif %}
+
+
+</div>
+
+{% endblock %}

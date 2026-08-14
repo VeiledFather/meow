@@ -1,0 +1,417 @@
+{% extends "base.html" %}
+
+{% block title %}
+{{ event.title }} — Admin — CampusHub
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+
+    <div>
+
+        <div class="eyebrow">
+            COLLEGE MANAGEMENT / EVENT REVIEW
+        </div>
+
+        <h1>
+            {{ event.title }}
+            <span class="wave">✦</span>
+        </h1>
+
+        <p>
+            Review the complete event proposal before taking action.
+        </p>
+
+    </div>
+
+    <a
+        href="{{ url_for('admin.events') }}"
+        class="secondary-btn"
+    >
+        ← All Events
+    </a>
+
+</div>
+
+
+<!-- =====================================================
+     STATUS
+====================================================== -->
+
+<div class="content-card">
+
+    <div class="section-heading">
+
+        <div>
+
+            <h2>
+                Event Status
+            </h2>
+
+        </div>
+
+        <div>
+
+            {% if event.status == "approved" %}
+
+                <span class="approved-badge">
+                    APPROVED
+                </span>
+
+            {% elif event.status == "pending" %}
+
+                <span class="pending-badge">
+                    PENDING
+                </span>
+
+            {% elif event.status == "rejected" %}
+
+                <span class="rejected-badge">
+                    REJECTED
+                </span>
+
+            {% elif event.status == "cancelled" %}
+
+                <span class="rejected-badge">
+                    CANCELLED
+                </span>
+
+            {% elif event.status == "postponed" %}
+
+                <span class="pending-badge">
+                    POSTPONED
+                </span>
+
+            {% else %}
+
+                <span class="event-category">
+                    {{ event.status|upper }}
+                </span>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     EVENT INFORMATION
+====================================================== -->
+
+<div class="content-card">
+
+    <div class="section-heading">
+
+        <div>
+
+            <h2>
+                📋 Event Information
+            </h2>
+
+            <p>
+                Complete proposal submitted by the organizer.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <div class="volunteer-details">
+
+        <div>
+            <span>EVENT TYPE</span>
+            <strong>
+                {{ event.event_type }}
+            </strong>
+        </div>
+
+
+        <div>
+            <span>DATE</span>
+            <strong>
+                📅 {{ event.date }}
+            </strong>
+        </div>
+
+
+        <div>
+            <span>TIME</span>
+            <strong>
+                ⏰ {{ event.start_time }}
+                –
+                {{ event.end_time }}
+            </strong>
+        </div>
+
+
+        <div>
+            <span>VENUE</span>
+            <strong>
+                📍 {{ event.venue }}
+            </strong>
+        </div>
+
+
+        <div>
+            <span>EXPECTED ATTENDEES</span>
+            <strong>
+                {{ event.expected_attendees }}
+            </strong>
+        </div>
+
+
+        <div>
+            <span>BUDGET</span>
+            <strong>
+                ₹{{ event.budget }}
+            </strong>
+        </div>
+
+    </div>
+
+
+    <div class="event-description">
+
+        <span class="eyebrow">
+            DESCRIPTION
+        </span>
+
+        <p>
+            {{ event.description }}
+        </p>
+
+    </div>
+
+
+    <div class="event-description">
+
+        <span class="eyebrow">
+            FOOD REQUIREMENTS
+        </span>
+
+        <p>
+            {{ event.food_requirements or "No food requirements specified." }}
+        </p>
+
+    </div>
+
+
+    <div class="event-description">
+
+        <span class="eyebrow">
+            EQUIPMENT REQUIREMENTS
+        </span>
+
+        <p>
+            {{ event.equipment_requirements or "No equipment requirements specified." }}
+        </p>
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     ORGANIZER
+====================================================== -->
+
+<div class="content-card">
+
+    <div class="section-heading">
+
+        <div>
+
+            <h2>
+                👤 Organizer
+            </h2>
+
+            <p>
+                Account responsible for this event.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    {% if organizer %}
+
+        <div class="approval-card">
+
+            <div class="approval-info">
+
+                <div class="event-type">
+                    ORGANIZER
+                </div>
+
+                <h3>
+                    {{ organizer.name }}
+                </h3>
+
+                <p>
+                    {{ organizer.email }}
+                </p>
+
+                <div class="event-meta">
+                    User ID: {{ organizer.id }}
+                </div>
+
+            </div>
+
+        </div>
+
+    {% else %}
+
+        <div class="empty-state">
+
+            <h3>
+                Organizer not found
+            </h3>
+
+        </div>
+
+    {% endif %}
+
+</div>
+
+
+<!-- =====================================================
+     ACTIVITY
+====================================================== -->
+
+<div class="stats-grid">
+
+    <div class="stat-card">
+
+        <span>
+            REGISTRATIONS
+        </span>
+
+        <strong>
+            {{ registration_count }}
+        </strong>
+
+    </div>
+
+
+    <div class="stat-card">
+
+        <span>
+            VOLUNTEER APPLICATIONS
+        </span>
+
+        <strong>
+            {{ volunteer_count }}
+        </strong>
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     ADMIN ACTIONS
+====================================================== -->
+
+<div class="content-card">
+
+    <div class="section-heading">
+
+        <div>
+
+            <h2>
+                Administrative Actions
+            </h2>
+
+            <p>
+                Manage this event from the college administration portal.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <div class="approval-actions">
+
+        {% if event.status == "pending" %}
+
+            <a
+                href="{{ url_for(
+                    'admin.approve',
+                    event_id=event.id
+                ) }}"
+                class="primary-btn"
+            >
+                ✓ Approve Event
+            </a>
+
+
+            <a
+                href="{{ url_for(
+                    'admin.reject',
+                    event_id=event.id
+                ) }}"
+                class="danger-btn"
+            >
+                Reject Event
+            </a>
+
+
+        {% elif event.status == "approved" %}
+
+            <a
+                href="{{ url_for(
+                    'admin.postpone',
+                    event_id=event.id
+                ) }}"
+                class="secondary-btn"
+            >
+                ⏸ Postpone
+            </a>
+
+
+            <a
+                href="{{ url_for(
+                    'admin.cancel',
+                    event_id=event.id
+                ) }}"
+                class="danger-btn"
+                onclick="return confirm('Cancel this event?');"
+            >
+                🚫 Cancel Event
+            </a>
+
+
+        {% elif event.status == "postponed" %}
+
+            <a
+                href="{{ url_for(
+                    'admin.cancel',
+                    event_id=event.id
+                ) }}"
+                class="danger-btn"
+                onclick="return confirm('Cancel this event?');"
+            >
+                🚫 Cancel Event
+            </a>
+
+
+        {% else %}
+
+            <span class="event-category">
+                No further action available
+            </span>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+{% endblock %}

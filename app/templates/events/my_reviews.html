@@ -1,0 +1,251 @@
+{% extends "base.html" %}
+
+{% block title %}
+My Reviews — CampusHub
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+
+    <div>
+
+        <div class="eyebrow">
+            CAMPUSHUB / YOUR EXPERIENCE
+        </div>
+
+        <h1>
+            My Reviews
+        </h1>
+
+        <p>
+            Rate the events you've attended and help make
+            CampusHub better.
+        </p>
+
+    </div>
+
+</div>
+
+
+<div class="content-card">
+
+    <div class="section-heading">
+
+        <div>
+
+            <span class="eyebrow">
+                ATTENDED EVENTS
+            </span>
+
+            <h2>
+                Share your experience
+            </h2>
+
+            <p>
+                Reviews become available after your QR ticket
+                has been checked in.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    {% if registrations %}
+
+        {% for registration in registrations %}
+
+            {% set event = registration.event %}
+
+            <div class="review-event-card">
+
+                <div class="review-event-info">
+
+                    <div class="event-type">
+                        {{ event.event_type }}
+                    </div>
+
+                    <h3>
+                        {{ event.title }}
+                    </h3>
+
+                    <div class="event-meta">
+
+                        📅 {{ event.date }}
+
+                        &nbsp; • &nbsp;
+
+                        📍 {{ event.venue }}
+
+                    </div>
+
+                </div>
+
+
+                {% if event.id in reviewed_event_ids %}
+
+                    <div class="review-completed">
+
+                        <div class="review-completed-icon">
+                            ✓
+                        </div>
+
+                        <div>
+
+                            <strong>
+                                REVIEWED
+                            </strong>
+
+                            <p>
+                                Thanks for sharing your experience.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                {% else %}
+
+                    <form
+                        method="POST"
+                        action="{{ url_for(
+                            'events.submit_review',
+                            event_id=event.id
+                        ) }}"
+                        class="review-center-form"
+                    >
+
+                        <label>
+                            Your rating
+                        </label>
+
+
+                        <div
+                            class="star-rating"
+                            role="radiogroup"
+                            aria-label="Event rating"
+                        >
+
+                            <input
+                                type="radio"
+                                id="review-{{ event.id }}-1"
+                                name="rating"
+                                value="1"
+                                required
+                            >
+
+                            <label
+                                for="review-{{ event.id }}-1"
+                                title="Poor"
+                            >★</label>
+
+
+                            <input
+                                type="radio"
+                                id="review-{{ event.id }}-2"
+                                name="rating"
+                                value="2"
+                            >
+
+                            <label
+                                for="review-{{ event.id }}-2"
+                                title="Average"
+                            >★</label>
+
+
+                            <input
+                                type="radio"
+                                id="review-{{ event.id }}-3"
+                                name="rating"
+                                value="3"
+                            >
+
+                            <label
+                                for="review-{{ event.id }}-3"
+                                title="Good"
+                            >★</label>
+
+
+                            <input
+                                type="radio"
+                                id="review-{{ event.id }}-4"
+                                name="rating"
+                                value="4"
+                            >
+
+                            <label
+                                for="review-{{ event.id }}-4"
+                                title="Great"
+                            >★</label>
+
+
+                            <input
+                                type="radio"
+                                id="review-{{ event.id }}-5"
+                                name="rating"
+                                value="5"
+                            >
+
+                            <label
+                                for="review-{{ event.id }}-5"
+                                title="Excellent"
+                            >★</label>
+
+                        </div>
+
+
+                        <textarea
+                            name="comment"
+                            rows="3"
+                            maxlength="500"
+                            placeholder="Tell us about your experience..."
+                        ></textarea>
+
+
+                        <button
+                            type="submit"
+                            class="primary-btn"
+                        >
+                            Submit Review →
+                        </button>
+
+                    </form>
+
+                {% endif %}
+
+            </div>
+
+        {% endfor %}
+
+    {% else %}
+
+        <div class="empty-state">
+
+            <div>
+                ✦
+            </div>
+
+            <h3>
+                No attended events yet
+            </h3>
+
+            <p>
+                Once you attend an event and your QR ticket
+                is checked in, it will appear here.
+            </p>
+
+            <a
+                href="{{ url_for('events.pinboard') }}"
+                class="secondary-btn"
+            >
+                Explore Events →
+            </a>
+
+        </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}

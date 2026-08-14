@@ -1,0 +1,505 @@
+from flask_login import UserMixin
+from werkzeug.security import generate_password_hash, check_password_hash
+
+from app import db
+
+
+# =========================================================
+# USER
+# =========================================================
+
+class User(UserMixin, db.Model):
+
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
+
+    name = db.Column(
+        db.String(100),
+        nullable=False
+    )
+
+    email = db.Column(
+        db.String(150),
+        unique=True,
+        nullable=False
+    )
+
+    password_hash = db.Column(
+        db.String(255),
+        nullable=False
+    )
+
+    role = db.Column(
+        db.String(30),
+        nullable=False,
+        default="student"
+    )
+
+    def set_password(self, password):
+
+        self.password_hash = generate_password_hash(
+            password
+        )
+
+    def check_password(self, password):
+
+        return check_password_hash(
+            self.password_hash,
+            password
+        )
+
+
+# =========================================================
+# EVENT
+# =========================================================
+
+class Event(db.Model):
+
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
+
+    title = db.Column(
+        db.String(150),
+        nullable=False
+    )
+
+    description = db.Column(
+        db.Text,
+        nullable=False
+    )
+
+    event_type = db.Column(
+        db.String(50),
+        nullable=False
+    )
+
+    date = db.Column(
+        db.String(20),
+        nullable=False
+    )
+
+    start_time = db.Column(
+        db.String(10),
+        nullable=False
+    )
+
+    end_time = db.Column(
+        db.String(10),
+        nullable=False
+    )
+
+    venue = db.Column(
+        db.String(150),
+        nullable=False
+    )
+
+    expected_attendees = db.Column(
+        db.Integer,
+        default=0
+    )
+
+    budget = db.Column(
+        db.Float,
+        default=0
+    )
+
+    food_requirements = db.Column(
+        db.Text,
+        default=""
+    )
+
+    equipment_requirements = db.Column(
+        db.Text,
+        default=""
+    )
+
+    status = db.Column(
+        db.String(30),
+        default="pending"
+    )
+
+    organizer_id = db.Column(
+        db.Integer,
+        db.ForeignKey("user.id"),
+        nullable=False
+    )
+
+
+# =========================================================
+# REGISTRATION
+# =========================================================
+
+class Registration(db.Model):
+
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
+
+    student_id = db.Column(
+        db.Integer,
+        db.ForeignKey("user.id"),
+        nullable=False
+    )
+
+    event_id = db.Column(
+        db.Integer,
+        db.ForeignKey("event.id"),
+        nullable=False
+    )
+
+    registration_code = db.Column(
+        db.String(50),
+        unique=True,
+        nullable=False
+    )
+
+    status = db.Column(
+        db.String(30),
+        default="registered"
+    )
+
+    checked_in = db.Column(
+        db.Boolean,
+        default=False
+    )
+
+    created_at = db.Column(
+        db.DateTime,
+        server_default=db.func.now()
+    )
+
+    student = db.relationship(
+        "User",
+        backref=db.backref(
+            "registrations",
+            lazy=True
+        )
+    )
+
+    event = db.relationship(
+        "Event",
+        backref=db.backref(
+            "registrations",
+            lazy=True
+        )
+    )
+
+
+# =========================================================
+# REVIEW
+# =========================================================
+
+class Review(db.Model):
+
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
+
+    student_id = db.Column(
+        db.Integer,
+        db.ForeignKey("user.id"),
+        nullable=False
+    )
+
+    event_id = db.Column(
+        db.Integer,
+        db.ForeignKey("event.id"),
+        nullable=False
+    )
+
+    rating = db.Column(
+        db.Integer,
+        nullable=False
+    )
+
+    comment = db.Column(
+        db.Text,
+        default=""
+    )
+
+    created_at = db.Column(
+        db.DateTime,
+        server_default=db.func.now()
+    )
+
+    student = db.relationship(
+        "User",
+        backref=db.backref(
+            "reviews",
+            lazy=True
+        )
+    )
+
+    event = db.relationship(
+        "Event",
+        backref=db.backref(
+            "reviews",
+            lazy=True
+        )
+    )
+
+
+# =========================================================
+# VOLUNTEER APPLICATION
+# =========================================================
+
+class VolunteerApplication(db.Model):
+
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
+
+    volunteer_id = db.Column(
+        db.Integer,
+        db.ForeignKey("user.id"),
+        nullable=False
+    )
+
+    event_id = db.Column(
+        db.Integer,
+        db.ForeignKey("event.id"),
+        nullable=False
+    )
+
+    status = db.Column(
+        db.String(30),
+        default="pending",
+        nullable=False
+    )
+
+    message = db.Column(
+        db.Text,
+        default=""
+    )
+
+    created_at = db.Column(
+        db.DateTime,
+        server_default=db.func.now()
+    )
+
+    volunteer = db.relationship(
+        "User",
+        backref=db.backref(
+            "volunteer_applications",
+            lazy=True
+        )
+    )
+
+    event = db.relationship(
+        "Event",
+        backref=db.backref(
+            "volunteer_applications",
+            lazy=True
+        )
+    )
+
+
+# =========================================================
+# EVENT GALLERY
+# =========================================================
+
+class EventGallery(db.Model):
+
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
+
+    event_id = db.Column(
+        db.Integer,
+        db.ForeignKey("event.id"),
+        nullable=False
+    )
+
+    filename = db.Column(
+        db.String(255),
+        nullable=False
+    )
+
+    original_filename = db.Column(
+        db.String(255),
+        nullable=False
+    )
+
+    uploaded_at = db.Column(
+        db.DateTime,
+        server_default=db.func.now()
+    )
+
+    event = db.relationship(
+        "Event",
+        backref=db.backref(
+            "gallery",
+            lazy=True,
+            cascade="all, delete-orphan"
+        )
+    )
+# =========================================================
+# DIGITAL CERTIFICATE
+# =========================================================
+
+class Certificate(db.Model):
+
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
+
+    student_id = db.Column(
+        db.Integer,
+        db.ForeignKey("user.id"),
+        nullable=False
+    )
+
+    event_id = db.Column(
+        db.Integer,
+        db.ForeignKey("event.id"),
+        nullable=False
+    )
+
+    certificate_code = db.Column(
+        db.String(80),
+        unique=True,
+        nullable=False
+    )
+
+    issued_at = db.Column(
+        db.DateTime,
+        server_default=db.func.now()
+    )
+
+    student = db.relationship(
+        "User",
+        backref=db.backref(
+            "certificates",
+            lazy=True
+        )
+    )
+
+    event = db.relationship(
+        "Event",
+        backref=db.backref(
+            "certificates",
+            lazy=True
+        )
+    )
+# =========================================================
+# SMART NOTIFICATION
+# =========================================================
+
+class Notification(db.Model):
+
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
+
+    user_id = db.Column(
+        db.Integer,
+        db.ForeignKey("user.id"),
+        nullable=False
+    )
+
+    title = db.Column(
+        db.String(150),
+        nullable=False
+    )
+
+    message = db.Column(
+        db.Text,
+        nullable=False
+    )
+
+    notification_type = db.Column(
+        db.String(50),
+        default="general"
+    )
+
+    event_id = db.Column(
+        db.Integer,
+        db.ForeignKey("event.id"),
+        nullable=True
+    )
+
+    is_read = db.Column(
+        db.Boolean,
+        default=False
+    )
+
+    created_at = db.Column(
+        db.DateTime,
+        server_default=db.func.now()
+    )
+
+    user = db.relationship(
+        "User",
+        backref=db.backref(
+            "notifications",
+            lazy=True,
+            cascade="all, delete-orphan"
+        )
+    )
+
+    event = db.relationship(
+        "Event",
+        backref=db.backref(
+            "notifications",
+            lazy=True
+        )
+    )
+
+
+# =========================================================
+# CAMPUSHUB REGISTRATION PROFILE
+# =========================================================
+
+class RegistrationProfile(db.Model):
+
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
+
+    user_id = db.Column(
+        db.Integer,
+        db.ForeignKey("user.id"),
+        unique=True,
+        nullable=False
+    )
+
+    college_id = db.Column(
+        db.String(100),
+        unique=True,
+        nullable=False
+    )
+
+    date_of_birth = db.Column(
+        db.String(20),
+        nullable=False
+    )
+
+    campus_id = db.Column(
+        db.String(100),
+        unique=True,
+        nullable=False
+    )
+
+    created_at = db.Column(
+        db.DateTime,
+        server_default=db.func.now()
+    )
+
+    user = db.relationship(
+        "User",
+        backref=db.backref(
+            "registration_profile",
+            uselist=False
+        )
+    )

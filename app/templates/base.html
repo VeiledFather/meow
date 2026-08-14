@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        {% block title %}CampusHub{% endblock %}
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
+
+</head>
+
+
+<body>
+
+    <div class="app-shell">
+
+        {% if current_user.is_authenticated %}
+
+        <aside class="sidebar">
+
+            <!-- =================================================
+                 BRAND
+            ================================================== -->
+
+            <a
+                href="{{ url_for('main.dashboard') }}"
+                class="brand"
+            >
+
+                <span class="brand-mark">
+                    C
+                </span>
+
+                <span>
+                    Campus<span>Hub</span>
+                </span>
+
+            </a>
+
+
+            <!-- =================================================
+                 CAMPUS
+            ================================================== -->
+
+            <div class="nav-section">
+
+                <p class="nav-label">
+                    CAMPUS
+                </p>
+
+
+                <a
+                    href="{{ url_for('main.dashboard') }}"
+                    class="nav-item"
+                >
+                    <span>⌂</span>
+                    Dashboard
+                </a>
+
+
+                <a
+                    href="{{ url_for('events.pinboard') }}"
+                    class="nav-item"
+                >
+                    <span>✦</span>
+                    Event Pinboard
+                </a>
+
+
+                <a
+                    href="{{ url_for('events.my_registrations') }}"
+                    class="nav-item"
+                >
+                    <span>◈</span>
+                    My Registrations
+                </a>
+
+
+                {% if current_user.role == "student" %}
+
+                <a
+                    href="{{ url_for(
+                        'certificate.my_certificates'
+                    ) }}"
+                    class="nav-item"
+                >
+                    <span>🎓</span>
+                    My Certificates
+                </a>
+
+                {% endif %}
+
+
+                {% if current_user.role == "student" %}
+
+                <a
+                    href="{{ url_for(
+                        'events.my_reviews'
+                    ) }}"
+                    class="nav-item"
+                >
+                    <span>★</span>
+                    My Reviews
+                </a>
+
+                {% endif %}
+
+
+                <a
+                    href="{{ url_for(
+                        'notification.center'
+                    ) }}"
+                    class="nav-item"
+                >
+                    <span>🔔</span>
+                    Notifications
+                </a>
+
+
+                <a
+                    href="{{ url_for('main.hall_of_fame') }}"
+                    class="nav-item"
+                >
+                    <span>🏆</span>
+                    Hall of Fame
+                </a>
+
+            </div>
+
+
+            <!-- =================================================
+                 ORGANIZER
+            ================================================== -->
+
+            {% if current_user.role == "organizer" %}
+
+            <div class="nav-section">
+
+                <p class="nav-label">
+                    ORGANIZER
+                </p>
+
+
+                <a
+                    href="{{ url_for(
+                        'organizer.dashboard'
+                    ) }}"
+                    class="nav-item"
+                >
+                    <span>▦</span>
+                    My Events
+                </a>
+
+
+                <a
+                    href="{{ url_for(
+                        'organizer.create_event'
+                    ) }}"
+                    class="nav-item"
+                >
+                    <span>＋</span>
+                    Host an Event
+                </a>
+
+
+                <a
+                    href="{{ url_for(
+                        'ai.event_advisor'
+                    ) }}"
+                    class="nav-item"
+                >
+                    <span>✦</span>
+                    EvAi Planner
+                </a>
+
+
+                <a
+                    href="{{ url_for(
+                        'ai.feedback_analysis'
+                    ) }}"
+                    class="nav-item"
+                >
+                    <span>◈</span>
+                    AI Feedback
+                </a>
+
+            </div>
+
+            {% endif %}
+
+
+            <!-- =================================================
+                 ADMIN
+            ================================================== -->
+
+            {% if current_user.role == "admin" %}
+
+            <div class="nav-section">
+
+                <p class="nav-label">
+                    MANAGEMENT
+                </p>
+
+
+                <a
+                    href="{{ url_for(
+                        'admin.dashboard'
+                    ) }}"
+                    class="nav-item"
+                >
+                    <span>▣</span>
+                    Approvals
+                </a>
+
+
+                <a
+                    href="#"
+                    class="nav-item"
+                >
+                    <span>⌁</span>
+                    Analytics
+                </a>
+
+            </div>
+
+            {% endif %}
+
+
+            <!-- =================================================
+                 VOLUNTEER
+            ================================================== -->
+
+            {% if current_user.role == "volunteer" %}
+
+            <div class="nav-section">
+
+                <p class="nav-label">
+                    VOLUNTEER
+                </p>
+
+
+                <a
+                    href="{{ url_for(
+                        'volunteer.dashboard'
+                    ) }}"
+                    class="nav-item"
+                >
+                    <span>◉</span>
+                    My Assignments
+                </a>
+
+
+                <a
+                    href="{{ url_for(
+                        'volunteer.scanner'
+                    ) }}"
+                    class="nav-item"
+                >
+                    <span>⌗</span>
+                    QR Scanner
+                </a>
+
+            </div>
+
+            {% endif %}
+
+
+            <!-- =================================================
+                 SIDEBAR BOTTOM
+            ================================================== -->
+
+            <div class="sidebar-bottom">
+
+                <div class="user-mini">
+
+                    <div class="avatar">
+                        {{ current_user.name[0]|upper }}
+                    </div>
+
+
+                    <div class="user-mini-info">
+
+                        <strong>
+                            {{ current_user.name }}
+                        </strong>
+
+                        <small>
+                            {{ current_user.role|capitalize }}
+                        </small>
+
+                    </div>
+
+                </div>
+
+
+                <a
+                    href="{{ url_for(
+                        'auth.logout'
+                    ) }}"
+                    class="logout"
+                >
+                    Log out
+                </a>
+
+            </div>
+
+        </aside>
+
+        {% endif %}
+
+
+        <!-- =====================================================
+             MAIN CONTENT
+        ====================================================== -->
+
+        <main
+            class="
+                main-content
+                {% if not current_user.is_authenticated %}
+                    full-page
+                {% endif %}
+            "
+        >
+
+            <!-- FLASH MESSAGES -->
+
+            {% with messages =
+                get_flashed_messages(
+                    with_categories=true
+                )
+            %}
+
+                {% if messages %}
+
+                    <div class="flash-container">
+
+                        {% for category, message in messages %}
+
+                            <div
+                                class="alert {{ category }}"
+                            >
+                                {{ message }}
+                            </div>
+
+                        {% endfor %}
+
+                    </div>
+
+                {% endif %}
+
+            {% endwith %}
+
+
+            {% block content %}
+            {% endblock %}
+
+        </main>
+
+    </div>
+
+
+    <!-- =========================================================
+         EvAi FLOATING ASSISTANT
+    ========================================================== -->
+
+    {% if current_user.is_authenticated %}
+
+    <div id="evai-widget" class="evai-widget">
+
+        <button
+            type="button"
+            id="evai-float-button"
+            class="evai-float-button"
+            aria-label="Open EvAi"
+            title="Ask EvAi"
+        >
+            <span class="evai-float-icon">✦</span>
+            <span class="evai-float-label">EvAi</span>
+        </button>
+
+
+        <section
+            id="evai-chat"
+            class="evai-chat"
+            aria-label="EvAi assistant"
+            hidden
+        >
+
+            <div class="evai-chat-header">
+
+                <div class="evai-chat-brand">
+
+                    <div class="evai-chat-orb">
+                        ✦
+                    </div>
+
+                    <div>
+                        <strong>EvAi</strong>
+
+                        <span>
+                            Campus AI Assistant
+                        </span>
+                    </div>
+
+                </div>
+
+
+                <button
+                    type="button"
+                    id="evai-close"
+                    class="evai-close"
+                    aria-label="Close EvAi"
+                >
+                    ×
+                </button>
+
+            </div>
+
+
+            <div
+                id="evai-messages"
+                class="evai-messages"
+            >
+
+                <div class="evai-message evai-message-ai">
+
+                    <div class="evai-message-bubble">
+                        Hi, {{ current_user.name.split()[0] }}! I'm EvAi.
+                        How can I help you with CampusHub?
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="evai-suggestions">
+
+                <button type="button" data-evai-prompt="What can you help me with?">
+                    What can you do?
+                </button>
+
+                <button type="button" data-evai-prompt="What is happening on campus?">
+                    Campus events
+                </button>
+
+                <button type="button" data-evai-prompt="How do I use CampusHub?">
+                    CampusHub help
+                </button>
+
+            </div>
+
+
+            <form
+                id="evai-chat-form"
+                class="evai-chat-form"
+            >
+
+                <input
+                    type="text"
+                    id="evai-input"
+                    name="message"
+                    placeholder="Ask EvAi..."
+                    autocomplete="off"
+                    maxlength="1000"
+                    required
+                >
+
+                <button
+                    type="submit"
+                    id="evai-send"
+                    aria-label="Send message"
+                >
+                    ➤
+                </button>
+
+            </form>
+
+        </section>
+
+    </div>
+
+    {% endif %}
+
+
+    <!-- =========================================================
+         JAVASCRIPT
+    ========================================================== -->
+
+    <script
+        src="{{ url_for(
+            'static',
+            filename='js/main.js'
+        ) }}"
+    ></script>
+
+</body>
+
+</html>

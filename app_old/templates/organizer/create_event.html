@@ -1,0 +1,272 @@
+
+{% extends "base.html" %}
+
+{% block title %}
+Host Event — CampusHub
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+
+    <div>
+
+        <div class="eyebrow">
+            EVENT MANAGEMENT
+        </div>
+
+        <h1>
+            Host an Event
+        </h1>
+
+        <p>
+            Create a proposal and submit it
+            to college management for approval.
+        </p>
+
+    </div>
+
+    <a
+        href="/organizer/dashboard"
+        class="secondary-btn"
+    >
+        ← Dashboard
+    </a>
+
+</div>
+
+
+<div class="form-card">
+
+    {% with messages =
+        get_flashed_messages(
+            with_categories=true
+        )
+    %}
+
+        {% for category, message in messages %}
+
+            <div class="alert {{ category }}">
+                {{ message }}
+            </div>
+
+        {% endfor %}
+
+    {% endwith %}
+
+
+    <form method="POST">
+
+        <div class="form-grid">
+
+            <div class="field-full">
+
+                <label>
+                    Event Name
+                </label>
+
+                <input
+                    name="title"
+                    placeholder="e.g. Campus AI Hackathon 2026"
+                    required
+                >
+
+            </div>
+
+
+            <div class="field-full">
+
+                <label>
+                    Description
+                </label>
+
+                <textarea
+                    name="description"
+                    placeholder="Describe your event..."
+                    required
+                ></textarea>
+
+            </div>
+
+
+            <div>
+
+                <label>
+                    Event Type
+                </label>
+
+                <select
+                    name="event_type"
+                    required
+                >
+
+                    <option value="">
+                        Select type
+                    </option>
+
+                    <option>
+                        Technical
+                    </option>
+
+                    <option>
+                        Cultural
+                    </option>
+
+                    <option>
+                        Sports
+                    </option>
+
+                    <option>
+                        Workshop
+                    </option>
+
+                    <option>
+                        Competition
+                    </option>
+
+                    <option>
+                        Seminar
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <div>
+
+                <label>
+                    Date
+                </label>
+
+                <input
+                    type="date"
+                    name="date"
+                    required
+                >
+
+            </div>
+
+
+            <div>
+
+                <label>
+                    Start Time
+                </label>
+
+                <input
+                    type="time"
+                    name="start_time"
+                    required
+                >
+
+            </div>
+
+
+            <div>
+
+                <label>
+                    End Time
+                </label>
+
+                <input
+                    type="time"
+                    name="end_time"
+                    required
+                >
+
+            </div>
+
+
+            <div class="field-full">
+
+                <label>
+                    Venue
+                </label>
+
+                <input
+                    name="venue"
+                    placeholder="Main Auditorium"
+                    required
+                >
+
+            </div>
+
+
+            <div>
+
+                <label>
+                    Expected Attendees
+                </label>
+
+                <input
+                    type="number"
+                    name="expected_attendees"
+                    min="1"
+                    placeholder="300"
+                    required
+                >
+
+            </div>
+
+
+            <div>
+
+                <label>
+                    Estimated Budget (₹)
+                </label>
+
+                <input
+                    type="number"
+                    name="budget"
+                    min="0"
+                    step="0.01"
+                    placeholder="100000"
+                    required
+                >
+
+            </div>
+
+
+            <div class="field-full">
+
+                <label>
+                    Food Requirements
+                </label>
+
+                <textarea
+                    name="food_requirements"
+                    placeholder="e.g. Lunch for 300 students, vegetarian snacks..."
+                ></textarea>
+
+            </div>
+
+
+            <div class="field-full">
+
+                <label>
+                    Equipment / Other Requirements
+                </label>
+
+                <textarea
+                    name="equipment_requirements"
+                    placeholder="e.g. Projector, microphones, stage, chairs..."
+                ></textarea>
+
+            </div>
+
+        </div>
+
+
+        <button
+            type="submit"
+            class="primary-btn"
+        >
+            Submit Event for Approval →
+        </button>
+
+    </form>
+
+</div>
+
+{% endblock %}

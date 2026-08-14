@@ -1,0 +1,206 @@
+
+{% extends "base.html" %}
+
+{% block title %}
+Organizer Dashboard — CampusHub
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+
+    <div>
+
+        <div class="eyebrow">
+            ORGANIZER PORTAL
+        </div>
+
+        <h1>
+            My Events
+        </h1>
+
+        <p>
+            Create, manage and monitor your event proposals.
+        </p>
+
+    </div>
+
+    <a
+        href="/organizer/create"
+        class="primary-btn"
+    >
+        + Host an Event
+    </a>
+
+</div>
+
+
+{% with messages =
+    get_flashed_messages(
+        with_categories=true
+    )
+%}
+
+    {% for category, message in messages %}
+
+        <div class="alert {{ category }}">
+            {{ message }}
+        </div>
+
+    {% endfor %}
+
+{% endwith %}
+
+
+<div class="stats-grid">
+
+    <div class="stat-card">
+        <span>Total Events</span>
+        <strong>{{ events|length }}</strong>
+    </div>
+
+    <div class="stat-card">
+        <span>Pending</span>
+        <strong>
+            {{ events|selectattr(
+                "status",
+                "equalto",
+                "pending"
+            )|list|length }}
+        </strong>
+    </div>
+
+    <div class="stat-card">
+        <span>Approved</span>
+        <strong>
+            {{ events|selectattr(
+                "status",
+                "equalto",
+                "approved"
+            )|list|length }}
+        </strong>
+    </div>
+
+    <div class="stat-card">
+        <span>Registrations</span>
+        <strong>0</strong>
+    </div>
+
+</div>
+
+
+<div class="content-card">
+
+    <div class="section-heading">
+
+        <div>
+
+            <h2>
+                Your Events
+            </h2>
+
+            <p>
+                Event proposals and published events.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <div class="event-grid">
+
+        {% for event in events %}
+
+        <div class="event-card">
+
+            <div class="event-type">
+                {{ event.event_type }}
+            </div>
+
+            <h3>
+                {{ event.title }}
+            </h3>
+
+            <p>
+                {{ event.description }}
+            </p>
+
+            <div class="event-meta">
+
+                📅 {{ event.date }}
+
+                <br>
+
+                ⏰
+                {{ event.start_time }}
+                –
+                {{ event.end_time }}
+
+                <br>
+
+                📍 {{ event.venue }}
+
+                <br>
+
+                👥
+                {{ event.expected_attendees }}
+                expected
+
+            </div>
+
+            <div class="event-footer">
+
+                <span
+                    class="status {{ event.status }}"
+                >
+                    {{ event.status }}
+                </span>
+
+                {% if event.status == "approved" %}
+
+                    <a
+                        href="/events/{{ event.id }}"
+                        class="text-link"
+                    >
+                        View →
+                    </a>
+
+                {% endif %}
+
+            </div>
+
+        </div>
+
+        {% else %}
+
+        <div class="empty-state">
+
+            <div>
+                📌
+            </div>
+
+            <h3>
+                No events yet
+            </h3>
+
+            <p>
+                Create your first event proposal.
+            </p>
+
+            <a
+                href="/organizer/create"
+                class="primary-btn"
+            >
+                Create Event
+            </a>
+
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+</div>
+
+{% endblock %}

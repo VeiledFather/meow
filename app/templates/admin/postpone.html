@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+
+{% block title %}
+Postpone Event — CampusHub
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+
+    <div>
+
+        <div class="eyebrow">
+            COLLEGE MANAGEMENT
+        </div>
+
+        <h1>
+            Postpone Event
+        </h1>
+
+        <p>
+            Choose the new date and time for
+            {{ event.title }}.
+        </p>
+
+    </div>
+
+
+    <a
+        href="{{ url_for('admin.events') }}"
+        class="secondary-btn"
+    >
+        ← Back to Events
+    </a>
+
+</div>
+
+
+<div class="form-card">
+
+    <div class="event-meta">
+
+        Current date:
+        {{ event.date }}
+
+        &nbsp; • &nbsp;
+
+        Current time:
+        {{ event.start_time }}
+        –
+        {{ event.end_time }}
+
+    </div>
+
+
+    <form method="POST">
+
+        <div class="form-grid">
+
+            <div>
+
+                <label>
+                    New Date
+                </label>
+
+                <input
+                    type="date"
+                    name="date"
+                    required
+                >
+
+            </div>
+
+
+            <div></div>
+
+
+            <div>
+
+                <label>
+                    New Start Time
+                </label>
+
+                <input
+                    type="time"
+                    name="start_time"
+                    required
+                >
+
+            </div>
+
+
+            <div>
+
+                <label>
+                    New End Time
+                </label>
+
+                <input
+                    type="time"
+                    name="end_time"
+                    required
+                >
+
+            </div>
+
+        </div>
+
+
+        <button
+            type="submit"
+            class="primary-btn"
+        >
+            ⏸ Postpone Event
+        </button>
+
+    </form>
+
+</div>
+
+{% endblock %}

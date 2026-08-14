@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+    <title>
+        Login — CampusHub
+    </title>
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1"
+    >
+
+    <link
+        rel="stylesheet"
+        href="/static/css/style.css"
+    >
+
+</head>
+
+
+<body class="auth-page">
+
+
+<div class="auth-container">
+
+
+    <div class="brand">
+
+        <div class="brand-icon">
+            CH
+        </div>
+
+        CampusHub
+
+    </div>
+
+
+    <div class="auth-card">
+
+        <h1>
+            Welcome back
+        </h1>
+
+        <p class="subtitle">
+            Sign in to your university event hub.
+        </p>
+
+
+        {% with messages =
+            get_flashed_messages(
+                with_categories=true
+            )
+        %}
+
+            {% for category, message in messages %}
+
+                <div class="alert {{ category }}">
+                    {{ message }}
+                </div>
+
+            {% endfor %}
+
+        {% endwith %}
+
+
+        <form method="POST">
+
+
+            <label>
+                Email
+            </label>
+
+            <input
+                type="email"
+                name="email"
+                placeholder="student@campus.com"
+                required
+            >
+
+
+            <label>
+                Password
+            </label>
+
+            <input
+                type="password"
+                name="password"
+                placeholder="••••••••"
+                required
+            >
+
+
+            <button
+                type="submit"
+                class="primary-btn full"
+            >
+                Sign In →
+            </button>
+
+        </form>
+
+
+        <div class="demo-box">
+
+            <strong>
+                Demo access
+            </strong>
+
+            <br><br>
+
+            Student:
+            student@campus.com
+
+            <br>
+
+            Organizer:
+            organizer@campus.com
+
+            <br>
+
+            Admin:
+            admin@campus.com
+
+            <br>
+
+            Volunteer:
+            volunteer@campus.com
+
+            <br><br>
+
+            Password:
+            <strong>123456</strong>
+
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+
+</html>

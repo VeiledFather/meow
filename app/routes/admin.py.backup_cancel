@@ -1,0 +1,165 @@
+
+from flask import (
+    Blueprint,
+    render_template,
+    redirect,
+    url_for,
+    flash
+)
+
+from flask_login import (
+    login_required,
+    current_user
+)
+
+from app import db
+from app.models import Event
+
+
+admin_bp = Blueprint(
+    "admin",
+    __name__
+)
+
+
+@admin_bp.route("/dashboard")
+@login_required
+def dashboard():
+
+    if current_user.role != "admin":
+        return "Access denied", 403
+
+    pending_events = Event.query.filter_by(
+        status="pending"
+    ).order_by(
+        Event.id.desc()
+    ).all()
+
+    approved_events = Event.query.filter_by(
+        status="approved"
+    ).order_by(
+        Event.id.desc()
+    ).all()
+
+    rejected_events = Event.query.filter_by(
+        status="rejected"
+    ).order_by(
+        Event.id.desc()
+    ).all()
+
+    return render_template(
+        "admin/dashboard.html",
+        pending_events=pending_events,
+        approved_events=approved_events,
+        rejected_events=rejected_events
+    )
+
+
+@admin_bp.route(
+    "/approve/<int:event_id>"
+)
+@login_required
+def approve(event_id):
+
+    if current_user.role != "admin":
+        return "Access denied", 403
+
+    event = db.session.get(
+        Event,
+        event_id
+    )
+
+    if event is None:
+        return "Event not found", 404
+
+    event.status = "approved"
+
+    db.session.commit()
+
+    flash(
+        f'"{event.title}" is now published.',
+        "success"
+    )
+
+    return redirect(
+        url_for("admin.dashboard")
+    )
+
+
+@admin_bp.route(
+    "/reject/<int:event_id>"
+)
+@login_required
+def reject(event_id):
+
+    if current_user.role != "admin":
+        return "Access denied", 403
+
+    event = db.session.get(
+        Event,
+        event_id
+    )
+
+    if event is None:
+        return "Event not found", 404
+
+    event.status = "rejected"
+
+    db.session.commit()
+
+    flash(
+        f'"{event.title}" was rejected.',
+        "success"
+    )
+
+    return redirect(
+        url_for("admin.dashboard")
+    )
+
+
+# =========================================================
+# EVENT MANAGEMENT
+# =========================================================
+
+@admin_bp.route("/events")
+@login_required
+def events():
+
+    if current_user.role != "admin":
+        return "Access denied", 403
+
+
+    all_events = Event.query.order_by(
+        Event.id.desc()
+    ).all()
+
+
+    pending_events = [
+        event
+        for event in all_events
+        if event.status == "pending"
+    ]
+
+
+    approved_events = [
+        event
+        for event in all_events
+        if event.status == "approved"
+    ]
+
+
+    rejected_events = [
+        event
+        for event in all_events
+        if event.status == "rejected"
+    ]
+
+
+    return render_template(
+        "admin/events.html",
+        all_events=all_events,
+        pending_events=pending_events,
+        approved_events=approved_events,
+        rejected_events=rejected_events
+    )
+

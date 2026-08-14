@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+
+{% block title %}
+Hall of Fame — CampusHub
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+
+    <div>
+
+        <div class="eyebrow">
+            CAMPUSHUB / HALL OF FAME
+        </div>
+
+        <h1>
+            🏆 Hall of Fame
+        </h1>
+
+        <p>
+            The top ten events rated by the CampusHub community.
+        </p>
+
+    </div>
+
+</div>
+
+
+<div class="content-card">
+
+    <div class="section-heading">
+
+        <div>
+
+            <span class="eyebrow">
+                TOP 10 EVENTS
+            </span>
+
+            <h2>
+                Campus favorites
+            </h2>
+
+            <p>
+                Rankings are based on average student ratings,
+                with review count used as the tiebreaker.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    {% if ranked_events %}
+
+        {% for item in ranked_events %}
+
+        <div class="approval-card">
+
+            <div class="approval-info">
+
+                <div class="event-type">
+                    #{{ loop.index }}
+                </div>
+
+                <h3>
+                    {{ item.event.title }}
+                </h3>
+
+                <p>
+                    {{ item.event.description }}
+                </p>
+
+                <div class="event-meta">
+
+                    📅 {{ item.event.date }}
+
+                    &nbsp; • &nbsp;
+
+                    📍 {{ item.event.venue }}
+
+                </div>
+
+                <div class="event-meta">
+
+                    ✦
+                    {{ item.review_count }}
+                    review{% if item.review_count != 1 %}s{% endif %}
+
+                </div>
+
+            </div>
+
+
+            <div class="approval-actions">
+
+                <span class="approved-badge">
+                    ★ {{ "%.1f"|format(item.rating) }}
+                </span>
+
+                <a
+                    href="{{ url_for(
+                        'events.details',
+                        event_id=item.event.id
+                    ) }}"
+                    class="secondary-btn"
+                >
+                    View Event →
+                </a>
+
+            </div>
+
+        </div>
+
+        {% endfor %}
+
+    {% else %}
+
+        <div class="empty-state">
+
+            <div>
+                🏆
+            </div>
+
+            <h3>
+                The Hall of Fame is waiting.
+            </h3>
+
+            <p>
+                Once students attend events and leave reviews,
+                the highest-rated events will appear here.
+            </p>
+
+        </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}

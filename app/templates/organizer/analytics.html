@@ -1,0 +1,425 @@
+{% extends "base.html" %}
+
+{% block title %}
+Organizer Analytics — CampusHub
+{% endblock %}
+
+{% block content %}
+
+<div class="dashboard-page">
+
+    <!-- HEADER -->
+
+    <div class="dashboard-header">
+
+        <div>
+
+            <span class="eyebrow">
+                CAMPUSHUB / ORGANIZER
+            </span>
+
+            <h1>
+                Event Analytics
+                <span class="wave">✦</span>
+            </h1>
+
+            <p>
+                Track registrations, attendance,
+                volunteers and event performance.
+            </p>
+
+        </div>
+
+        <a
+            href="{{ url_for('organizer.dashboard') }}"
+            class="secondary-btn"
+        >
+            ← Dashboard
+        </a>
+
+    </div>
+
+
+    <!-- OVERVIEW -->
+
+    <div class="student-stats">
+
+        <div class="student-stat">
+
+            <div class="stat-icon">
+                ◈
+            </div>
+
+            <div>
+                <span>EVENTS</span>
+
+                <strong>
+                    {{ total_events }}
+                </strong>
+            </div>
+
+        </div>
+
+
+        <div class="student-stat">
+
+            <div class="stat-icon">
+                ✓
+            </div>
+
+            <div>
+                <span>REGISTRATIONS</span>
+
+                <strong>
+                    {{ total_registrations }}
+                </strong>
+            </div>
+
+        </div>
+
+
+        <div class="student-stat">
+
+            <div class="stat-icon">
+                ⌁
+            </div>
+
+            <div>
+                <span>CHECK-INS</span>
+
+                <strong>
+                    {{ total_checkins }}
+                </strong>
+            </div>
+
+        </div>
+
+
+        <div class="student-stat">
+
+            <div class="stat-icon">
+                ★
+            </div>
+
+            <div>
+                <span>AVG RATING</span>
+
+                <strong>
+                    {{ overall_rating }}/5
+                </strong>
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- EVENT STATUS -->
+
+    <div class="form-card">
+
+        <span class="eyebrow">
+            EVENT STATUS
+        </span>
+
+        <h2>
+            Event Overview
+        </h2>
+
+
+        <div class="volunteer-details">
+
+            <div>
+
+                <span>
+                    APPROVED
+                </span>
+
+                <strong>
+                    {{ approved_events }}
+                </strong>
+
+            </div>
+
+
+            <div>
+
+                <span>
+                    PENDING
+                </span>
+
+                <strong>
+                    {{ pending_events }}
+                </strong>
+
+            </div>
+
+
+            <div>
+
+                <span>
+                    REJECTED
+                </span>
+
+                <strong>
+                    {{ rejected_events }}
+                </strong>
+
+            </div>
+
+
+            <div>
+
+                <span>
+                    ATTENDANCE
+                </span>
+
+                <strong>
+                    {{ overall_attendance }}%
+                </strong>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- VOLUNTEERS -->
+
+    <div class="form-card">
+
+        <span class="eyebrow">
+            VOLUNTEER ACTIVITY
+        </span>
+
+        <h2>
+            Volunteer Overview
+        </h2>
+
+
+        <div class="volunteer-details">
+
+            <div>
+
+                <span>
+                    APPLICATIONS
+                </span>
+
+                <strong>
+                    {{ total_volunteers }}
+                </strong>
+
+            </div>
+
+
+            <div>
+
+                <span>
+                    APPROVED
+                </span>
+
+                <strong>
+                    {{ approved_volunteers }}
+                </strong>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- PER EVENT ANALYTICS -->
+
+    <div class="section-header">
+
+        <div>
+
+            <span class="eyebrow">
+                EVENT PERFORMANCE
+            </span>
+
+            <h2>
+                Your Events
+            </h2>
+
+        </div>
+
+    </div>
+
+
+    {% if event_analytics %}
+
+    <div class="volunteer-event-list">
+
+        {% for item in event_analytics %}
+
+        <div class="volunteer-event-card">
+
+            <div class="volunteer-event-main">
+
+                <div class="event-card-top">
+
+                    <span class="event-category">
+                        {{ item.event.event_type }}
+                    </span>
+
+
+                    {% if item.event.status == "approved" %}
+
+                    <span class="approved-badge">
+                        APPROVED
+                    </span>
+
+                    {% elif item.event.status == "pending" %}
+
+                    <span class="pending-badge">
+                        PENDING
+                    </span>
+
+                    {% elif item.event.status == "rejected" %}
+
+                    <span class="rejected-badge">
+                        REJECTED
+                    </span>
+
+                    {% else %}
+
+                    <span class="event-category">
+                        {{ item.event.status|upper }}
+                    </span>
+
+                    {% endif %}
+
+                </div>
+
+
+                <h3>
+                    {{ item.event.title }}
+                </h3>
+
+
+                <p class="volunteer-description">
+
+                    📅 {{ item.event.date }}
+
+                    &nbsp; · &nbsp;
+
+                    ⏰
+                    {{ item.event.start_time }}
+                    –
+                    {{ item.event.end_time }}
+
+                    &nbsp; · &nbsp;
+
+                    📍 {{ item.event.venue }}
+
+                </p>
+
+
+                <div class="volunteer-details">
+
+                    <div>
+
+                        <span>
+                            REGISTRATIONS
+                        </span>
+
+                        <strong>
+                            {{ item.registrations }}
+                        </strong>
+
+                    </div>
+
+
+                    <div>
+
+                        <span>
+                            CHECK-INS
+                        </span>
+
+                        <strong>
+                            {{ item.checkins }}
+                        </strong>
+
+                    </div>
+
+
+                    <div>
+
+                        <span>
+                            ATTENDANCE
+                        </span>
+
+                        <strong>
+                            {{ item.attendance_rate }}%
+                        </strong>
+
+                    </div>
+
+
+                    <div>
+
+                        <span>
+                            RATING
+                        </span>
+
+                        <strong>
+                            {% if item.average_rating %}
+                                ★ {{ item.average_rating }}/5
+                            {% else %}
+                                No ratings
+                            {% endif %}
+                        </strong>
+
+                    </div>
+
+
+                    <div>
+
+                        <span>
+                            VOLUNTEERS
+                        </span>
+
+                        <strong>
+                            {{ item.volunteers }}
+                        </strong>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+
+    {% else %}
+
+    <div class="dashboard-empty">
+
+        <div class="empty-symbol">
+            📊
+        </div>
+
+        <h3>
+            No event data yet.
+        </h3>
+
+        <p>
+            Create an event and start receiving
+            registrations to see analytics here.
+        </p>
+
+    </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}

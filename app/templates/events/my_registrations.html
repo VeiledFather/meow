@@ -1,0 +1,211 @@
+{% extends "base.html" %}
+
+{% block title %}
+My Registrations — CampusHub
+{% endblock %}
+
+{% block content %}
+
+<div class="dashboard-page">
+
+    <div class="dashboard-header">
+
+        <div>
+            <span class="eyebrow">
+                CAMPUSHUB / STUDENT
+            </span>
+
+            <h1>
+                My Registrations
+                <span class="wave">✦</span>
+            </h1>
+
+            <p>
+                Your registered campus events and digital tickets.
+            </p>
+        </div>
+
+        <a
+            href="{{ url_for('events.pinboard') }}"
+            class="dashboard-action"
+        >
+            Explore Events →
+        </a>
+
+    </div>
+
+
+    {% if registrations %}
+
+        <div class="volunteer-event-list">
+
+            {% for registration in registrations %}
+
+                <div class="volunteer-event-card">
+
+                    <div class="volunteer-event-main">
+
+                        <div class="event-card-top">
+
+                            <span class="event-category">
+                                {{ registration.event.event_type }}
+                            </span>
+
+                            <span class="approved-badge">
+                                REGISTERED
+                            </span>
+
+                        </div>
+
+
+                        <h3>
+                            {{ registration.event.title }}
+                        </h3>
+
+
+                        <p class="volunteer-description">
+                            {{ registration.event.description }}
+                        </p>
+
+
+                        <div class="volunteer-details">
+
+                            <div>
+                                <span>DATE</span>
+                                <strong>
+                                    📅 {{ registration.event.date }}
+                                </strong>
+                            </div>
+
+
+                            <div>
+                                <span>TIME</span>
+                                <strong>
+                                    ⏰
+                                    {{ registration.event.start_time }}
+                                    –
+                                    {{ registration.event.end_time }}
+                                </strong>
+                            </div>
+
+
+                            <div>
+                                <span>VENUE</span>
+                                <strong>
+                                    📍 {{ registration.event.venue }}
+                                </strong>
+                            </div>
+
+
+                            <div>
+                                <span>REGISTRATION</span>
+                                <strong>
+                                    {{ registration.registration_code }}
+                                </strong>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="volunteer-event-side">
+
+                        <div class="organizer-box">
+
+                            <span class="eyebrow">
+                                TICKET STATUS
+                            </span>
+
+                            <div class="organizer-avatar">
+                                ✓
+                            </div>
+
+                            <strong>
+                                Registration confirmed
+                            </strong>
+
+                            <small>
+                                Your place has been reserved.
+                            </small>
+
+                        </div>
+
+
+                        <div class="requirements-box">
+
+                            <span class="eyebrow">
+                                CHECK-IN
+                            </span>
+
+                            <p>
+
+                                {% if registration.checked_in %}
+
+                                    <strong>
+                                        ✓ Checked in
+                                    </strong>
+
+                                {% else %}
+
+                                    Not checked in yet.
+
+                                {% endif %}
+
+                            </p>
+
+                        </div>
+
+
+                        <a
+                            href="{{ url_for(
+                                'events.ticket',
+                                registration_id=registration.id
+                            ) }}"
+                            class="volunteer-apply"
+                        >
+                            View Digital Ticket
+                            <span>→</span>
+                        </a>
+
+                    </div>
+
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+    {% else %}
+
+        <div class="dashboard-empty">
+
+            <div class="empty-symbol">
+                🎟
+            </div>
+
+            <h3>
+                No registrations yet.
+            </h3>
+
+            <p>
+                Explore the CampusHub pinboard and register
+                for an upcoming event.
+            </p>
+
+            <br>
+
+            <a
+                href="{{ url_for('events.pinboard') }}"
+                class="dashboard-action"
+            >
+                Explore Events →
+            </a>
+
+        </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}

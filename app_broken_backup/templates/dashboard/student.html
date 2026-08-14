@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+    <title>
+        Student — CampusHub
+    </title>
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1"
+    >
+
+    <link
+        rel="stylesheet"
+        href="/static/css/style.css"
+    >
+
+</head>
+
+<body>
+
+<div class="dashboard">
+
+<aside class="sidebar">
+
+<div class="sidebar-brand">
+
+<div class="brand-icon">CH</div>
+
+<span>CampusHub</span>
+
+</div>
+
+<nav class="sidebar-nav">
+
+<a class="active" href="/auth/student">
+📌 <span>Event Pinboard</span>
+</a>
+
+<a href="#">
+🎟️ <span>My Registrations</span>
+</a>
+
+<a href="#">
+🏆 <span>Hall of Fame</span>
+</a>
+
+<a href="#">
+⭐ <span>My Reviews</span>
+</a>
+
+<a href="/auth/logout">
+↪ <span>Logout</span>
+</a>
+
+</nav>
+
+</aside>
+
+
+<main class="main">
+
+<div class="topbar">
+
+<div>
+
+<h1>
+Good to see you, {{ current_user.name }}
+</h1>
+
+<p>
+Discover what's happening around campus.
+</p>
+
+</div>
+
+<div class="profile">
+
+<div class="avatar">
+{{ current_user.name[0] }}
+</div>
+
+</div>
+
+</div>
+
+
+<div class="card">
+
+<div class="card-header">
+
+<h2>
+📌 Event Pinboard
+</h2>
+
+</div>
+
+<p style="color:#8e96aa">
+
+Your upcoming university events will appear here.
+
+</p>
+
+</div>
+
+</main>
+
+</div>
+
+</body>
+
+</html>

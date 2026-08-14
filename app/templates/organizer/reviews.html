@@ -1,0 +1,239 @@
+{% extends "base.html" %}
+
+{% block title %}
+Event Reviews — CampusHub
+{% endblock %}
+
+{% block content %}
+
+<div class="dashboard-page">
+
+    <div class="dashboard-header">
+
+        <div>
+
+            <span class="eyebrow">
+                CAMPUSHUB / ORGANIZER
+            </span>
+
+            <h1>
+                Event Reviews
+                <span class="wave">✦</span>
+            </h1>
+
+            <p>
+                Student feedback for
+                {{ event.title }}.
+            </p>
+
+        </div>
+
+        <a
+            href="{{ url_for('organizer.dashboard') }}"
+            class="secondary-btn"
+        >
+            ← Dashboard
+        </a>
+
+    </div>
+
+
+    <!-- SUMMARY -->
+
+    <div class="student-stats">
+
+        <div class="student-stat">
+
+            <div class="stat-icon">
+                ★
+            </div>
+
+            <div>
+
+                <span>
+                    AVERAGE RATING
+                </span>
+
+                <strong>
+                    {{ average_rating }}/5
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        <div class="student-stat">
+
+            <div class="stat-icon">
+                ◈
+            </div>
+
+            <div>
+
+                <span>
+                    TOTAL REVIEWS
+                </span>
+
+                <strong>
+                    {{ reviews|length }}
+                </strong>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- EVENT -->
+
+    <div class="form-card">
+
+        <span class="eyebrow">
+            EVENT
+        </span>
+
+        <h2>
+            {{ event.title }}
+        </h2>
+
+        <p>
+            {{ event.description }}
+        </p>
+
+    </div>
+
+
+    <!-- REVIEWS -->
+
+    <div class="section-header">
+
+        <div>
+
+            <span class="eyebrow">
+                STUDENT FEEDBACK
+            </span>
+
+            <h2>
+                Reviews
+            </h2>
+
+        </div>
+
+    </div>
+
+
+    {% if reviews %}
+
+        <div class="volunteer-event-list">
+
+            {% for review in reviews %}
+
+                <div class="volunteer-event-card">
+
+                    <div class="volunteer-event-main">
+
+                        <div class="event-card-top">
+
+                            <span class="event-category">
+                                {{ review.student.name }}
+                            </span>
+
+                            <span class="approved-badge">
+                                ★ {{ review.rating }}/5
+                            </span>
+
+                        </div>
+
+
+                        {% if review.comment %}
+
+                            <p class="volunteer-description">
+                                "{{ review.comment }}"
+                            </p>
+
+                        {% else %}
+
+                            <p class="volunteer-description">
+                                No written comment provided.
+                            </p>
+
+                        {% endif %}
+
+
+                        <div class="volunteer-details">
+
+                            <div>
+
+                                <span>
+                                    STUDENT
+                                </span>
+
+                                <strong>
+                                    {{ review.student.name }}
+                                </strong>
+
+                            </div>
+
+
+                            <div>
+
+                                <span>
+                                    RATING
+                                </span>
+
+                                <strong>
+                                    ★ {{ review.rating }}/5
+                                </strong>
+
+                            </div>
+
+
+                            <div>
+
+                                <span>
+                                    SUBMITTED
+                                </span>
+
+                                <strong>
+                                    {{ review.created_at }}
+                                </strong>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+    {% else %}
+
+        <div class="dashboard-empty">
+
+            <div class="empty-symbol">
+                ★
+            </div>
+
+            <h3>
+                No reviews yet.
+            </h3>
+
+            <p>
+                Student feedback will appear here
+                after your event receives reviews.
+            </p>
+
+        </div>
+
+    {% endif %}
+
+
+</div>
+
+{% endblock %}

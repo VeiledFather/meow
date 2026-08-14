@@ -1,0 +1,299 @@
+{% extends "base.html" %}
+
+{% block title %}
+{{ event.title }} — Attendees — CampusHub
+{% endblock %}
+
+
+{% block content %}
+
+<div class="dashboard-page">
+
+
+    <!-- =================================================
+         HEADER
+    ================================================== -->
+
+    <a
+        href="{{ url_for('organizer.dashboard') }}"
+        class="text-link"
+    >
+        ← Back to Organizer Dashboard
+    </a>
+
+
+    <div class="dashboard-header attendee-header">
+
+        <div>
+
+            <span class="eyebrow">
+                CAMPUSHUB / ATTENDANCE
+            </span>
+
+            <h1>
+                {{ event.title }}
+                <span class="wave">✦</span>
+            </h1>
+
+            <p>
+                Registration and attendance management.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <!-- =================================================
+         EVENT INFORMATION
+    ================================================== -->
+
+    <div class="detail-card attendee-event-card">
+
+        <div class="event-type">
+            {{ event.event_type }}
+        </div>
+
+        <div class="event-card-details">
+
+            <span>
+                📅 {{ event.date }}
+            </span>
+
+            <span>
+                ⏰ {{ event.start_time }}
+                –
+                {{ event.end_time }}
+            </span>
+
+            <span>
+                📍 {{ event.venue }}
+            </span>
+
+        </div>
+
+    </div>
+
+
+    <!-- =================================================
+         ATTENDANCE STATS
+    ================================================== -->
+
+    <div class="student-stats">
+
+
+        <div class="student-stat">
+
+            <div class="stat-icon">
+                🎟
+            </div>
+
+            <div>
+
+                <span>
+                    REGISTERED
+                </span>
+
+                <strong>
+                    {{ total }}
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        <div class="student-stat">
+
+            <div class="stat-icon">
+                ✓
+            </div>
+
+            <div>
+
+                <span>
+                    CHECKED IN
+                </span>
+
+                <strong>
+                    {{ checked_in }}
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        <div class="student-stat">
+
+            <div class="stat-icon">
+                ◌
+            </div>
+
+            <div>
+
+                <span>
+                    NOT CHECKED IN
+                </span>
+
+                <strong>
+                    {{ not_checked_in }}
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        <div class="student-stat">
+
+            <div class="stat-icon">
+                %
+            </div>
+
+            <div>
+
+                <span>
+                    ATTENDANCE
+                </span>
+
+                <strong>
+                    {{ attendance_percentage }}%
+                </strong>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =================================================
+         ATTENDEE LIST
+    ================================================== -->
+
+    <div class="section-header">
+
+        <div>
+
+            <span class="eyebrow">
+                ATTENDEE MANAGEMENT
+            </span>
+
+            <h2>
+                Registered Students
+            </h2>
+
+        </div>
+
+        <span>
+            {{ total }} attendee{% if total != 1 %}s{% endif %}
+        </span>
+
+    </div>
+
+
+    {% if registrations %}
+
+    <div class="attendee-list">
+
+        {% for registration in registrations %}
+
+        <div class="attendee-card">
+
+
+            <!-- STUDENT -->
+
+            <div class="attendee-student">
+
+                <div class="application-avatar">
+
+                    {{ registration.student.name[0]|upper }}
+
+                </div>
+
+
+                <div>
+
+                    <h3>
+                        {{ registration.student.name }}
+                    </h3>
+
+                    <p>
+                        {{ registration.student.email }}
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <!-- REGISTRATION -->
+
+            <div class="attendee-registration">
+
+                <span>
+                    REGISTRATION CODE
+                </span>
+
+                <strong>
+                    {{ registration.registration_code }}
+                </strong>
+
+            </div>
+
+
+            <!-- STATUS -->
+
+            <div class="attendee-status">
+
+                {% if registration.checked_in %}
+
+                <span class="volunteer-status approved">
+                    ✓ Checked In
+                </span>
+
+                {% else %}
+
+                <span class="volunteer-status pending">
+                    ◌ Not Checked In
+                </span>
+
+                {% endif %}
+
+            </div>
+
+
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+
+    {% else %}
+
+
+    <div class="dashboard-empty">
+
+        <div class="empty-symbol">
+            🎟
+        </div>
+
+        <h3>
+            No registrations yet.
+        </h3>
+
+        <p>
+            Students who register for this event
+            will appear here.
+        </p>
+
+    </div>
+
+    {% endif %}
+
+
+</div>
+
+{% endblock %}

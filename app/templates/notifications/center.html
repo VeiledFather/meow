@@ -1,0 +1,385 @@
+{% extends "base.html" %}
+
+{% block title %}
+Notifications — CampusHub
+{% endblock %}
+
+
+{% block content %}
+
+<div class="dashboard-page">
+
+    <!-- =====================================================
+         HEADER
+    ====================================================== -->
+
+    <div class="dashboard-header">
+
+        <div>
+
+            <span class="eyebrow">
+                CAMPUSHUB / SMART ALERTS
+            </span>
+
+            <h1>
+                Notifications
+                <span class="wave">✦</span>
+            </h1>
+
+            <p>
+                Important updates, event reminders and
+                CampusHub activity in one place.
+            </p>
+
+        </div>
+
+
+        {% if unread_count > 0 %}
+
+        <form
+            method="POST"
+            action="{{ url_for(
+                'notification.mark_all_read'
+            ) }}"
+        >
+
+            <button
+                type="submit"
+                class="secondary-btn"
+            >
+                Mark all as read
+            </button>
+
+        </form>
+
+        {% endif %}
+
+    </div>
+
+
+    <!-- =====================================================
+         SUMMARY
+    ====================================================== -->
+
+    <div class="student-stats">
+
+
+        <div class="student-stat">
+
+            <div class="stat-icon">
+                🔔
+            </div>
+
+            <div>
+
+                <span>
+                    TOTAL
+                </span>
+
+                <strong>
+                    {{ notifications|length }}
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        <div class="student-stat">
+
+            <div class="stat-icon">
+                ✦
+            </div>
+
+            <div>
+
+                <span>
+                    UNREAD
+                </span>
+
+                <strong>
+                    {{ unread_count }}
+                </strong>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         SMART REMINDER GENERATOR
+    ====================================================== -->
+
+    {% if current_user.role == "student" %}
+
+    <div class="evai-card">
+
+        <div class="evai-orb">
+            🔔
+        </div>
+
+
+        <div class="evai-content">
+
+            <span class="evai-label">
+                SMART NOTIFICATIONS
+            </span>
+
+            <h2>
+                Check your upcoming events
+            </h2>
+
+            <p>
+                CampusHub can generate reminders for
+                registered events happening today or tomorrow.
+            </p>
+
+        </div>
+
+
+        <form
+            method="POST"
+            action="{{ url_for(
+                'notification.generate_reminders'
+            ) }}"
+        >
+
+            <button
+                type="submit"
+                class="evai-open"
+            >
+                Check now
+                <span>→</span>
+            </button>
+
+        </form>
+
+    </div>
+
+    {% endif %}
+
+
+    <!-- =====================================================
+         NOTIFICATIONS
+    ====================================================== -->
+
+    <div class="section-header">
+
+        <div>
+
+            <span class="eyebrow">
+                YOUR ALERTS
+            </span>
+
+            <h2>
+                Recent notifications
+            </h2>
+
+        </div>
+
+    </div>
+
+
+    {% if notifications %}
+
+    <div class="notification-list">
+
+        {% for notification in notifications %}
+
+        <div
+            class="
+                notification-card
+                {% if not notification.is_read %}
+                    notification-unread
+                {% endif %}
+            "
+        >
+
+
+            <!-- ICON -->
+
+            <div class="notification-icon">
+
+                {% if notification.notification_type == "event_reminder" %}
+
+                    ⏰
+
+                {% elif notification.notification_type == "event_today" %}
+
+                    📅
+
+                {% elif notification.notification_type == "certificate" %}
+
+                    🎓
+
+                {% elif notification.notification_type == "registration" %}
+
+                    🎟️
+
+                {% else %}
+
+                    🔔
+
+                {% endif %}
+
+            </div>
+
+
+            <!-- CONTENT -->
+
+            <div class="notification-content">
+
+                <div class="notification-top">
+
+                    <h3>
+                        {{ notification.title }}
+                    </h3>
+
+
+                    {% if not notification.is_read %}
+
+                    <span class="notification-new">
+                        NEW
+                    </span>
+
+                    {% endif %}
+
+                </div>
+
+
+                <p>
+                    {{ notification.message }}
+                </p>
+
+
+                <small>
+
+                    {% if notification.created_at %}
+
+                        {{ notification.created_at }}
+
+                    {% else %}
+
+                        Recently
+
+                    {% endif %}
+
+                </small>
+
+
+                {% if notification.event %}
+
+                <div class="notification-event">
+
+                    <span>
+                        EVENT
+                    </span>
+
+                    <strong>
+                        {{ notification.event.title }}
+                    </strong>
+
+                </div>
+
+                {% endif %}
+
+            </div>
+
+
+            <!-- ACTION -->
+
+            <div class="notification-action">
+
+                {% if not notification.is_read %}
+
+                <form
+                    method="POST"
+                    action="{{ url_for(
+                        'notification.mark_read',
+                        notification_id=
+                            notification.id
+                    ) }}"
+                >
+
+                    <button
+                        type="submit"
+                        class="secondary-btn"
+                    >
+                        Mark read
+                    </button>
+
+                </form>
+
+                {% elif notification.event_id %}
+
+                <a
+                    href="{{ url_for(
+                        'events.details',
+                        event_id=
+                            notification.event_id
+                    ) }}"
+                    class="secondary-btn"
+                >
+                    View Event →
+                </a>
+
+                {% endif %}
+
+            </div>
+
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+
+    {% else %}
+
+    <!-- =====================================================
+         EMPTY STATE
+    ====================================================== -->
+
+    <div class="dashboard-empty">
+
+        <div class="empty-symbol">
+            🔔
+        </div>
+
+        <h3>
+            You're all caught up.
+        </h3>
+
+        <p>
+            There are no notifications for you right now.
+        </p>
+
+        {% if current_user.role == "student" %}
+
+        <form
+            method="POST"
+            action="{{ url_for(
+                'notification.generate_reminders'
+            ) }}"
+        >
+
+            <button
+                type="submit"
+                class="dashboard-action"
+            >
+                Check for smart reminders →
+            </button>
+
+        </form>
+
+        {% endif %}
+
+    </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}

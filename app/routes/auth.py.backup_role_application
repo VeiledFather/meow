@@ -1,0 +1,242 @@
+from flask import Blueprint, render_template, request, redirect, url_for, flash
+
+from flask_login import login_user, logout_user, login_required, current_user
+
+from app import db
+from app.models import User, RegistrationProfile
+
+
+auth_bp = Blueprint(
+    "auth",
+    __name__
+)
+
+
+@auth_bp.route("/login", methods=["GET", "POST"])
+def login():
+
+    if current_user.is_authenticated:
+        return redirect(url_for("main.dashboard"))
+
+    if request.method == "POST":
+
+        email = request.form.get("email", "").strip().lower()
+        password = request.form.get("password", "")
+
+        user = User.query.filter_by(
+            email=email
+        ).first()
+
+        if user and user.check_password(password):
+
+            login_user(user)
+
+            return redirect(
+                url_for("main.dashboard")
+            )
+
+        flash(
+            "Invalid email or password.",
+            "error"
+        )
+
+    return render_template(
+        "auth/login.html"
+    )
+
+
+# =========================================================
+# CAMPUSHUB REGISTRATION
+# =========================================================
+
+@auth_bp.route(
+    "/register",
+    methods=["GET", "POST"]
+)
+def register():
+
+    if current_user.is_authenticated:
+
+        return redirect(
+            url_for("main.dashboard")
+        )
+
+
+    if request.method == "POST":
+
+        name = request.form.get(
+            "name",
+            ""
+        ).strip()
+
+        college_id = request.form.get(
+            "college_id",
+            ""
+        ).strip()
+
+        date_of_birth = request.form.get(
+            "date_of_birth",
+            ""
+        ).strip()
+
+        email = request.form.get(
+            "email",
+            ""
+        ).strip().lower()
+
+        password = request.form.get(
+            "password",
+            ""
+        )
+
+
+        # -------------------------------------------------
+        # BASIC VALIDATION
+        # -------------------------------------------------
+
+        if not name or not college_id or not date_of_birth or not email or not password:
+
+            flash(
+                "Please complete every required field.",
+                "error"
+            )
+
+            return render_template(
+                "auth/register.html"
+            )
+
+
+        if len(password) < 8:
+
+            flash(
+                "Password must contain at least 8 characters.",
+                "error"
+            )
+
+            return render_template(
+                "auth/register.html"
+            )
+
+
+        # -------------------------------------------------
+        # DUPLICATE CHECKS
+        # -------------------------------------------------
+
+        existing_user = User.query.filter_by(
+            email=email
+        ).first()
+
+
+        if existing_user:
+
+            flash(
+                "An account with this email already exists.",
+                "error"
+            )
+
+            return render_template(
+                "auth/register.html"
+            )
+
+
+        existing_college_id = RegistrationProfile.query.filter_by(
+            college_id=college_id
+        ).first()
+
+
+        if existing_college_id:
+
+            flash(
+                "This college ID is already registered.",
+                "error"
+            )
+
+            return render_template(
+                "auth/register.html"
+            )
+
+
+        # -------------------------------------------------
+        # CREATE USER
+        # -------------------------------------------------
+
+        user = User(
+
+            name=name,
+
+            email=email,
+
+            role="student"
+
+        )
+
+
+        user.set_password(
+            password
+        )
+
+
+        db.session.add(
+            user
+        )
+
+        db.session.flush()
+
+
+        # -------------------------------------------------
+        # GENERATE CAMPUSHUB ID
+        # -------------------------------------------------
+
+        campus_id = (
+            "CH-S-"
+            + str(user.id).zfill(6)
+        )
+
+
+        profile = RegistrationProfile(
+
+            user_id=user.id,
+
+            college_id=college_id,
+
+            date_of_birth=date_of_birth,
+
+            campus_id=campus_id
+
+        )
+
+
+        db.session.add(
+            profile
+        )
+
+
+        db.session.commit()
+
+
+        flash(
+            f"Registration successful. Your CampusHub ID is {campus_id}.",
+            "success"
+        )
+
+
+        return redirect(
+            url_for("auth.login")
+        )
+
+
+    return render_template(
+        "auth/register.html"
+    )
+
+
+
+@auth_bp.route("/logout")
+@login_required
+def logout():
+
+    logout_user()
+
+    return redirect(
+        url_for("auth.login")
+    )

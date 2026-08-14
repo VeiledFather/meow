@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+
+{% block title %}
+My Certificates — CampusHub
+{% endblock %}
+
+
+{% block content %}
+
+<div class="page-header">
+
+    <div>
+
+        <div class="eyebrow">
+            CAMPUSHUB / ACHIEVEMENTS
+        </div>
+
+        <h1>
+            My Certificates
+            <span class="wave">✦</span>
+        </h1>
+
+        <p>
+            Your verified event participation certificates.
+        </p>
+
+    </div>
+
+
+    <a
+        href="{{ url_for('main.dashboard') }}"
+        class="secondary-btn"
+    >
+        ← Dashboard
+    </a>
+
+</div>
+
+
+{% if certificates %}
+
+<div class="certificate-list">
+
+    {% for certificate in certificates %}
+
+    <div class="certificate-list-card">
+
+        <div class="certificate-list-icon">
+            ✦
+        </div>
+
+
+        <div class="certificate-list-content">
+
+            <span class="eyebrow">
+                CERTIFICATE OF PARTICIPATION
+            </span>
+
+            <h2>
+                {{ certificate.event.title }}
+            </h2>
+
+            <p>
+                {{ certificate.event.event_type }}
+                ·
+                {{ certificate.event.date }}
+            </p>
+
+            <small>
+                Certificate ID:
+                {{ certificate.certificate_code }}
+            </small>
+
+        </div>
+
+
+        <div class="certificate-list-action">
+
+            <a
+                href="{{ url_for(
+                    'certificate.view',
+                    certificate_id=certificate.id
+                ) }}"
+                class="primary-btn"
+            >
+                View Certificate →
+            </a>
+
+        </div>
+
+    </div>
+
+    {% endfor %}
+
+</div>
+
+
+{% else %}
+
+<div class="dashboard-empty">
+
+    <div class="empty-symbol">
+        🎓
+    </div>
+
+    <h3>
+        No certificates yet.
+    </h3>
+
+    <p>
+        Attend eligible CampusHub events to earn
+        your digital certificates.
+    </p>
+
+    <a
+        href="{{ url_for('events.pinboard') }}"
+        class="dashboard-action"
+    >
+        Explore Events →
+    </a>
+
+</div>
+
+{% endif %}
+
+{% endblock %}

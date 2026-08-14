@@ -1,0 +1,267 @@
+{% extends "base.html" %}
+
+{% block title %}
+Role Application — CampusHub
+{% endblock %}
+
+{% block content %}
+
+<div class="auth-page">
+
+    <div class="auth-glow"></div>
+
+    <div class="auth-container">
+
+        <div class="auth-brand">
+
+            <div class="brand-mark large">
+                C
+            </div>
+
+            <div>
+                Campus<span>Hub</span>
+            </div>
+
+        </div>
+
+
+        <div class="auth-card">
+
+            <div class="auth-heading">
+
+                <span class="eyebrow">
+                    CAMPUS ROLES
+                </span>
+
+                <h1>
+                    Apply for a role.
+                </h1>
+
+                <p>
+                    Apply to become a CampusHub volunteer or organizer.
+                    Your application will be reviewed by college administration.
+                </p>
+
+            </div>
+
+
+            {% with messages =
+                get_flashed_messages(
+                    with_categories=true
+                )
+            %}
+
+                {% for category, message in messages %}
+
+                    <div class="alert {{ category }}">
+                        {{ message }}
+                    </div>
+
+                {% endfor %}
+
+            {% endwith %}
+
+
+            {% if not applications or applications[0].status != "pending" %}
+
+            <form method="POST">
+
+                <div class="form-group">
+
+                    <label>
+                        Apply For
+                    </label>
+
+                    <select
+                        name="requested_role"
+                        required
+                    >
+
+                        <option value="">
+                            Select a role
+                        </option>
+
+                        <option value="volunteer">
+                            Volunteer
+                        </option>
+
+                        <option value="organizer">
+                            Organizer
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Current CGPA
+                    </label>
+
+                    <input
+                        type="number"
+                        name="cgpa"
+                        min="0"
+                        max="10"
+                        step="0.01"
+                        placeholder="e.g. 8.42"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Attendance Percentage
+                    </label>
+
+                    <input
+                        type="number"
+                        name="attendance"
+                        min="0"
+                        max="100"
+                        step="0.1"
+                        placeholder="e.g. 87.5"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Why should you be selected?
+                    </label>
+
+                    <textarea
+                        name="message"
+                        rows="6"
+                        placeholder="Tell the administration about your experience, interests and why you want this role."
+                    ></textarea>
+
+                </div>
+
+
+                <button
+                    type="submit"
+                    class="primary-button"
+                >
+                    Submit Application
+                    <span>→</span>
+                </button>
+
+            </form>
+
+            {% else %}
+
+            <div class="empty-state">
+
+                <div>
+                    ✦
+                </div>
+
+                <h3>
+                    Application under review
+                </h3>
+
+                <p>
+                    Your application is currently being reviewed
+                    by college administration.
+                </p>
+
+            </div>
+
+            {% endif %}
+
+
+            {% if applications %}
+
+            <div class="auth-divider">
+
+                <span>
+                    APPLICATION HISTORY
+                </span>
+
+            </div>
+
+
+            {% for application in applications %}
+
+            <div class="approval-card">
+
+                <div class="approval-info">
+
+                    <div class="event-type">
+                        {{ application.requested_role|upper }}
+                    </div>
+
+                    <h3>
+                        {{ application.requested_role|title }}
+                        Application
+                    </h3>
+
+                    <p>
+                        CGPA: {{ application.cgpa }}
+                        &nbsp; • &nbsp;
+                        Attendance: {{ application.attendance }}%
+                    </p>
+
+                    <div class="event-meta">
+                        Submitted:
+                        {{ application.created_at }}
+                    </div>
+
+                </div>
+
+
+                <div class="approval-actions">
+
+                    {% if application.status == "pending" %}
+
+                        <span class="pending-badge">
+                            PENDING
+                        </span>
+
+                    {% elif application.status == "approved" %}
+
+                        <span class="approved-badge">
+                            APPROVED
+                        </span>
+
+                    {% elif application.status == "rejected" %}
+
+                        <span class="rejected-badge">
+                            REJECTED
+                        </span>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+            {% endfor %}
+
+            {% endif %}
+
+
+            <p class="auth-footer">
+
+                <a href="{{ url_for('main.dashboard') }}">
+                    ← Back to Dashboard
+                </a>
+
+            </p>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,123 @@
+
+{% extends "base.html" %}
+
+{% block title %}
+{{ event.title }} — CampusHub
+{% endblock %}
+
+{% block content %}
+
+<a
+    href="/events/"
+    class="text-link"
+>
+    ← Back to Pinboard
+</a>
+
+
+<div class="detail-card">
+
+    <div class="event-type">
+        {{ event.event_type }}
+    </div>
+
+    <h1>
+        {{ event.title }}
+    </h1>
+
+    <p class="detail-description">
+        {{ event.description }}
+    </p>
+
+
+    <div class="detail-grid">
+
+        <div class="detail-item">
+
+            <span>
+                DATE
+            </span>
+
+            <strong>
+                📅 {{ event.date }}
+            </strong>
+
+        </div>
+
+
+        <div class="detail-item">
+
+            <span>
+                TIME
+            </span>
+
+            <strong>
+                ⏰
+                {{ event.start_time }}
+                –
+                {{ event.end_time }}
+            </strong>
+
+        </div>
+
+
+        <div class="detail-item">
+
+            <span>
+                VENUE
+            </span>
+
+            <strong>
+                📍 {{ event.venue }}
+            </strong>
+
+        </div>
+
+
+        <div class="detail-item">
+
+            <span>
+                EXPECTED
+            </span>
+
+            <strong>
+                👥
+                {{ event.expected_attendees }}
+            </strong>
+
+        </div>
+
+    </div>
+
+
+    <div class="registration-preview">
+
+        <div>
+
+            <h3>
+                🎟️ Registration
+            </h3>
+
+            <p>
+                Register for this event and receive
+                a unique digital QR ticket.
+            </p>
+
+        </div>
+
+        <button
+            class="primary-btn"
+            onclick="
+                alert(
+                    'Student registration is the next milestone.'
+                )
+            "
+        >
+            Register →
+        </button>
+
+    </div>
+
+</div>
+
+{% endblock %}

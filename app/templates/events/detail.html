@@ -1,0 +1,504 @@
+{% extends "base.html" %}
+
+{% block title %}
+{{ event.title }} — CampusHub
+{% endblock %}
+
+
+{% block content %}
+
+<a
+    href="{{ url_for('events.pinboard') }}"
+    class="text-link"
+>
+    ← Back to Pinboard
+</a>
+
+
+<div class="detail-card">
+
+    <div class="event-type">
+        {{ event.event_type }}
+    </div>
+
+
+    <h1>
+        {{ event.title }}
+    </h1>
+
+
+    <p class="detail-description">
+        {{ event.description }}
+    </p>
+
+
+    <div class="detail-grid">
+
+        <div class="detail-item">
+
+            <span>
+                DATE
+            </span>
+
+            <strong>
+                📅 {{ event.date }}
+            </strong>
+
+        </div>
+
+
+        <div class="detail-item">
+
+            <span>
+                TIME
+            </span>
+
+            <strong>
+                ⏰
+                {{ event.start_time }}
+                –
+                {{ event.end_time }}
+            </strong>
+
+        </div>
+
+
+        <div class="detail-item">
+
+            <span>
+                VENUE
+            </span>
+
+            <strong>
+                📍 {{ event.venue }}
+            </strong>
+
+        </div>
+
+
+        <div class="detail-item">
+
+            <span>
+                EXPECTED
+            </span>
+
+            <strong>
+                👥 {{ event.expected_attendees or 0 }}
+            </strong>
+
+        </div>
+
+    </div>
+
+
+    <!-- =================================================
+         REGISTRATION
+    ================================================== -->
+
+    <div class="registration-preview">
+
+        <div>
+
+            <h3>
+                🎟️ Registration
+            </h3>
+
+            <p>
+                Register for this event and receive
+                your CampusHub digital ticket.
+            </p>
+
+        </div>
+
+
+        {% if current_user.role == "student" %}
+
+            {% set registration = none %}
+
+
+            {% for r in current_user.registrations %}
+
+                {% if r.event_id == event.id %}
+
+                    {% set registration = r %}
+
+                {% endif %}
+
+            {% endfor %}
+
+
+            {% if registration %}
+
+                <a
+                    href="{{ url_for(
+                        'events.ticket',
+                        registration_id=registration.id
+                    ) }}"
+                    class="primary-btn"
+                >
+                    View Ticket →
+                </a>
+
+
+            {% elif event.status == "approved" %}
+
+                <form
+                    method="POST"
+                    action="{{ url_for(
+                        'events.register',
+                        event_id=event.id
+                    ) }}"
+                >
+
+                    <button
+                        type="submit"
+                        class="primary-btn"
+                    >
+                        Register →
+                    </button>
+
+                </form>
+
+
+            {% else %}
+
+                <button
+                    class="primary-btn"
+                    disabled
+                >
+                    Registration unavailable
+                </button>
+
+            {% endif %}
+
+        {% endif %}
+
+    </div>
+
+
+    <!-- =================================================
+         EVENT GALLERY
+    ================================================== -->
+
+    {% if photos %}
+
+    <div class="detail-gallery-section">
+
+        <div class="section-header">
+
+            <div>
+
+                <span class="eyebrow">
+                    EVENT MEMORIES
+                </span>
+
+                <h2>
+                    📸 Event Gallery
+                </h2>
+
+            </div>
+
+
+            <span>
+                {{ photos|length }}
+                photo{% if photos|length != 1 %}s{% endif %}
+            </span>
+
+        </div>
+
+
+        <div class="detail-gallery-grid">
+
+            {% for photo in photos %}
+
+            <div class="detail-gallery-card">
+
+                <img
+                    src="{{ url_for(
+                        'static',
+                        filename='uploads/events/' ~ photo.filename
+                    ) }}"
+                    alt="{{ event.title }}"
+                    loading="lazy"
+                >
+
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+    </div>
+
+    {% endif %}
+
+
+    <!-- =================================================
+         REVIEWS
+    ================================================== -->
+
+    <div class="detail-review-section">
+
+        <div class="section-header">
+
+            <div>
+
+                <span class="eyebrow">
+                    COMMUNITY
+                </span>
+
+                <h2>
+                    Event Reviews
+                </h2>
+
+            </div>
+
+        </div>
+
+
+        {% if event.reviews %}
+
+            <div class="review-list">
+
+                {% for review in event.reviews %}
+
+                <div class="review-card">
+
+                    <div class="review-top">
+
+                        <strong>
+                            {{ review.student.name }}
+                        </strong>
+
+
+                        <span>
+
+                            {% for i in range(review.rating) %}
+                                ★
+                            {% endfor %}
+
+                            {% for i in range(5 - review.rating) %}
+                                ☆
+                            {% endfor %}
+
+                        </span>
+
+                    </div>
+
+
+                    {% if review.comment %}
+
+                    <p>
+                        {{ review.comment }}
+                    </p>
+
+                    {% endif %}
+
+                </div>
+
+                {% endfor %}
+
+            </div>
+
+
+        {% else %}
+
+            <div class="dashboard-empty">
+
+                <div class="empty-symbol">
+                    ☆
+                </div>
+
+                <h3>
+                    No reviews yet.
+                </h3>
+
+                <p>
+                    Be the first student to review this event
+                    after attending it.
+                </p>
+
+            </div>
+
+        {% endif %}
+
+
+        <!-- =================================================
+             REVIEW FORM
+        ================================================== -->
+
+        {% if current_user.role == "student" %}
+
+            {% set my_registration = none %}
+
+
+            {% for r in current_user.registrations %}
+
+                {% if r.event_id == event.id %}
+
+                    {% set my_registration = r %}
+
+                {% endif %}
+
+            {% endfor %}
+
+
+            {% if my_registration and my_registration.checked_in %}
+
+                {% set already_reviewed = false %}
+
+
+                {% for review in event.reviews %}
+
+                    {% if review.student_id == current_user.id %}
+
+                        {% set already_reviewed = true %}
+
+                    {% endif %}
+
+                {% endfor %}
+
+
+                {% if not already_reviewed %}
+
+                    <div class="review-form-card">
+
+                        <span class="eyebrow">
+                            YOUR EXPERIENCE
+                        </span>
+
+
+                        <h3>
+                            How was {{ event.title }}?
+                        </h3>
+
+
+                        <form
+                            method="POST"
+                            action="{{ url_for(
+                                'events.submit_review',
+                                event_id=event.id
+                            ) }}"
+                        >
+
+                            <label for="rating">
+                                Rating
+                            </label>
+
+
+                            <div class="star-rating" role="radiogroup" aria-label="Event rating">
+
+    <input
+        type="radio"
+        id="rating-1"
+        name="rating"
+        value="1"
+        required
+    >
+    <label for="rating-1" title="Poor">★</label>
+
+
+    <input
+        type="radio"
+        id="rating-2"
+        name="rating"
+        value="2"
+    >
+    <label for="rating-2" title="Average">★</label>
+
+
+    <input
+        type="radio"
+        id="rating-3"
+        name="rating"
+        value="3"
+    >
+    <label for="rating-3" title="Good">★</label>
+
+
+    <input
+        type="radio"
+        id="rating-4"
+        name="rating"
+        value="4"
+    >
+    <label for="rating-4" title="Great">★</label>
+
+
+    <input
+        type="radio"
+        id="rating-5"
+        name="rating"
+        value="5"
+    >
+    <label for="rating-5" title="Excellent">★</label>
+
+</div>
+
+<div class="rating-hint">
+    Choose a rating from 1 to 5
+</div>
+
+
+                            <label for="comment">
+                                Comment
+                            </label>
+
+
+                            <textarea
+                                id="comment"
+                                name="comment"
+                                rows="4"
+                                maxlength="500"
+                                placeholder="Tell us about your experience..."
+                            ></textarea>
+
+
+                            <button
+                                type="submit"
+                                class="primary-btn"
+                            >
+                                Submit Review →
+                            </button>
+
+                        </form>
+
+                    </div>
+
+
+                {% endif %}
+
+
+            {% elif my_registration %}
+
+                <div class="review-locked">
+
+                    <span>
+                        🔒
+                    </span>
+
+                    <div>
+
+                        <strong>
+                            Review locked
+                        </strong>
+
+                        <p>
+                            Attend this event first.
+                            You can review it after your QR ticket
+                            has been checked in.
+                        </p>
+
+                    </div>
+
+                </div>
+
+            {% endif %}
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+{% endblock %}

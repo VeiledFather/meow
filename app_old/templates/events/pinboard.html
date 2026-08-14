@@ -1,0 +1,148 @@
+
+{% extends "base.html" %}
+
+{% block title %}
+Event Pinboard — CampusHub
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+
+    <div>
+
+        <div class="eyebrow">
+            CAMPUS EVENT NETWORK
+        </div>
+
+        <h1>
+            Event Pinboard
+        </h1>
+
+        <p>
+            Discover officially approved events happening around campus.
+        </p>
+
+    </div>
+
+</div>
+
+
+<div class="pinboard-hero">
+
+    <div>
+
+        <div class="eyebrow">
+            WHAT'S HAPPENING?
+        </div>
+
+        <h2>
+            Find your next experience.
+        </h2>
+
+        <p>
+            From hackathons to cultural nights,
+            everything officially happening on campus,
+            in one place.
+        </p>
+
+    </div>
+
+    <div class="hero-icon">
+        ✦
+    </div>
+
+</div>
+
+
+<div class="section-heading">
+
+    <div>
+
+        <h2>
+            📌 Upcoming Events
+        </h2>
+
+        <p>
+            {{ events|length }} approved events
+        </p>
+
+    </div>
+
+</div>
+
+
+<div class="event-grid">
+
+    {% for event in events %}
+
+    <div class="event-card">
+
+        <div class="event-type">
+            {{ event.event_type }}
+        </div>
+
+        <h3>
+            {{ event.title }}
+        </h3>
+
+        <p>
+            {{ event.description }}
+        </p>
+
+        <div class="event-meta">
+
+            📅 {{ event.date }}
+
+            <br>
+
+            ⏰
+            {{ event.start_time }}
+            –
+            {{ event.end_time }}
+
+            <br>
+
+            📍 {{ event.venue }}
+
+            <br>
+
+            👥
+            {{ event.expected_attendees }}
+            expected attendees
+
+        </div>
+
+
+        <a
+            href="/events/{{ event.id }}"
+            class="secondary-btn"
+        >
+            View Event →
+        </a>
+
+    </div>
+
+    {% else %}
+
+    <div class="empty-state">
+
+        <div>
+            📌
+        </div>
+
+        <h3>
+            The pinboard is empty
+        </h3>
+
+        <p>
+            Approved events will appear here.
+        </p>
+
+    </div>
+
+    {% endfor %}
+
+</div>
+
+{% endblock %}

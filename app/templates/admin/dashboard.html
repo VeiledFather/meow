@@ -1,0 +1,260 @@
+
+{% extends "base.html" %}
+
+{% block title %}
+Management Dashboard — CampusHub
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+
+    <div>
+
+        <div class="eyebrow">
+            COLLEGE MANAGEMENT
+        </div>
+
+        <h1>
+            Event Approvals
+        </h1>
+
+        <p>
+            Review student proposals before they appear
+            on the official CampusHub pinboard.
+        </p>
+
+    </div>
+
+
+    <a
+        href="{{ url_for('admin.events') }}"
+        class="secondary-btn"
+    >
+        📋 Manage All Events →
+    </a>
+
+    <a
+        href="{{ url_for('admin.users') }}"
+        class="secondary-btn"
+    >
+        👥 Manage Users →
+    </a>
+
+    <a
+        href="{{ url_for('admin.venues') }}"
+        class="secondary-btn"
+    >
+        📍 Manage Venues →
+    </a>
+
+    <a
+        href="{{ url_for('admin.analytics') }}"
+        class="secondary-btn"
+    >
+        📊 Analytics →
+    </a>
+
+    <a
+        href="{{ url_for('admin.announcements') }}"
+        class="secondary-btn"
+    >
+        📢 Announcements →
+    </a>
+
+    <a
+        href="{{ url_for('admin.role_applications') }}"
+        class="secondary-btn"
+    >
+        👤 Role Applications →
+    </a>
+
+</div>
+
+
+{% with messages =
+    get_flashed_messages(
+        with_categories=true
+    )
+%}
+
+    {% for category, message in messages %}
+
+        <div class="alert {{ category }}">
+            {{ message }}
+        </div>
+
+    {% endfor %}
+
+{% endwith %}
+
+
+<div class="stats-grid">
+
+    <div class="stat-card">
+
+        <span>
+            Pending Approval
+        </span>
+
+        <strong>
+            {{ pending_events|length }}
+        </strong>
+
+    </div>
+
+
+    <div class="stat-card">
+
+        <span>
+            Published Events
+        </span>
+
+        <strong>
+            {{ approved_events|length }}
+        </strong>
+
+    </div>
+
+
+    <div class="stat-card">
+
+        <span>
+            Rejected
+        </span>
+
+        <strong>
+            {{ rejected_events|length }}
+        </strong>
+
+    </div>
+
+
+    <div class="stat-card">
+
+        <span>
+            Platform
+        </span>
+
+        <strong>
+            LIVE
+        </strong>
+
+    </div>
+
+</div>
+
+
+<div class="content-card">
+
+    <div class="section-heading">
+
+        <div>
+
+            <h2>
+                📋 Pending Proposals
+            </h2>
+
+            <p>
+                Review and approve student-organized events.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    {% for event in pending_events %}
+
+    <div class="approval-card">
+
+        <div class="approval-info">
+
+            <div class="event-type">
+                {{ event.event_type }}
+            </div>
+
+            <h3>
+                {{ event.title }}
+            </h3>
+
+            <p>
+                {{ event.description }}
+            </p>
+
+            <div class="event-meta">
+
+                📅 {{ event.date }}
+
+                &nbsp; • &nbsp;
+
+                ⏰
+                {{ event.start_time }}
+                –
+                {{ event.end_time }}
+
+                &nbsp; • &nbsp;
+
+                📍 {{ event.venue }}
+
+            </div>
+
+            <div class="event-meta">
+
+                👥
+                {{ event.expected_attendees }}
+                attendees
+
+                &nbsp; • &nbsp;
+
+                💰
+                ₹{{ event.budget }}
+
+            </div>
+
+        </div>
+
+
+        <div class="approval-actions">
+
+            <a
+                href="/admin/approve/{{ event.id }}"
+                class="primary-btn"
+            >
+                ✓ Approve
+            </a>
+
+            <a
+                href="/admin/reject/{{ event.id }}"
+                class="danger-btn"
+            >
+                Reject
+            </a>
+
+        </div>
+
+    </div>
+
+    {% else %}
+
+    <div class="empty-state">
+
+        <div>
+            ✓
+        </div>
+
+        <h3>
+            No pending proposals
+        </h3>
+
+        <p>
+            All submitted events have been reviewed.
+        </p>
+
+    </div>
+
+    {% endfor %}
+
+</div>
+
+{% endblock %}

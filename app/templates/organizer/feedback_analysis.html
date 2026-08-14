@@ -1,0 +1,675 @@
+{% extends "base.html" %}
+
+{% block title %}
+AI Feedback Analysis — CampusHub
+{% endblock %}
+
+
+{% block content %}
+
+<div class="page-header">
+
+    <div>
+
+        <div class="eyebrow">
+            EVAi / FEEDBACK INTELLIGENCE
+        </div>
+
+        <h1>
+            AI Feedback Analysis
+            <span class="wave">✦</span>
+        </h1>
+
+        <p>
+            Turn student reviews into useful event insights.
+        </p>
+
+    </div>
+
+
+    <a
+        href="{{ url_for('organizer.dashboard') }}"
+        class="secondary-btn"
+    >
+        ← Dashboard
+    </a>
+
+</div>
+
+
+<!-- =========================================================
+     EVENT SELECTOR
+========================================================= -->
+
+<div class="form-card">
+
+    <form
+        method="POST"
+        action="{{ url_for('ai.feedback_analysis') }}"
+    >
+
+        <div class="form-grid">
+
+            <div class="field-full">
+
+                <label>
+                    Select Event
+                </label>
+
+                <select
+                    name="event_id"
+                    required
+                >
+
+                    <option value="">
+                        Choose an event to analyze
+                    </option>
+
+
+                    {% for event in events %}
+
+                    <option
+                        value="{{ event.id }}"
+                        {% if selected_event and selected_event.id == event.id %}
+                            selected
+                        {% endif %}
+                    >
+                        {{ event.title }}
+                    </option>
+
+                    {% endfor %}
+
+                </select>
+
+            </div>
+
+        </div>
+
+
+        <button
+            type="submit"
+            class="primary-btn"
+        >
+            ✦ Analyze Feedback
+        </button>
+
+    </form>
+
+</div>
+
+
+{% if analysis %}
+
+<!-- =========================================================
+     ANALYSIS HEADER
+========================================================= -->
+
+<div class="section-header">
+
+    <div>
+
+        <span class="eyebrow">
+            ANALYSIS COMPLETE
+        </span>
+
+        <h2>
+            {{ selected_event.title }}
+        </h2>
+
+    </div>
+
+
+    <span class="approved-badge">
+        {{ analysis.review_count }} Reviews
+    </span>
+
+</div>
+
+
+<!-- =========================================================
+     QUICK STATS
+========================================================= -->
+
+<div class="student-stats">
+
+
+    <div class="student-stat">
+
+        <div class="stat-icon">
+            ★
+        </div>
+
+        <div>
+
+            <span>
+                AVERAGE RATING
+            </span>
+
+            <strong>
+                {{ analysis.average_rating }}/5
+            </strong>
+
+        </div>
+
+    </div>
+
+
+    <div class="student-stat">
+
+        <div class="stat-icon">
+            😊
+        </div>
+
+        <div>
+
+            <span>
+                POSITIVE
+            </span>
+
+            <strong>
+                {{ analysis.positive }}%
+            </strong>
+
+        </div>
+
+    </div>
+
+
+    <div class="student-stat">
+
+        <div class="stat-icon">
+            😐
+        </div>
+
+        <div>
+
+            <span>
+                NEUTRAL
+            </span>
+
+            <strong>
+                {{ analysis.neutral }}%
+            </strong>
+
+        </div>
+
+    </div>
+
+
+    <div class="student-stat">
+
+        <div class="stat-icon">
+            ☹
+        </div>
+
+        <div>
+
+            <span>
+                NEGATIVE
+            </span>
+
+            <strong>
+                {{ analysis.negative }}%
+            </strong>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================================
+     FEEDBACK BREAKDOWN
+========================================================= -->
+
+<div class="dashboard-lower-grid">
+
+
+    <div class="mini-panel">
+
+        <div class="panel-heading">
+
+            <div>
+
+                <span class="eyebrow">
+                    FEEDBACK SIGNALS
+                </span>
+
+                <h3>
+                    Sentiment overview
+                </h3>
+
+            </div>
+
+            <span class="panel-icon">
+                ◈
+            </span>
+
+        </div>
+
+
+        <div class="feedback-bars">
+
+
+            <div class="feedback-bar-row">
+
+                <div class="feedback-bar-label">
+
+                    <span>
+                        Positive
+                    </span>
+
+                    <strong>
+                        {{ analysis.positive }}%
+                    </strong>
+
+                </div>
+
+
+                <div class="feedback-bar">
+
+                    <div
+                        class="feedback-bar-fill positive"
+                        style="
+                            width: {{ analysis.positive }}%;
+                        "
+                    ></div>
+
+                </div>
+
+            </div>
+
+
+            <div class="feedback-bar-row">
+
+                <div class="feedback-bar-label">
+
+                    <span>
+                        Neutral
+                    </span>
+
+                    <strong>
+                        {{ analysis.neutral }}%
+                    </strong>
+
+                </div>
+
+
+                <div class="feedback-bar">
+
+                    <div
+                        class="feedback-bar-fill neutral"
+                        style="
+                            width: {{ analysis.neutral }}%;
+                        "
+                    ></div>
+
+                </div>
+
+            </div>
+
+
+            <div class="feedback-bar-row">
+
+                <div class="feedback-bar-label">
+
+                    <span>
+                        Negative
+                    </span>
+
+                    <strong>
+                        {{ analysis.negative }}%
+                    </strong>
+
+                </div>
+
+
+                <div class="feedback-bar">
+
+                    <div
+                        class="feedback-bar-fill negative"
+                        style="
+                            width: {{ analysis.negative }}%;
+                        "
+                    ></div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         KEY THEMES
+    ====================================================== -->
+
+    <div class="mini-panel">
+
+        <div class="panel-heading">
+
+            <div>
+
+                <span class="eyebrow">
+                    WHAT STUDENTS MENTIONED
+                </span>
+
+                <h3>
+                    Key themes
+                </h3>
+
+            </div>
+
+            <span class="panel-icon">
+                ✦
+            </span>
+
+        </div>
+
+
+        {% if analysis.themes %}
+
+        <div class="feedback-themes">
+
+            {% for theme in analysis.themes %}
+
+            <div class="feedback-theme">
+
+                <strong>
+                    {{ theme.name }}
+                </strong>
+
+                <span>
+                    {{ theme.mentions }}
+                    mention{% if theme.mentions != 1 %}s{% endif %}
+                </span>
+
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+
+        {% else %}
+
+        <div class="empty-mini">
+
+            <span>
+                ◌
+            </span>
+
+            <p>
+                No recurring themes detected yet.
+            </p>
+
+        </div>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+
+<!-- =========================================================
+     EVAi DETAILED INSIGHTS
+========================================================= -->
+
+<div class="dashboard-lower-grid">
+
+    <div class="mini-panel">
+
+        <div class="panel-heading">
+
+            <div>
+
+                <span class="eyebrow">
+                    WHAT WORKED
+                </span>
+
+                <h3>
+                    Student strengths
+                </h3>
+
+            </div>
+
+            <span class="panel-icon">
+                ✓
+            </span>
+
+        </div>
+
+
+        {% if analysis.strengths %}
+
+        <div class="evai-insight-list">
+
+            {% for item in analysis.strengths %}
+
+            <div class="evai-insight-item">
+                <span>✓</span>
+                <p>{{ item }}</p>
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+        {% else %}
+
+        <div class="empty-mini">
+            <p>
+                No specific strengths were identified.
+            </p>
+        </div>
+
+        {% endif %}
+
+    </div>
+
+
+    <div class="mini-panel">
+
+        <div class="panel-heading">
+
+            <div>
+
+                <span class="eyebrow">
+                    WHAT WENT WRONG
+                </span>
+
+                <h3>
+                    Areas of concern
+                </h3>
+
+            </div>
+
+            <span class="panel-icon">
+                !
+            </span>
+
+        </div>
+
+
+        {% if analysis.problems %}
+
+        <div class="evai-insight-list">
+
+            {% for item in analysis.problems %}
+
+            <div class="evai-insight-item">
+                <span>!</span>
+                <p>{{ item }}</p>
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+        {% else %}
+
+        <div class="empty-mini">
+            <p>
+                No major problems were identified.
+            </p>
+        </div>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+
+<div class="dashboard-lower-grid">
+
+    <div class="mini-panel">
+
+        <div class="panel-heading">
+
+            <div>
+
+                <span class="eyebrow">
+                    NEXT TIME
+                </span>
+
+                <h3>
+                    Improvements
+                </h3>
+
+            </div>
+
+            <span class="panel-icon">
+                ↗
+            </span>
+
+        </div>
+
+
+        {% if analysis.improvements %}
+
+        <div class="evai-insight-list">
+
+            {% for item in analysis.improvements %}
+
+            <div class="evai-insight-item">
+                <span>→</span>
+                <p>{{ item }}</p>
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+        {% else %}
+
+        <div class="empty-mini">
+            <p>
+                No specific improvements were identified.
+            </p>
+        </div>
+
+        {% endif %}
+
+    </div>
+
+
+    <div class="mini-panel">
+
+        <div class="panel-heading">
+
+            <div>
+
+                <span class="eyebrow">
+                    PRESERVE
+                </span>
+
+                <h3>
+                    Keep doing
+                </h3>
+
+            </div>
+
+            <span class="panel-icon">
+                ★
+            </span>
+
+        </div>
+
+
+        {% if analysis.keep_doing %}
+
+        <div class="evai-insight-list">
+
+            {% for item in analysis.keep_doing %}
+
+            <div class="evai-insight-item">
+                <span>★</span>
+                <p>{{ item }}</p>
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+        {% else %}
+
+        <div class="empty-mini">
+            <p>
+                No specific items were identified.
+            </p>
+        </div>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+
+<!-- =========================================================
+     EVAi RECOMMENDATION
+========================================================= -->
+
+<div class="evai-card">
+
+    <div class="evai-orb">
+        ✦
+    </div>
+
+
+    <div class="evai-content">
+
+        <span class="evai-label">
+            EVAi • EVENT INTELLIGENCE
+        </span>
+
+
+        <h2>
+            EvAi's recommendation
+        </h2>
+
+
+        <p>
+            {{ analysis.recommendation }}
+        </p>
+
+    </div>
+
+
+    <div class="evai-open">
+        INSIGHT
+        <span>✦</span>
+    </div>
+
+</div>
+
+
+{% endif %}
+
+
+{% endblock %}
