@@ -1,3 +1,5 @@
+import os
+
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
@@ -18,9 +20,25 @@ def create_app():
 
     app.config["SECRET_KEY"] = "campushub-secret-key"
 
-    app.config["SQLALCHEMY_DATABASE_URI"] = (
-        "sqlite:///campushub.db"
-    )
+    # Use PostgreSQL on Render when DATABASE_URL is available.
+    # Keep SQLite locally for development.
+    database_url = os.getenv("DATABASE_URL")
+
+    if database_url:
+        # Render may provide postgres://; SQLAlchemy expects postgresql://.
+        if database_url.startswith("postgres://"):
+            database_url = database_url.replace(
+                "postgres://",
+                "postgresql://",
+                1
+            )
+
+        app.config["SQLALCHEMY_DATABASE_URI"] = database_url
+
+    else:
+        app.config["SQLALCHEMY_DATABASE_URI"] = (
+            "sqlite:///campushub.db"
+        )
 
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 

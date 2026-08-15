@@ -7,3 +7,5 @@ google-genai
 qrcode==8.2
 Pillow==12.3.0
 gunicorn
+
+psycopg[binary]
