@@ -1,5 +1,3 @@
-import os
-
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
@@ -22,23 +20,10 @@ def create_app():
 
     # Use PostgreSQL on Render when DATABASE_URL is available.
     # Keep SQLite locally for development.
-    database_url = os.getenv("DATABASE_URL")
-
-    if database_url:
-        # Render may provide postgres://; SQLAlchemy expects postgresql://.
-        if database_url.startswith("postgres://"):
-            database_url = database_url.replace(
-                "postgres://",
-                "postgresql://",
-                1
-            )
-
-        app.config["SQLALCHEMY_DATABASE_URI"] = database_url
-
-    else:
-        app.config["SQLALCHEMY_DATABASE_URI"] = (
-            "sqlite:///campushub.db"
-        )
+    # SQLite database for local/Render testing.
+    app.config["SQLALCHEMY_DATABASE_URI"] = (
+        "sqlite:///campushub.db"
+    )
 
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
@@ -154,44 +139,6 @@ def create_app():
     with app.app_context():
 
         db.create_all()
-
-        # Temporary Render SQLite diagnostic
-        try:
-            from app.models import User, CampusIdentity
-
-            print("=" * 70)
-            print("CAMPUSHUB POST-CREATE DATABASE CHECK")
-            print("=" * 70)
-            print(
-                "DATABASE:",
-                "POSTGRESQL"
-                if os.getenv("DATABASE_URL")
-                else "SQLITE"
-            )
-            print("DRIVER:", db.engine.url.drivername)
-            print("USERS:", User.query.count())
-            print("IDENTITIES:", CampusIdentity.query.count())
-
-            for identity in CampusIdentity.query.all():
-                print(
-                    "IDENTITY:",
-                    identity.id,
-                    identity.campus_id,
-                    "user=",
-                    identity.user_id,
-                    "type=",
-                    identity.identity_type,
-                    "status=",
-                    identity.status
-                )
-
-            print("=" * 70)
-
-        except Exception as e:
-            print("=" * 70)
-            print("POST-CREATE DATABASE CHECK FAILED")
-            print(type(e).__name__ + ":", str(e))
-            print("=" * 70)
 
 
     return app
