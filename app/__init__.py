@@ -148,6 +148,51 @@ def create_app():
 
 
     # =====================================================
+    # DEPLOYMENT DATABASE DIAGNOSTIC
+    # =====================================================
+
+    with app.app_context():
+
+        try:
+            from app.models import User, CampusIdentity
+
+            print("=" * 70)
+            print("CAMPUSHUB DEPLOYMENT DATABASE CHECK")
+            print("=" * 70)
+
+            print(
+                "DATABASE SOURCE:",
+                "POSTGRESQL"
+                if os.getenv("DATABASE_URL")
+                else "SQLITE"
+            )
+
+            print(
+                "DATABASE DRIVER:",
+                db.engine.url.drivername
+            )
+
+            print(
+                "USERS:",
+                User.query.count()
+            )
+
+            print(
+                "CAMPUS IDENTITIES:",
+                CampusIdentity.query.count()
+            )
+
+            print("=" * 70)
+
+        except Exception as e:
+
+            print("=" * 70)
+            print("CAMPUSHUB DATABASE CHECK FAILED")
+            print(type(e).__name__ + ":", str(e))
+            print("=" * 70)
+
+
+    # =====================================================
     # DATABASE
     # =====================================================
 
