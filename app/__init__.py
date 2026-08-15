@@ -1,3 +1,4 @@
+from pathlib import Path
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
@@ -21,8 +22,14 @@ def create_app():
     # Use PostgreSQL on Render when DATABASE_URL is available.
     # Keep SQLite locally for development.
     # SQLite database for local/Render testing.
+    # Render deployment database.
+    # This intentionally uses the database shipped with the project.
+    deployment_db = (
+        Path(app.root_path).parent / "campushub_render.db"
+    ).resolve()
+
     app.config["SQLALCHEMY_DATABASE_URI"] = (
-        "sqlite:///campushub.db"
+        "sqlite:///" + str(deployment_db)
     )
 
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
