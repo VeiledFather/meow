@@ -35,13 +35,25 @@ Organizer Dashboard — CampusHub
         </div>
 
 
-        <a
-            href="{{ url_for('organizer.create_event') }}"
-            class="dashboard-action"
-        >
-            + Host an Event
-            <span>→</span>
-        </a>
+        <div class="organizer-header-actions">
+
+            <a
+                href="{{ url_for('organizer.certificate_management') }}"
+                class="dashboard-action"
+            >
+                ✦ Certificates
+                <span>→</span>
+            </a>
+
+            <a
+                href="{{ url_for('organizer.create_event') }}"
+                class="dashboard-action"
+            >
+                + Host an Event
+                <span>→</span>
+            </a>
+
+        </div>
 
     </div>
 
@@ -699,3 +711,23 @@ Organizer Dashboard — CampusHub
 </div>
 
 {% endblock %}
+
+<style>
+.organizer-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+@media (max-width: 700px) {
+    .organizer-header-actions {
+        width: 100%;
+    }
+
+    .organizer-header-actions .dashboard-action {
+        flex: 1;
+        justify-content: center;
+    }
+}
+</style>

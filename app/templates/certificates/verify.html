@@ -1,0 +1,618 @@
+{% extends "base.html" %}
+
+{% block title %}
+Certificate Verification — CampusHub
+{% endblock %}
+
+{% block content %}
+
+<div class="certificate-verification-page">
+
+    <div class="certificate-verification-glow"></div>
+
+    <div class="verification-shell">
+
+        <div class="verification-header">
+
+            <div class="verification-mark">
+                ✓
+            </div>
+
+            <div class="eyebrow">
+                CAMPUSHUB CREDENTIAL VERIFICATION
+            </div>
+
+            <h1>
+                Certificate Verified
+            </h1>
+
+            <p>
+                This digital certificate has been successfully
+                authenticated against the CampusHub records.
+            </p>
+
+        </div>
+
+
+        <div class="verification-card">
+
+            <div class="verification-status">
+                <span class="verification-dot"></span>
+                AUTHENTIC CERTIFICATE
+            </div>
+
+
+            <div class="certificate-preview">
+
+                <div class="certificate-topline">
+                    CAMPUSHUB
+                </div>
+
+                <div class="certificate-label">
+                    DIGITAL CERTIFICATE
+                </div>
+
+                <h2>
+                    Certificate of Achievement
+                </h2>
+
+                <div class="certificate-rule"></div>
+
+                <p class="certificate-presented">
+                    This certificate is officially issued to
+                </p>
+
+                <h3>
+                    {{ certificate.student.name }}
+                </h3>
+
+                <p class="certificate-event">
+                    for successful participation in
+                </p>
+
+                <h4>
+                    {{ certificate.event.title }}
+                </h4>
+
+                <div class="certificate-details">
+
+                    <div>
+                        <span>Certificate ID</span>
+                        <strong>
+                            {{ certificate.certificate_code }}
+                        </strong>
+                    </div>
+
+                    <div>
+                        <span>Issued</span>
+                        <strong>
+                            {{ certificate.issued_at.strftime("%d %B %Y") }}
+                        </strong>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="verification-meta">
+
+                <div class="verification-meta-item">
+
+                    <span>
+                        STATUS
+                    </span>
+
+                    <strong>
+                        ✓ VERIFIED
+                    </strong>
+
+                </div>
+
+
+                <div class="verification-meta-item">
+
+                    <span>
+                        CERTIFICATE ID
+                    </span>
+
+                    <strong>
+                        {{ certificate.certificate_code }}
+                    </strong>
+
+                </div>
+
+
+                <div class="verification-meta-item">
+
+                    <span>
+                        EVENT
+                    </span>
+
+                    <strong>
+                        {{ certificate.event.title }}
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <div class="verification-note">
+
+                <span>🔐</span>
+
+                <p>
+                    This certificate was verified directly against
+                    the CampusHub digital certificate registry.
+                    The certificate ID uniquely identifies this credential.
+                </p>
+
+            </div>
+
+
+            <div class="verification-actions">
+
+                <a
+                    href="{{ url_for(
+                        'certificate.verify',
+                        certificate_code=certificate.certificate_code
+                    ) }}"
+                    class="secondary-btn"
+                >
+                    ↻ Refresh Verification
+                </a>
+
+                <button
+                    type="button"
+                    class="primary-button"
+                    onclick="window.print()"
+                >
+                    Print Certificate
+                    <span>→</span>
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <div class="verification-footer">
+
+            <span>
+                CampusHub Digital Credentials
+            </span>
+
+            <span>
+                •
+            </span>
+
+            <span>
+                Secure Verification
+            </span>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<style>
+
+.certificate-verification-page {
+    position: relative;
+    min-height: calc(100vh - 80px);
+    padding: 70px 20px;
+    overflow: hidden;
+}
+
+.certificate-verification-glow {
+    position: absolute;
+    width: 520px;
+    height: 520px;
+    left: 50%;
+    top: 25%;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    background: rgba(181,140,255,.07);
+    filter: blur(90px);
+    pointer-events: none;
+}
+
+.verification-shell {
+    position: relative;
+    width: min(920px, 100%);
+    margin: 0 auto;
+}
+
+.verification-header {
+    text-align: center;
+    margin-bottom: 35px;
+}
+
+.verification-mark {
+    width: 58px;
+    height: 58px;
+    margin: 0 auto 18px;
+
+    display: grid;
+    place-items: center;
+
+    border-radius: 50%;
+
+    font-size: 1.6rem;
+    font-weight: 700;
+
+    color: #d9c5ff;
+
+    border: 1px solid rgba(181,140,255,.35);
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(181,140,255,.18),
+            rgba(181,140,255,.04)
+        );
+
+    box-shadow:
+        0 0 35px rgba(181,140,255,.12);
+}
+
+.verification-header h1 {
+    margin: 9px 0;
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    letter-spacing: -.035em;
+}
+
+.verification-header p {
+    max-width: 650px;
+    margin: 0 auto;
+    opacity: .62;
+    line-height: 1.7;
+}
+
+.verification-card {
+    padding: clamp(22px, 5vw, 46px);
+
+    border-radius: 26px;
+
+    border: 1px solid rgba(181,140,255,.16);
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(181,140,255,.075),
+            rgba(255,255,255,.018)
+        );
+
+    box-shadow:
+        0 30px 100px rgba(0,0,0,.28),
+        0 0 50px rgba(181,140,255,.035);
+
+    backdrop-filter: blur(18px);
+}
+
+.verification-status {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+
+    width: fit-content;
+    margin-bottom: 25px;
+
+    padding: 7px 12px;
+
+    border-radius: 999px;
+
+    font-size: .67rem;
+    letter-spacing: .1em;
+
+    color: #cfc1e8;
+
+    background: rgba(181,140,255,.07);
+    border: 1px solid rgba(181,140,255,.12);
+}
+
+.verification-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #b58cff;
+    box-shadow: 0 0 12px rgba(181,140,255,.8);
+}
+
+.certificate-preview {
+    position: relative;
+
+    padding: clamp(30px, 6vw, 70px);
+
+    text-align: center;
+
+    border-radius: 20px;
+
+    border: 1px solid rgba(181,140,255,.22);
+
+    background:
+        radial-gradient(
+            circle at 50% 0%,
+            rgba(181,140,255,.10),
+            transparent 55%
+        ),
+        rgba(8,8,14,.5);
+
+    overflow: hidden;
+}
+
+.certificate-preview::before,
+.certificate-preview::after {
+    content: "";
+    position: absolute;
+
+    width: 130px;
+    height: 130px;
+
+    border: 1px solid rgba(181,140,255,.13);
+    border-radius: 50%;
+}
+
+.certificate-preview::before {
+    top: -65px;
+    left: -65px;
+}
+
+.certificate-preview::after {
+    right: -65px;
+    bottom: -65px;
+}
+
+.certificate-topline {
+    font-size: .7rem;
+    letter-spacing: .35em;
+    color: #cdb8ee;
+}
+
+.certificate-label {
+    margin-top: 18px;
+
+    font-size: .62rem;
+    letter-spacing: .2em;
+
+    opacity: .48;
+}
+
+.certificate-preview h2 {
+    margin: 14px 0 20px;
+
+    font-family: Georgia, serif;
+    font-weight: 500;
+
+    font-size: clamp(2rem, 5vw, 3.6rem);
+
+    letter-spacing: -.025em;
+}
+
+.certificate-rule {
+    width: 110px;
+    height: 1px;
+
+    margin: 0 auto 25px;
+
+    background: rgba(181,140,255,.45);
+}
+
+.certificate-presented,
+.certificate-event {
+    opacity: .55;
+    font-size: .85rem;
+}
+
+.certificate-preview h3 {
+    margin: 14px 0;
+
+    font-family: Georgia, serif;
+    font-weight: 500;
+
+    font-size: clamp(1.7rem, 4vw, 2.7rem);
+
+    color: #e4d5ff;
+}
+
+.certificate-preview h4 {
+    margin: 10px 0 0;
+
+    font-size: 1.1rem;
+    font-weight: 500;
+}
+
+.certificate-details {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+
+    gap: 20px;
+
+    margin-top: 40px;
+    padding-top: 25px;
+
+    border-top: 1px solid rgba(255,255,255,.07);
+}
+
+.certificate-details div {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.certificate-details span {
+    font-size: .62rem;
+    letter-spacing: .12em;
+    opacity: .42;
+}
+
+.certificate-details strong {
+    font-size: .78rem;
+    word-break: break-word;
+    color: #cdb8ee;
+}
+
+.verification-meta {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+
+    gap: 10px;
+
+    margin-top: 14px;
+}
+
+.verification-meta-item {
+    padding: 15px;
+
+    border-radius: 13px;
+
+    background: rgba(255,255,255,.018);
+    border: 1px solid rgba(255,255,255,.055);
+}
+
+.verification-meta-item span {
+    display: block;
+
+    margin-bottom: 5px;
+
+    font-size: .6rem;
+    letter-spacing: .1em;
+
+    opacity: .42;
+}
+
+.verification-meta-item strong {
+    display: block;
+
+    font-size: .78rem;
+
+    word-break: break-word;
+}
+
+.verification-note {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+
+    margin-top: 18px;
+    padding: 17px;
+
+    border-radius: 14px;
+
+    background: rgba(181,140,255,.035);
+    border: 1px solid rgba(181,140,255,.08);
+}
+
+.verification-note span {
+    font-size: 1rem;
+}
+
+.verification-note p {
+    margin: 0;
+
+    font-size: .78rem;
+    line-height: 1.6;
+    opacity: .58;
+}
+
+.verification-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    flex-wrap: wrap;
+
+    margin-top: 22px;
+}
+
+.verification-footer {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+
+    margin-top: 25px;
+
+    font-size: .68rem;
+    opacity: .35;
+}
+
+@media (max-width: 700px) {
+
+    .certificate-details,
+    .verification-meta {
+        grid-template-columns: 1fr;
+    }
+
+    .verification-actions > * {
+        width: 100%;
+        text-align: center;
+    }
+
+}
+
+@media print {
+
+    body {
+        background: white !important;
+        color: black !important;
+    }
+
+    nav,
+    header,
+    footer,
+    .verification-header,
+    .verification-status,
+    .verification-meta,
+    .verification-note,
+    .verification-actions,
+    .verification-footer {
+        display: none !important;
+    }
+
+    .certificate-verification-page {
+        padding: 0;
+        min-height: auto;
+    }
+
+    .certificate-verification-glow {
+        display: none;
+    }
+
+    .verification-card {
+        border: none;
+        box-shadow: none;
+        background: white;
+        padding: 0;
+    }
+
+    .certificate-preview {
+        min-height: 75vh;
+
+        color: black;
+
+        background: white;
+        border: 3px double #777;
+
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .certificate-preview h2,
+    .certificate-preview h3,
+    .certificate-preview h4 {
+        color: black;
+    }
+
+    .certificate-topline,
+    .certificate-label {
+        color: #333;
+    }
+
+}
+
+</style>
+
+{% endblock %}

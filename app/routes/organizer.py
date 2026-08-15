@@ -1,4 +1,5 @@
 from flask import (
+    session,
     Blueprint,
     render_template,
     request,
@@ -9,6 +10,7 @@ from flask import (
 
 import os
 import uuid
+import secrets
 
 from werkzeug.utils import secure_filename
 
@@ -25,7 +27,8 @@ from app.models import (
     Registration,
     EventGallery,
     Review,
-    Certificate
+    Certificate,
+    CampusIdentity
 )
 
 
@@ -44,7 +47,28 @@ def organizer_required():
     if not current_user.is_authenticated:
         return False
 
-    return current_user.role == "organizer"
+    active_identity_id = session.get(
+        "active_identity_id"
+    )
+
+    identity = None
+
+    if active_identity_id:
+        identity = db.session.get(
+            CampusIdentity,
+            active_identity_id
+        )
+
+    if identity is None:
+        return False
+
+    if identity.user_id != current_user.id:
+        return False
+
+    if identity.identity_type != "organizer":
+        return False
+
+    return identity.status == "active"
 
 
 def get_owned_event(event_id):
@@ -1375,3 +1399,113 @@ def certificate_management():
 
     )
 
+
+
+# =========================================================
+# ISSUE DIGITAL CERTIFICATES
+# =========================================================
+
+@organizer_bp.route(
+    "/certificates/<int:event_id>/issue",
+    methods=["POST"]
+)
+@login_required
+def issue_certificates_for_event(event_id):
+
+    if not organizer_required():
+        return "Access denied", 403
+
+    event = Event.query.filter_by(
+        id=event_id,
+        organizer_id=current_user.id
+    ).first()
+
+    if event is None:
+        return "Event not found", 404
+
+    # -----------------------------------------------------
+    # Only students who actually checked in are eligible.
+    # -----------------------------------------------------
+
+    registrations = Registration.query.filter_by(
+        event_id=event.id,
+        checked_in=True
+    ).all()
+
+    eligible_ids = {
+        registration.student_id
+        for registration in registrations
+    }
+
+    selected_ids = request.form.getlist(
+        "student_ids"
+    )
+
+    selected_ids = {
+        int(student_id)
+        for student_id in selected_ids
+        if str(student_id).isdigit()
+    }
+
+    selected_ids &= eligible_ids
+
+    issued = 0
+    already_issued = 0
+
+    for student_id in selected_ids:
+
+        existing = Certificate.query.filter_by(
+            student_id=student_id,
+            event_id=event.id
+        ).first()
+
+        if existing:
+            already_issued += 1
+            continue
+
+        certificate_code = None
+
+        while certificate_code is None:
+
+            candidate = (
+                "CERT-"
+                + secrets.token_hex(8).upper()
+            )
+
+            if not Certificate.query.filter_by(
+                certificate_code=candidate
+            ).first():
+                certificate_code = candidate
+
+        certificate = Certificate(
+            student_id=student_id,
+            event_id=event.id,
+            certificate_code=certificate_code
+        )
+
+        db.session.add(certificate)
+
+        issued += 1
+
+    db.session.commit()
+
+    if issued:
+        flash(
+            f"{issued} digital certificate"
+            f"{'s' if issued != 1 else ''} issued successfully.",
+            "success"
+        )
+
+    if already_issued:
+        flash(
+            f"{already_issued} certificate"
+            f"{'s were' if already_issued != 1 else ' was'} "
+            "already issued and skipped.",
+            "info"
+        )
+
+    return redirect(
+        url_for(
+            "organizer.certificate_management"
+        )
+    )

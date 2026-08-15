@@ -22,7 +22,7 @@
 </head>
 
 
-<body>
+<body class="{% if current_user.is_authenticated %}campushub-app{% endif %}">
 
     <div class="app-shell">
 
@@ -88,7 +88,7 @@
                 </a>
 
 
-                {% if current_user.role == "student" %}
+                {% if session.get("active_identity_type") == "student" %}
 
                 <a
                     href="{{ url_for(

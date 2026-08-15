@@ -23,7 +23,9 @@ from app.models import (
     Certificate,
     Notification,
     RoleApplication,
-    RegistrationProfile
+    CampusIdentity,
+    RegistrationProfile,
+    PasswordResetToken
 )
 
 from app.routes.notifications import create_notification
@@ -34,6 +36,277 @@ admin_bp = Blueprint(
     __name__
 )
 
+
+
+# =========================================================
+# ADMIN IDENTITY MANAGEMENT
+# =========================================================
+
+PERMANENT_DEMO_EMAILS = {
+    "admin@campus.com",
+    "organizer@campus.com",
+    "volunteer@campus.com",
+    "student@campus.com",
+}
+
+
+
+# =========================================================
+# COLLEGE ADMINISTRATION — CHC PROVISIONING
+# =========================================================
+
+HEAD_ADMIN_EMAIL = "admin@campus.com"
+
+
+@admin_bp.route(
+    "/college-admins/create",
+    methods=["GET", "POST"]
+)
+@login_required
+def create_college_admin():
+
+    # -------------------------------------------------
+    # ONLY THE PERMANENT HEAD ADMIN MAY CREATE CHC IDs
+    # -------------------------------------------------
+
+    if current_user.email.lower() != HEAD_ADMIN_EMAIL:
+        return "Access denied", 403
+
+    if request.method == "POST":
+
+        name = request.form.get(
+            "name",
+            ""
+        ).strip()
+
+        email = request.form.get(
+            "email",
+            ""
+        ).strip().lower()
+
+        password = request.form.get(
+            "password",
+            ""
+        )
+
+        # ---------------------------------------------
+        # VALIDATION
+        # ---------------------------------------------
+
+        if not name or not email or not password:
+
+            flash(
+                "Name, email and password are required.",
+                "error"
+            )
+
+            return render_template(
+                "admin/create_college_admin.html"
+            )
+
+        if len(password) < 8:
+
+            flash(
+                "Password must contain at least 8 characters.",
+                "error"
+            )
+
+            return render_template(
+                "admin/create_college_admin.html"
+            )
+
+        existing_user = User.query.filter_by(
+            email=email
+        ).first()
+
+        if existing_user:
+
+            flash(
+                "An account with this email already exists.",
+                "error"
+            )
+
+            return render_template(
+                "admin/create_college_admin.html"
+            )
+
+        # ---------------------------------------------
+        # CREATE USER
+        # ---------------------------------------------
+
+        user = User(
+            name=name,
+            email=email,
+            role="admin"
+        )
+
+        user.set_password(password)
+
+        db.session.add(user)
+        db.session.flush()
+
+        # ---------------------------------------------
+        # GENERATE CHC ID
+        #
+        # Example:
+        # CHC-000014
+        # ---------------------------------------------
+
+        campus_id = (
+            "CHC-"
+            + str(user.id).zfill(6)
+        )
+
+        identity = CampusIdentity(
+            user_id=user.id,
+            campus_id=campus_id,
+            identity_type="admin",
+            status="active",
+            activated_at=db.func.now()
+        )
+
+        db.session.add(identity)
+
+        db.session.commit()
+
+        flash(
+            f"College Administrator created successfully: {campus_id}",
+            "success"
+        )
+
+        return redirect(
+            url_for("admin.users")
+        )
+
+    return render_template(
+        "admin/create_college_admin.html"
+    )
+
+@admin_bp.route(
+    "/identities/<int:identity_id>/suspend",
+    methods=["POST"]
+)
+@login_required
+def suspend_identity(identity_id):
+
+    if current_user.role != "admin":
+        return "Access denied", 403
+
+    identity = db.session.get(
+        CampusIdentity,
+        identity_id
+    )
+
+    if identity is None:
+        return "Identity not found", 404
+
+    user = db.session.get(
+        User,
+        identity.user_id
+    )
+
+    if user is None:
+        return "User not found", 404
+
+    # -------------------------------------------------
+    # PERMANENT DEMO ACCOUNTS CANNOT BE SUSPENDED
+    # -------------------------------------------------
+
+    if user.email.lower() in PERMANENT_DEMO_EMAILS:
+        flash(
+            "Permanent CampusHub demo identities cannot be suspended.",
+            "warning"
+        )
+
+        return redirect(
+            url_for("admin.users")
+        )
+
+    # -------------------------------------------------
+    # SUSPEND ONLY THIS IDENTITY
+    #
+    # Other identities belonging to the same user
+    # remain intact.
+    # -------------------------------------------------
+
+    identity.status = "suspended"
+    identity.suspended_at = db.func.now()
+
+    db.session.commit()
+
+    create_notification(
+        user_id=user.id,
+        title="CampusHub identity suspended",
+        message=(
+            f"Your {identity.identity_type} identity "
+            f"({identity.campus_id}) has been suspended "
+            "by college administration."
+        ),
+        notification_type="identity_suspended"
+    )
+
+    flash(
+        f"{identity.campus_id} has been suspended.",
+        "success"
+    )
+
+    return redirect(
+        url_for("admin.users")
+    )
+
+
+@admin_bp.route(
+    "/identities/<int:identity_id>/activate",
+    methods=["POST"]
+)
+@login_required
+def activate_identity(identity_id):
+
+    if current_user.role != "admin":
+        return "Access denied", 403
+
+    identity = db.session.get(
+        CampusIdentity,
+        identity_id
+    )
+
+    if identity is None:
+        return "Identity not found", 404
+
+    user = db.session.get(
+        User,
+        identity.user_id
+    )
+
+    if user is None:
+        return "User not found", 404
+
+    identity.status = "active"
+    identity.suspended_at = None
+
+    if identity.activated_at is None:
+        identity.activated_at = db.func.now()
+
+    db.session.commit()
+
+    create_notification(
+        user_id=user.id,
+        title="CampusHub identity activated",
+        message=(
+            f"Your {identity.identity_type} identity "
+            f"({identity.campus_id}) is now active."
+        ),
+        notification_type="identity_activated"
+    )
+
+    flash(
+        f"{identity.campus_id} has been activated.",
+        "success"
+    )
+
+    return redirect(
+        url_for("admin.users")
+    )
 
 @admin_bp.route("/dashboard")
 @login_required
@@ -344,6 +617,109 @@ def postpone(event_id):
         event=event
     )
 
+
+
+
+
+# =========================================================
+# ADMIN PASSWORD RESET
+# =========================================================
+
+@admin_bp.route(
+    "/users/<int:user_id>/reset-password",
+    methods=["GET", "POST"]
+)
+@login_required
+def reset_user_password(user_id):
+
+    if current_user.role != "admin":
+        return "Access denied", 403
+
+    user = db.session.get(
+        User,
+        user_id
+    )
+
+    if user is None:
+        return "User not found", 404
+
+    # The permanent head administrator cannot have their
+    # password changed by another administrator.
+    if (
+        user.email.lower() == HEAD_ADMIN_EMAIL
+        and current_user.email.lower() != HEAD_ADMIN_EMAIL
+    ):
+        flash(
+            "The permanent head administrator account is protected.",
+            "warning"
+        )
+
+        return redirect(
+            url_for("admin.users")
+        )
+
+    if request.method == "POST":
+
+        password = request.form.get(
+            "password",
+            ""
+        )
+
+        confirm_password = request.form.get(
+            "confirm_password",
+            ""
+        )
+
+        if len(password) < 8:
+
+            flash(
+                "Password must contain at least 8 characters.",
+                "error"
+            )
+
+            return render_template(
+                "admin/reset_user_password.html",
+                user=user
+            )
+
+        if password != confirm_password:
+
+            flash(
+                "The passwords do not match.",
+                "error"
+            )
+
+            return render_template(
+                "admin/reset_user_password.html",
+                user=user
+            )
+
+        user.set_password(password)
+
+        # Invalidate outstanding self-service reset links.
+        PasswordResetToken.query.filter_by(
+            user_id=user.id,
+            used=False
+        ).update(
+            {"used": True},
+            synchronize_session=False
+        )
+
+        db.session.commit()
+
+        flash(
+            f"Password reset successfully for {user.email}.",
+            "success"
+        )
+
+        return redirect(
+            url_for("admin.users")
+        )
+
+    return render_template(
+        "admin/reset_user_password.html",
+        user=user
+    )
 
 
 # =========================================================
@@ -1015,46 +1391,85 @@ def approve_role_application(application_id):
 
 
     # -------------------------------------------------
-    # GRANT THE APPROVED ROLE
-    # -------------------------------------------------
-
-    user.role = application.requested_role
-
-
-    # -------------------------------------------------
-    # UPDATE CAMPUSHUB ID
+    # PRESERVE THE USER'S EXISTING BASE ROLE
     #
-    # Student   -> CH-S-000005
-    # Volunteer -> CH-V-000005
-    # Organizer -> CH-O-000005
+    # A user may own multiple CampusHub identities.
+    # Approving CHV / CHO / CHC must NEVER overwrite
+    # the existing CHS / base account role.
+    #
+    # The active CampusHub identity will determine
+    # which portal the user enters.
     # -------------------------------------------------
 
-    profile = RegistrationProfile.query.filter_by(
-        user_id=user.id
-    ).first()
+    requested_role = application.requested_role.lower().strip()
 
 
-    if profile:
+    # -------------------------------------------------
+    # CAMPUSHUB MULTI-IDENTITY SYSTEM
+    #
+    # Existing identities are NEVER deleted.
+    #
+    # Student   -> CHS-000013
+    # Volunteer -> CHV-000013
+    # Organizer -> CHO-000013
+    # Admin     -> CHC-000013
+    # -------------------------------------------------
 
-        role_code = {
+    role_code = {
 
-            "student": "S",
+        "student": "CHS",
 
-            "volunteer": "V",
+        "volunteer": "CHV",
 
-            "organizer": "O"
+        "organizer": "CHO",
 
-        }.get(
-            application.requested_role
+        "admin": "CHC"
+
+    }.get(requested_role)
+
+
+    if role_code:
+
+        campus_id = (
+            f"{role_code}-"
+            f"{str(user.id).zfill(6)}"
         )
 
+        identity = CampusIdentity.query.filter_by(
+            user_id=user.id,
+            identity_type=requested_role
+        ).first()
 
-        if role_code:
+        if identity is None:
 
-            profile.campus_id = (
-                f"CH-{role_code}-"
-                f"{str(user.id).zfill(6)}"
+            identity = CampusIdentity(
+                user_id=user.id,
+                campus_id=campus_id,
+                identity_type=requested_role,
+                status="active",
+                activated_at=db.func.now()
             )
+
+            db.session.add(identity)
+
+        else:
+
+            identity.status = "active"
+            identity.suspended_at = None
+
+            if identity.activated_at is None:
+                identity.activated_at = db.func.now()
+
+
+    # -------------------------------------------------
+    # KEEP THE ORIGINAL REGISTRATION PROFILE INTACT
+    #
+    # We deliberately DO NOT overwrite
+    # RegistrationProfile.campus_id here.
+    #
+    # This preserves the user's original student /
+    # registration identity and existing relationships.
+    # -------------------------------------------------
 
 
     application.status = "approved"

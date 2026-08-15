@@ -1,0 +1,545 @@
+{% extends "base.html" %}
+
+{% block title %}
+Dashboard — CampusHub
+{% endblock %}
+
+
+{% block content %}
+
+<div class="dashboard-page">
+
+    <!-- =====================================================
+         HEADER
+    ====================================================== -->
+
+    <div class="dashboard-header">
+
+        <div>
+
+            <span class="eyebrow">
+                CAMPUSHUB / STUDENT
+            </span>
+
+            <h1>
+                Hey, {{ current_user.name.split()[0] }}.
+                <span class="wave">✦</span>
+            </h1>
+
+            <p>
+                Discover what's happening around your campus.
+            </p>
+
+        </div>
+
+
+        <a
+            href="{{ url_for('events.pinboard') }}"
+            class="dashboard-action"
+        >
+            Explore Events
+            <span>→</span>
+        </a>
+
+    </div>
+
+
+    <!-- =====================================================
+         QUICK STATS
+    ====================================================== -->
+
+    <div class="student-stats">
+
+
+        <div class="student-stat">
+
+            <div class="stat-icon">
+                ✦
+            </div>
+
+            <div>
+
+                <span>
+                    UPCOMING EVENTS
+                </span>
+
+                <strong>
+                    {{ upcoming_events|length }}
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        <div class="student-stat">
+
+            <div class="stat-icon">
+                ◈
+            </div>
+
+            <div>
+
+                <span>
+                    MY REGISTRATIONS
+                </span>
+
+                <strong>
+                    {{ current_user.registrations|length }}
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        <div class="student-stat">
+
+            <div class="stat-icon">
+                ♡
+            </div>
+
+            <div>
+
+                <span>
+                    EVENTS ATTENDED
+                </span>
+
+                <strong>
+                    {{
+                        current_user.registrations
+                        |selectattr("checked_in")
+                        |list
+                        |length
+                    }}
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        <div class="student-stat">
+
+            <div class="stat-icon">
+                ★
+            </div>
+
+            <div>
+
+                <span>
+                    CERTIFICATES
+                </span>
+
+                <strong>
+                    {{ current_user.certificates|length }}
+                </strong>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         EVAi
+    ====================================================== -->
+
+    <div class="evai-card">
+
+        <div class="evai-orb">
+            ✦
+        </div>
+
+        <div class="evai-content">
+
+            <span class="evai-label">
+                EVAi • CAMPUS AI
+            </span>
+
+            <h2>
+                Need help finding something?
+            </h2>
+
+            <p>
+                Ask EvAi about events, registrations,
+                venues, schedules and everything happening
+                around CampusHub.
+            </p>
+
+
+            <div class="evai-prompts">
+
+                <button>
+                    What's happening this week?
+                </button>
+
+                <button>
+                    Find coding events
+                </button>
+
+                <button>
+                    Where is my next event?
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <a
+            href="#"
+            class="evai-open"
+        >
+            Ask EvAi
+            <span>→</span>
+        </a>
+
+    </div>
+
+
+    <!-- =====================================================
+         EVENTS
+    ====================================================== -->
+
+    <div class="section-header">
+
+        <div>
+
+            <span class="eyebrow">
+                DISCOVER
+            </span>
+
+            <h2>
+                Upcoming on campus
+            </h2>
+
+        </div>
+
+
+        <a href="{{ url_for('events.pinboard') }}">
+            View all →
+        </a>
+
+    </div>
+
+
+    <div class="student-event-grid">
+
+        {% for event in upcoming_events %}
+
+        <a
+            href="{{ url_for(
+                'events.details',
+                event_id=event.id
+            ) }}"
+            class="student-event-card"
+        >
+
+            <div class="event-card-top">
+
+                <span class="event-category">
+                    {{ event.event_type }}
+                </span>
+
+                <span class="event-arrow">
+                    ↗
+                </span>
+
+            </div>
+
+
+            <h3>
+                {{ event.title }}
+            </h3>
+
+
+            <p>
+                {{ event.description }}
+            </p>
+
+
+            <div class="event-card-details">
+
+                <span>
+                    📅 {{ event.date }}
+                </span>
+
+                <span>
+                    ⏰ {{ event.start_time }}
+                </span>
+
+                <span>
+                    📍 {{ event.venue }}
+                </span>
+
+            </div>
+
+        </a>
+
+
+        {% else %}
+
+        <div class="dashboard-empty">
+
+            <div class="empty-symbol">
+                ✦
+            </div>
+
+            <h3>
+                Your campus is quiet... for now.
+            </h3>
+
+            <p>
+                Approved events will appear here.
+            </p>
+
+            <a
+                href="{{ url_for('events.pinboard') }}"
+                class="dashboard-action"
+            >
+                Open Pinboard →
+            </a>
+
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+
+    <!-- =====================================================
+         LOWER GRID
+    ====================================================== -->
+
+    <div class="dashboard-lower-grid">
+
+
+        <!-- =================================================
+             MY REGISTRATIONS
+        ================================================== -->
+
+        <div class="mini-panel">
+
+            <div class="panel-heading">
+
+                <div>
+
+                    <span class="eyebrow">
+                        YOUR ACTIVITY
+                    </span>
+
+                    <h3>
+                        My registrations
+                    </h3>
+
+                </div>
+
+
+                <span class="panel-icon">
+                    ◈
+                </span>
+
+            </div>
+
+
+            {% if current_user.registrations %}
+
+            <div class="empty-mini">
+
+                <span>
+                    🎟
+                </span>
+
+                <p>
+                    You have
+                    <strong>
+                        {{ current_user.registrations|length }}
+                    </strong>
+                    registered event{% if current_user.registrations|length != 1 %}s{% endif %}.
+                </p>
+
+
+                <a
+                    href="{{ url_for(
+                        'events.my_registrations'
+                    ) }}"
+                >
+                    View My Tickets →
+                </a>
+
+            </div>
+
+
+            {% else %}
+
+            <div class="empty-mini">
+
+                <span>
+                    ◌
+                </span>
+
+                <p>
+                    You haven't registered for an event yet.
+                </p>
+
+                <a
+                    href="{{ url_for(
+                        'events.pinboard'
+                    ) }}"
+                >
+                    Find an event →
+                </a>
+
+            </div>
+
+            {% endif %}
+
+        </div>
+
+
+        <!-- =================================================
+             CERTIFICATES
+        ================================================== -->
+
+        <div class="mini-panel">
+
+            <div class="panel-heading">
+
+                <div>
+
+                    <span class="eyebrow">
+                        ACHIEVEMENTS
+                    </span>
+
+                    <h3>
+                        My Certificates
+                    </h3>
+
+                </div>
+
+
+                <span class="panel-icon">
+                    🎓
+                </span>
+
+            </div>
+
+
+            {% if current_user.certificates %}
+
+            <div class="empty-mini">
+
+                <span>
+                    🎓
+                </span>
+
+                <p>
+                    You have
+                    <strong>
+                        {{ current_user.certificates|length }}
+                    </strong>
+                    certificate{% if current_user.certificates|length != 1 %}s{% endif %}.
+                </p>
+
+
+                <a
+                    href="{{ url_for(
+                        'certificate.my_certificates'
+                    ) }}"
+                >
+                    View Certificates →
+                </a>
+
+            </div>
+
+
+            {% else %}
+
+            <div class="empty-mini">
+
+                <span>
+                    ✦
+                </span>
+
+                <p>
+                    Attend eligible events to earn
+                    digital certificates.
+                </p>
+
+
+                <a
+                    href="{{ url_for(
+                        'events.pinboard'
+                    ) }}"
+                >
+                    Explore Events →
+                </a>
+
+            </div>
+
+            {% endif %}
+
+        </div>
+
+
+
+    <!-- =================================================
+         CAMPUS ROLE APPLICATION
+    ================================================== -->
+
+    <div class="content-card">
+
+        <div class="section-heading">
+
+            <div>
+
+                <span class="eyebrow">
+                    CAMPUS ROLES
+                </span>
+
+                <h2>
+                    ✦ Get involved
+                </h2>
+
+                <p>
+                    Apply to become a CampusHub volunteer
+                    or event organizer.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="empty-mini">
+
+            <span>
+                👤
+            </span>
+
+            <p>
+                Take a more active role in your campus
+                community.
+            </p>
+
+            <a
+                href="{{ url_for(
+                    'auth.role_application'
+                ) }}"
+            >
+                Apply for a Campus Role →
+            </a>
+
+        </div>
+
+    </div>
+
+
+    </div>
+
+</div>
+
+{% endblock %}
+

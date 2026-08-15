@@ -1,0 +1,281 @@
+{% extends "base.html" %}
+
+{% block title %}
+Create College Administrator — CampusHub
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+
+    <div>
+
+        <div class="eyebrow">
+            CAMPUSHUB ADMINISTRATION
+        </div>
+
+        <h1>
+            Create College Administrator
+        </h1>
+
+        <p>
+            Provision a new College Administrator identity.
+        </p>
+
+    </div>
+
+    <a
+        href="{{ url_for('admin.users') }}"
+        class="secondary-btn"
+    >
+        ← User Management
+    </a>
+
+</div>
+
+
+<div class="content-card chc-create-card">
+
+    <div class="section-heading">
+
+        <div>
+
+            <span class="eyebrow">
+                CHC IDENTITY
+            </span>
+
+            <h2>
+                New College Administrator
+            </h2>
+
+            <p>
+                A unique CHC identity will be generated automatically.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <form
+        method="POST"
+        class="chc-form"
+    >
+
+        <div class="form-group">
+
+            <label for="name">
+                Full Name
+            </label>
+
+            <input
+                type="text"
+                id="name"
+                name="name"
+                placeholder="College Administrator"
+                required
+            >
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label for="email">
+                Email Address
+            </label>
+
+            <input
+                type="email"
+                id="email"
+                name="email"
+                placeholder="administrator@college.edu"
+                required
+            >
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label for="password">
+                Initial Password
+            </label>
+
+            <input
+                type="password"
+                id="password"
+                name="password"
+                minlength="8"
+                placeholder="Minimum 8 characters"
+                required
+            >
+
+        </div>
+
+
+        <div class="chc-preview">
+
+            <span>
+                ID TYPE
+            </span>
+
+            <strong>
+                CHC-XXXXXX
+            </strong>
+
+            <small>
+                Generated automatically after creation
+            </small>
+
+        </div>
+
+
+        <div class="chc-warning">
+
+            <strong>
+                🔐 Head Administrator Control
+            </strong>
+
+            <p>
+                Only the permanent CampusHub Head Administrator
+                can create College Administrator identities.
+            </p>
+
+        </div>
+
+
+        <div class="chc-actions">
+
+            <a
+                href="{{ url_for('admin.users') }}"
+                class="secondary-btn"
+            >
+                Cancel
+            </a>
+
+            <button
+                type="submit"
+                class="primary-button"
+            >
+                Create CHC Administrator
+            </button>
+
+        </div>
+
+    </form>
+
+</div>
+
+
+<style>
+
+.chc-create-card {
+    max-width: 760px;
+    margin: 0 auto;
+}
+
+.chc-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.chc-form .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.chc-form label {
+    font-weight: 600;
+}
+
+.chc-form input {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.chc-preview {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+
+    padding: 18px;
+
+    border-radius: 14px;
+
+    border: 1px solid rgba(181,140,255,.14);
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(181,140,255,.055),
+            rgba(255,255,255,.018)
+        );
+
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.025),
+        0 0 30px rgba(181,140,255,.035);
+}
+
+.chc-preview span {
+    font-size: .72rem;
+    letter-spacing: .12em;
+    opacity: .55;
+}
+
+.chc-preview strong {
+    font-size: 1.25rem;
+    letter-spacing: .08em;
+    color: #d9c7ff;
+}
+
+.chc-preview small {
+    opacity: .55;
+}
+
+.chc-warning {
+    padding: 15px 17px;
+
+    border-radius: 12px;
+
+    border: 1px solid rgba(181,140,255,.10);
+
+    background: rgba(181,140,255,.035);
+}
+
+.chc-warning strong {
+    color: #d9c7ff;
+}
+
+.chc-warning p {
+    margin: 7px 0 0;
+    opacity: .68;
+}
+
+.chc-actions {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 10px;
+}
+
+@media (max-width: 600px) {
+
+    .chc-actions {
+        flex-direction: column-reverse;
+        align-items: stretch;
+    }
+
+    .chc-actions > * {
+        width: 100%;
+        text-align: center;
+        box-sizing: border-box;
+    }
+
+}
+
+</style>
+
+{% endblock %}

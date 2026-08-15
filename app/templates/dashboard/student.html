@@ -427,57 +427,43 @@ Dashboard — CampusHub
             </div>
 
 
-            {% if current_user.certificates %}
+            {% if session.get("active_identity_type") == "student" %}
 
-            <div class="empty-mini">
+                <div class="empty-mini">
 
-                <span>
-                    🎓
-                </span>
+                    <span>
+                        🎓
+                    </span>
 
-                <p>
-                    You have
-                    <strong>
-                        {{ current_user.certificates|length }}
-                    </strong>
-                    certificate{% if current_user.certificates|length != 1 %}s{% endif %}.
-                </p>
+                    <p>
+                        View your officially issued
+                        digital certificates.
+                    </p>
 
+                    <a
+                        href="{{ url_for(
+                            'certificate.my_certificates'
+                        ) }}"
+                    >
+                        View Certificates →
+                    </a>
 
-                <a
-                    href="{{ url_for(
-                        'certificate.my_certificates'
-                    ) }}"
-                >
-                    View Certificates →
-                </a>
-
-            </div>
-
+                </div>
 
             {% else %}
 
-            <div class="empty-mini">
+                <div class="empty-mini">
 
-                <span>
-                    ✦
-                </span>
+                    <span>
+                        ✦
+                    </span>
 
-                <p>
-                    Attend eligible events to earn
-                    digital certificates.
-                </p>
+                    <p>
+                        Select your student identity
+                        to view digital certificates.
+                    </p>
 
-
-                <a
-                    href="{{ url_for(
-                        'events.pinboard'
-                    ) }}"
-                >
-                    Explore Events →
-                </a>
-
-            </div>
+                </div>
 
             {% endif %}
 

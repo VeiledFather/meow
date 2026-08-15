@@ -1,0 +1,701 @@
+{% extends "base.html" %}
+
+{% block title %}
+Organizer Dashboard — CampusHub
+{% endblock %}
+
+
+{% block content %}
+
+<div class="dashboard-page">
+
+
+    <!-- =================================================
+         HEADER
+    ================================================== -->
+
+    <div class="dashboard-header">
+
+        <div>
+
+            <span class="eyebrow">
+                CAMPUSHUB / ORGANIZER
+            </span>
+
+            <h1>
+                My Events
+                <span class="wave">✦</span>
+            </h1>
+
+            <p>
+                Manage your events, volunteers and
+                campus activities.
+            </p>
+
+        </div>
+
+
+        <a
+            href="{{ url_for('organizer.create_event') }}"
+            class="dashboard-action"
+        >
+            + Host an Event
+            <span>→</span>
+        </a>
+
+    </div>
+
+
+    <!-- =================================================
+         QUICK STATS
+    ================================================== -->
+
+    <div class="student-stats">
+
+
+        <div class="student-stat">
+
+            <div class="stat-icon">
+                ✦
+            </div>
+
+            <div>
+
+                <span>
+                    TOTAL EVENTS
+                </span>
+
+                <strong>
+                    {{ events|length }}
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        <div class="student-stat">
+
+            <div class="stat-icon">
+                ⏳
+            </div>
+
+            <div>
+
+                <span>
+                    PENDING EVENTS
+                </span>
+
+                <strong>
+                    {{ pending_events }}
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        <div class="student-stat">
+
+            <div class="stat-icon">
+                👥
+            </div>
+
+            <div>
+
+                <span>
+                    APPROVED VOLUNTEERS
+                </span>
+
+                <strong>
+                    {{ approved_volunteers }}
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        <div class="student-stat">
+
+            <div class="stat-icon">
+                🎟
+            </div>
+
+            <div>
+
+                <span>
+                    REGISTRATIONS
+                </span>
+
+                <strong>
+                    {{ total_registrations }}
+                </strong>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =================================================
+         ATTENDANCE OVERVIEW
+    ================================================== -->
+
+    <div class="organizer-overview">
+
+        <div>
+
+            <span class="eyebrow">
+                ATTENDANCE
+            </span>
+
+            <h2>
+                Event Activity
+            </h2>
+
+            <p>
+                {{ total_checkins }}
+                students have checked in across
+                your events.
+            </p>
+
+        </div>
+
+
+        <div class="organizer-overview-number">
+
+            {{ total_checkins }}
+
+            <span>
+                CHECK-INS
+            </span>
+
+        </div>
+
+    </div>
+
+
+    <!-- =================================================
+         VOLUNTEER APPLICATIONS
+    ================================================== -->
+
+    <div class="section-header">
+
+        <div>
+
+            <span class="eyebrow">
+                TEAM MANAGEMENT
+            </span>
+
+            <h2>
+                Volunteer Applications
+            </h2>
+
+        </div>
+
+        <span>
+            {{ pending_applications }} pending
+        </span>
+
+    </div>
+
+
+    {% if pending_volunteer_applications %}
+
+
+    <div class="volunteer-applications">
+
+
+        {% for item in pending_volunteer_applications %}
+
+        {% set application = item.application %}
+        {% set event = item.event %}
+
+
+        <div class="volunteer-application-card">
+
+
+            <div class="application-main">
+
+
+                <div class="application-avatar">
+
+                    {{ application.volunteer.name[0]|upper }}
+
+                </div>
+
+
+                <div>
+
+                    <span class="eyebrow">
+                        APPLICATION FOR
+                    </span>
+
+                    <h3>
+                        {{ application.volunteer.name }}
+                    </h3>
+
+                    <p>
+                        {{ application.volunteer.email }}
+                    </p>
+
+
+                    <div class="application-event">
+
+                        <strong>
+                            {{ event.title }}
+                        </strong>
+
+                        <span>
+                            📅 {{ event.date }}
+                            ·
+                            📍 {{ event.venue }}
+                        </span>
+
+                    </div>
+
+
+                    {% if application.message %}
+
+                    <div class="application-message">
+
+                        <strong>
+                            Applicant message
+                        </strong>
+
+                        <p>
+                            {{ application.message }}
+                        </p>
+
+                    </div>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+
+            <div class="application-side">
+
+
+                <span class="volunteer-status pending">
+                    ⏳ Pending
+                </span>
+
+
+                <div class="application-actions">
+
+
+                    <form
+                        method="POST"
+                        action="{{ url_for(
+                            'organizer.approve_volunteer',
+                            application_id=application.id
+                        ) }}"
+                    >
+
+                        <button
+                            type="submit"
+                            class="approve-btn"
+                        >
+                            ✓ Approve
+                        </button>
+
+                    </form>
+
+
+                    <form
+                        method="POST"
+                        action="{{ url_for(
+                            'organizer.reject_volunteer',
+                            application_id=application.id
+                        ) }}"
+                    >
+
+                        <button
+                            type="submit"
+                            class="reject-btn"
+                        >
+                            ✕ Reject
+                        </button>
+
+                    </form>
+
+
+                </div>
+
+            </div>
+
+        </div>
+
+        {% endfor %}
+
+
+    </div>
+
+
+    {% else %}
+
+
+    <div class="empty-mini">
+
+        <span>
+            ✓
+        </span>
+
+        <p>
+            No pending volunteer applications.
+        </p>
+
+    </div>
+
+
+    {% endif %}
+
+
+    <!-- =================================================
+         APPROVED VOLUNTEERS
+    ================================================== -->
+
+    <div class="section-header volunteer-subsection">
+
+        <div>
+
+            <span class="eyebrow">
+                YOUR TEAM
+            </span>
+
+            <h2>
+                Approved Volunteers
+            </h2>
+
+        </div>
+
+        <span>
+            {{ approved_volunteers }} assigned
+        </span>
+
+    </div>
+
+
+    {% if approved_volunteer_applications %}
+
+
+    <div class="approved-volunteer-grid">
+
+
+        {% for item in approved_volunteer_applications %}
+
+        {% set application = item.application %}
+        {% set event = item.event %}
+
+
+        <div class="approved-volunteer-card">
+
+
+            <div class="approved-volunteer-avatar">
+
+                {{ application.volunteer.name[0]|upper }}
+
+            </div>
+
+
+            <div class="approved-volunteer-info">
+
+                <h3>
+                    {{ application.volunteer.name }}
+                </h3>
+
+                <p>
+                    {{ application.volunteer.email }}
+                </p>
+
+                <span>
+
+                    Assigned to
+
+                    <strong>
+                        {{ event.title }}
+                    </strong>
+
+                </span>
+
+            </div>
+
+
+            <div class="volunteer-status approved">
+
+                ✓ Assigned
+
+            </div>
+
+
+        </div>
+
+        {% endfor %}
+
+
+    </div>
+
+
+    {% else %}
+
+
+    <div class="empty-mini">
+
+        <p>
+            No volunteers have been approved yet.
+        </p>
+
+    </div>
+
+
+    {% endif %}
+
+
+    <!-- =================================================
+         YOUR EVENTS
+    ================================================== -->
+
+    <div class="section-header">
+
+        <div>
+
+            <span class="eyebrow">
+                EVENT MANAGEMENT
+            </span>
+
+            <h2>
+                Your Events
+            </h2>
+
+        </div>
+
+
+        <a
+            href="{{ url_for('organizer.create_event') }}"
+        >
+            + Create Event
+        </a>
+
+    </div>
+
+
+    {% if events %}
+
+
+    <div class="student-event-grid">
+
+
+        {% for event in events %}
+
+
+        <div class="student-event-card">
+
+
+            <div class="event-card-top">
+
+                <span class="event-category">
+                    {{ event.event_type }}
+                </span>
+
+
+                <span class="status {{ event.status }}">
+                    {{ event.status|upper }}
+                </span>
+
+            </div>
+
+
+            <h3>
+                {{ event.title }}
+            </h3>
+
+
+            <p>
+                {{ event.description }}
+            </p>
+
+
+            <div class="event-card-details">
+
+                <span>
+                    📅 {{ event.date }}
+                </span>
+
+                <span>
+                    ⏰ {{ event.start_time }}
+                </span>
+
+                <span>
+                    📍 {{ event.venue }}
+                </span>
+
+            </div>
+
+
+            <!-- EVENT STATISTICS -->
+
+            <div class="organizer-event-stats">
+
+
+                <div>
+
+                    <span>
+                        REGISTERED
+                    </span>
+
+                    <strong>
+                        {{ event.total_registrations }}
+                    </strong>
+
+                </div>
+
+
+                <div>
+
+                    <span>
+                        CHECKED IN
+                    </span>
+
+                    <strong>
+                        {{ event.total_checkins }}
+                    </strong>
+
+                </div>
+
+
+                <div>
+
+                    <span>
+                        VOLUNTEERS
+                    </span>
+
+                    <strong>
+                        {{
+                            event.volunteer_applications
+                            |selectattr(
+                                "status",
+                                "equalto",
+                                "approved"
+                            )
+                            |list
+                            |length
+                        }}
+                    </strong>
+
+                </div>
+
+
+            </div>
+
+
+            <!-- EVENT ACTIONS -->
+
+            {% if event.status == "approved" %}
+
+
+            <div class="organizer-event-actions">
+
+                <a
+                    href="{{ url_for(
+                        'organizer.gallery',
+                        event_id=event.id
+                    ) }}"
+                    class="organizer-event-link"
+                >
+                    📸 Gallery
+                </a>
+                <a
+                    href="{{ url_for(
+                        'organizer.attendees',
+                        event_id=event.id
+                    ) }}"
+                    class="organizer-event-link"
+                >
+                    👥 Attendees
+                </a>
+
+
+                <a
+                    href="{{ url_for(
+                        'events.details',
+                        event_id=event.id
+                    ) }}"
+                    class="organizer-event-link"
+                >
+                    View Event →
+                </a>
+
+
+            </div>
+
+
+            {% elif event.status == "pending" %}
+
+
+            <div class="event-notice">
+
+                ⏳ Waiting for management approval
+
+            </div>
+
+
+            {% elif event.status == "rejected" %}
+
+
+            <div class="event-notice rejected">
+
+                ✕ Event proposal was rejected
+
+            </div>
+
+
+            {% endif %}
+
+
+        </div>
+
+        {% endfor %}
+
+
+    </div>
+
+
+    {% else %}
+
+
+    <div class="dashboard-empty">
+
+        <div class="empty-symbol">
+            ✦
+        </div>
+
+        <h3>
+            No events yet.
+        </h3>
+
+        <p>
+            Create your first campus event.
+        </p>
+
+
+        <a
+            href="{{ url_for('organizer.create_event') }}"
+            class="dashboard-action"
+        >
+            Create Event →
+        </a>
+
+    </div>
+
+
+    {% endif %}
+
+
+</div>
+
+{% endblock %}

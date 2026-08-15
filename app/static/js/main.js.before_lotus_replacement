@@ -1,0 +1,1285 @@
+
+
+/* =========================================================
+   EvAi FLOATING ASSISTANT
+========================================================= */
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+        const widget =
+            document.getElementById(
+                "evai-widget"
+            );
+
+        if (!widget) {
+            return;
+        }
+
+
+        const floatButton =
+            document.getElementById(
+                "evai-float-button"
+            );
+
+        const chat =
+            document.getElementById(
+                "evai-chat"
+            );
+
+        const closeButton =
+            document.getElementById(
+                "evai-close"
+            );
+
+        const form =
+            document.getElementById(
+                "evai-chat-form"
+            );
+
+        const input =
+            document.getElementById(
+                "evai-input"
+            );
+
+        const messages =
+            document.getElementById(
+                "evai-messages"
+            );
+
+        const sendButton =
+            document.getElementById(
+                "evai-send"
+            );
+
+
+        function openChat() {
+
+            chat.hidden = false;
+
+            input.focus();
+
+        }
+
+
+        function closeChat() {
+
+            chat.hidden = true;
+
+        }
+
+
+        function scrollMessages() {
+
+            messages.scrollTop =
+                messages.scrollHeight;
+
+        }
+
+
+        function addMessage(
+            text,
+            type
+        ) {
+
+            const wrapper =
+                document.createElement(
+                    "div"
+                );
+
+            wrapper.className =
+                "evai-message " +
+                (
+                    type === "user"
+                        ? "evai-message-user"
+                        : "evai-message-ai"
+                );
+
+
+            const bubble =
+                document.createElement(
+                    "div"
+                );
+
+            bubble.className =
+                "evai-message-bubble";
+
+            bubble.textContent =
+                text;
+
+
+            wrapper.appendChild(
+                bubble
+            );
+
+            messages.appendChild(
+                wrapper
+            );
+
+            scrollMessages();
+
+            return wrapper;
+
+        }
+
+
+        floatButton.addEventListener(
+            "click",
+            function () {
+
+                if (chat.hidden) {
+                    openChat();
+                } else {
+                    closeChat();
+                }
+
+            }
+        );
+
+
+        closeButton.addEventListener(
+            "click",
+            closeChat
+        );
+
+
+        document
+            .querySelectorAll(
+                "[data-evai-prompt]"
+            )
+            .forEach(
+                function (button) {
+
+                    button.addEventListener(
+                        "click",
+                        function () {
+
+                            input.value =
+                                button.dataset.evaiPrompt;
+
+                            input.focus();
+
+                        }
+                    );
+
+                }
+            );
+
+
+        form.addEventListener(
+            "submit",
+            async function (event) {
+
+                event.preventDefault();
+
+
+                const message =
+                    input.value.trim();
+
+
+                if (!message) {
+                    return;
+                }
+
+
+                addMessage(
+                    message,
+                    "user"
+                );
+
+
+                input.value = "";
+
+                input.disabled = true;
+                sendButton.disabled = true;
+
+
+                const typing =
+                    addMessage(
+                        "EvAi is thinking...",
+                        "ai"
+                    );
+
+                typing.classList.add(
+                    "evai-typing"
+                );
+
+
+                try {
+
+                    const response =
+                        await fetch(
+                            "/ai/chat",
+                            {
+                                method: "POST",
+
+                                headers: {
+                                    "Content-Type":
+                                        "application/json"
+                                },
+
+                                body:
+                                    JSON.stringify({
+                                        message:
+                                            message
+                                    })
+                            }
+                        );
+
+
+                    const data =
+                        await response.json();
+
+
+                    typing.remove();
+
+
+                    if (
+                        !response.ok ||
+                        !data.success
+                    ) {
+
+                        addMessage(
+                            data.error ||
+                            "EvAi could not process that request.",
+                            "ai"
+                        );
+
+                        return;
+
+                    }
+
+
+                    addMessage(
+                        data.answer,
+                        "ai"
+                    );
+
+
+                } catch (error) {
+
+                    typing.remove();
+
+                    addMessage(
+                        "I couldn't connect to EvAi right now. Please try again.",
+                        "ai"
+                    );
+
+                    console.error(
+                        "EvAi error:",
+                        error
+                    );
+
+                } finally {
+
+                    input.disabled = false;
+                    sendButton.disabled = false;
+
+                    input.focus();
+
+                }
+
+            }
+        );
+
+    }
+);
+
+
+/* =========================================================
+   CAMPUSHUB — SIGNATURE PAGE MOTION
+========================================================= */
+
+(function () {
+
+    const path = window.location.pathname;
+
+    /*
+     * Give the authentication pages their own visual identity.
+     */
+    if (document.body.classList.contains("auth-page")) {
+
+        if (
+            path.includes("/register") ||
+            path.includes("/signup")
+        ) {
+            document.body.classList.add("auth-register");
+        }
+
+        else if (
+            path.includes("/login") ||
+            path.includes("/signin")
+        ) {
+            document.body.classList.add("auth-login");
+        }
+
+    }
+
+
+
+
+    /*
+     * Smooth internal navigation.
+     *
+     * Only add the small exit fade to ordinary
+     * same-site navigation. Forms, downloads,
+     * external links and special links are untouched.
+     */
+    document.addEventListener("click", function (event) {
+
+        const link = event.target.closest("a");
+
+        if (!link) return;
+
+        if (
+            event.defaultPrevented ||
+            link.target === "_blank" ||
+            link.hasAttribute("download") ||
+            link.href.startsWith("mailto:") ||
+            link.href.startsWith("tel:")
+        ) {
+            return;
+        }
+
+        const url = new URL(link.href, window.location.href);
+
+        if (url.origin !== window.location.origin) {
+            return;
+        }
+
+        if (
+            url.pathname === window.location.pathname &&
+            url.search === window.location.search
+        ) {
+            return;
+        }
+
+        if (
+            link.closest(".evai-chat") ||
+            link.closest("form")
+        ) {
+            return;
+        }
+
+        /*
+         * Don't interfere with modifier-key navigation.
+         */
+        if (
+            event.ctrlKey ||
+            event.metaKey ||
+            event.shiftKey ||
+            event.altKey
+        ) {
+            return;
+        }
+
+        document.body.classList.add("page-exit");
+
+    });
+
+
+})();
+
+
+
+/* =========================================================
+   CAMPUSHUB — CLICK / TAP RIPPLE ENGINE
+   ========================================================= */
+
+(function () {
+
+    "use strict";
+
+
+    function createRipple(x, y) {
+
+        const ripple =
+            document.createElement("span");
+
+        ripple.className =
+            "ch-click-ripple";
+
+        ripple.style.left =
+            x + "px";
+
+        ripple.style.top =
+            y + "px";
+
+        document.body.appendChild(
+            ripple
+        );
+
+
+        ripple.addEventListener(
+            "animationend",
+            function () {
+
+                ripple.remove();
+
+            },
+            { once: true }
+        );
+    }
+
+
+    /*
+     * Pointer events work for BOTH:
+     *
+     * Desktop mouse
+     * Laptop trackpad
+     * Touchscreen
+     * Phone
+     * Tablet
+     *
+     */
+
+    document.addEventListener(
+        "pointerdown",
+        function (event) {
+
+            /*
+             * Don't create a decorative ripple
+             * on controls that already have their
+             * own meaningful interaction.
+             */
+
+            const interactive =
+                event.target.closest(
+                    "a, button, input, select, " +
+                    "textarea, label, summary, " +
+                    "[role='button']"
+                );
+
+
+            /*
+             * Only trigger the "dead/non-functional"
+             * feedback when the clicked thing isn't
+             * an actual interactive control.
+             */
+
+            if (interactive) {
+
+                /*
+                 * If it is explicitly disabled,
+                 * give it the ripple.
+                 */
+
+                if (
+                    interactive.disabled ||
+                    interactive.getAttribute(
+                        "aria-disabled"
+                    ) === "true"
+                ) {
+
+                    createRipple(
+                        event.clientX,
+                        event.clientY
+                    );
+                }
+
+                return;
+            }
+
+
+            /*
+             * Empty/background/non-action area.
+             * Give it the little neon feedback.
+             */
+
+            createRipple(
+                event.clientX,
+                event.clientY
+            );
+
+        },
+        {
+            passive: true
+        }
+    );
+
+})();
+
+
+
+/* =========================================================
+   CAMPUSHUB — ENCHANTED AMBIENT ENGINE
+   ========================================================= */
+
+(function () {
+
+    "use strict";
+
+
+    /* =====================================================
+       🪷 LOTUS VINE
+       ===================================================== */
+
+    function createLotusVine() {
+
+        if (
+            document.querySelector(
+                ".ch-lotus-vine"
+            )
+        ) {
+            return;
+        }
+
+        const vine =
+            document.createElement("div");
+
+        vine.className =
+            "ch-lotus-vine";
+
+        vine.innerHTML = `
+
+            <div class="ch-lotus-stem"></div>
+
+            <div class="ch-lotus-branch one"></div>
+            <div class="ch-lotus-branch two"></div>
+            <div class="ch-lotus-branch three"></div>
+
+            <div class="ch-lotus-leaf one"></div>
+            <div class="ch-lotus-leaf two"></div>
+            <div class="ch-lotus-leaf three"></div>
+
+            <div class="ch-lotus-flower">
+
+                <div class="ch-lotus-petal far-left"></div>
+                <div class="ch-lotus-petal left"></div>
+                <div class="ch-lotus-petal center"></div>
+                <div class="ch-lotus-petal right"></div>
+                <div class="ch-lotus-petal far-right"></div>
+
+                <div class="ch-lotus-core"></div>
+
+            </div>
+        `;
+
+        document.body.appendChild(
+            vine
+        );
+
+
+        /* -------------------------------------------------
+           PIXIE DUST
+           ------------------------------------------------- */
+
+        for (
+            let i = 0;
+            i < 14;
+            i++
+        ) {
+
+            const pixie =
+                document.createElement("span");
+
+            pixie.className =
+                "ch-pixie";
+
+            pixie.style.right =
+                (20 + Math.random() * 105)
+                + "px";
+
+            pixie.style.bottom =
+                (40 + Math.random() * 250)
+                + "px";
+
+            pixie.style.setProperty(
+                "--duration",
+                (3.2 + Math.random() * 3.8)
+                + "s"
+            );
+
+            pixie.style.setProperty(
+                "--drift-x",
+                (-35 + Math.random() * 70)
+                + "px"
+            );
+
+            pixie.style.animationDelay =
+                (-Math.random() * 5)
+                + "s";
+
+            vine.appendChild(
+                pixie
+            );
+        }
+    }
+
+
+    /* =====================================================
+       🦋 BUTTERFLY
+       ===================================================== */
+
+    function createButterfly() {
+
+        /*
+         * Don't spawn too many if the user leaves
+         * the page open for a long time.
+         */
+
+        if (
+            document.querySelectorAll(
+                ".ch-butterfly"
+            ).length >= 2
+        ) {
+            return;
+        }
+
+
+        const butterfly =
+            document.createElement("div");
+
+        butterfly.className =
+            "ch-butterfly";
+
+
+        butterfly.innerHTML = `
+
+            <span class="ch-wing left"></span>
+            <span class="ch-wing right"></span>
+
+            <span class="ch-butterfly-body"></span>
+
+        `;
+
+
+        const edge =
+            Math.floor(
+                Math.random() * 4
+            );
+
+
+        const vw =
+            window.innerWidth;
+
+        const vh =
+            window.innerHeight;
+
+
+        /*
+         * Start and end positions.
+         *
+         * Values are deliberately randomized
+         * so the butterfly never follows exactly
+         * the same path.
+         */
+
+        let startX;
+        let startY;
+        let endX;
+        let endY;
+
+
+        if (edge === 0) {
+
+            /* left */
+
+            startX = -50;
+            startY =
+                40 +
+                Math.random() *
+                (vh - 100);
+
+            endX =
+                vw + 70;
+
+            endY =
+                50 +
+                Math.random() *
+                (vh - 120);
+
+        } else if (edge === 1) {
+
+            /* right */
+
+            startX =
+                vw + 50;
+
+            startY =
+                50 +
+                Math.random() *
+                (vh - 120);
+
+            endX = -70;
+
+            endY =
+                80 +
+                Math.random() *
+                (vh - 140);
+
+        } else if (edge === 2) {
+
+            /* top */
+
+            startX =
+                30 +
+                Math.random() *
+                (vw - 60);
+
+            startY = -50;
+
+            endX =
+                30 +
+                Math.random() *
+                (vw - 60);
+
+            endY =
+                vh + 70;
+
+        } else {
+
+            /* bottom */
+
+            startX =
+                30 +
+                Math.random() *
+                (vw - 60);
+
+            startY =
+                vh + 50;
+
+            endX =
+                30 +
+                Math.random() *
+                (vw - 60);
+
+            endY = -70;
+        }
+
+
+        /*
+         * Generate interesting middle points.
+         */
+
+        const midX =
+            (startX + endX) / 2 +
+            (-160 + Math.random() * 320);
+
+        const midY =
+            (startY + endY) / 2 +
+            (-130 + Math.random() * 260);
+
+
+        const mid2X =
+            (startX + endX) / 2 +
+            (-220 + Math.random() * 440);
+
+        const mid2Y =
+            (startY + endY) / 2 +
+            (-160 + Math.random() * 320);
+
+
+        const finalX =
+            endX +
+            (-80 + Math.random() * 160);
+
+        const finalY =
+            endY +
+            (-80 + Math.random() * 160);
+
+
+        butterfly.style.setProperty(
+            "--start-x",
+            startX + "px"
+        );
+
+        butterfly.style.setProperty(
+            "--start-y",
+            startY + "px"
+        );
+
+        butterfly.style.setProperty(
+            "--mid-x",
+            midX + "px"
+        );
+
+        butterfly.style.setProperty(
+            "--mid-y",
+            midY + "px"
+        );
+
+        butterfly.style.setProperty(
+            "--mid2-x",
+            mid2X + "px"
+        );
+
+        butterfly.style.setProperty(
+            "--mid2-y",
+            mid2Y + "px"
+        );
+
+        butterfly.style.setProperty(
+            "--end-x",
+            endX + "px"
+        );
+
+        butterfly.style.setProperty(
+            "--end-y",
+            endY + "px"
+        );
+
+        butterfly.style.setProperty(
+            "--final-x",
+            finalX + "px"
+        );
+
+        butterfly.style.setProperty(
+            "--final-y",
+            finalY + "px"
+        );
+
+
+        butterfly.style.setProperty(
+            "--start-angle",
+            (-25 + Math.random() * 50)
+            + "deg"
+        );
+
+        butterfly.style.setProperty(
+            "--mid-angle",
+            (-18 + Math.random() * 36)
+            + "deg"
+        );
+
+        butterfly.style.setProperty(
+            "--mid2-angle",
+            (-25 + Math.random() * 50)
+            + "deg"
+        );
+
+        butterfly.style.setProperty(
+            "--end-angle",
+            (-20 + Math.random() * 40)
+            + "deg"
+        );
+
+        butterfly.style.setProperty(
+            "--final-angle",
+            (-30 + Math.random() * 60)
+            + "deg"
+        );
+
+
+        butterfly.style.setProperty(
+            "--flight-duration",
+            (7 + Math.random() * 4)
+            + "s"
+        );
+
+
+        document.body.appendChild(
+            butterfly
+        );
+
+
+        butterfly.addEventListener(
+            "animationend",
+            function () {
+
+                butterfly.remove();
+
+            },
+            {
+                once: true
+            }
+        );
+    }
+
+
+    /* =====================================================
+       TIMING
+       ===================================================== */
+
+    function startButterflies() {
+
+        /*
+         * First butterfly isn't immediate.
+         * The interface gets time to breathe.
+         */
+
+        setTimeout(
+            createButterfly,
+            3000
+        );
+
+
+        setInterval(
+            function () {
+
+                /*
+                 * Small randomness around 5 seconds.
+                 * This prevents a mechanical rhythm.
+                 */
+
+                const delay =
+                    4000 +
+                    Math.random() *
+                    2200;
+
+                setTimeout(
+                    createButterfly,
+                    delay
+                );
+
+            },
+            5000
+        );
+    }
+
+
+    /* =====================================================
+       INITIALIZE
+       ===================================================== */
+
+    function initEnchantedLayer() {
+
+        createLotusVine();
+
+        startButterflies();
+    }
+
+
+    if (
+        document.readyState ===
+        "loading"
+    ) {
+
+        document.addEventListener(
+            "DOMContentLoaded",
+            initEnchantedLayer,
+            { once: true }
+        );
+
+    } else {
+
+        initEnchantedLayer();
+
+    }
+
+})();
+
+
+
+/* =========================================================
+   CAMPUSHUB — RELIABLE BUTTERFLY V2
+   ========================================================= */
+
+(function () {
+
+    "use strict";
+
+
+    function spawnButterfly() {
+
+        /*
+         * Don't stack butterflies.
+         */
+
+        if (
+            document.querySelectorAll(
+                ".ch-butterfly-v2"
+            ).length >= 2
+        ) {
+            return;
+        }
+
+
+        const butterfly =
+            document.createElement("div");
+
+        butterfly.className =
+            "ch-butterfly-v2";
+
+
+        butterfly.innerHTML = `
+
+            <span class="wing left-wing"></span>
+            <span class="wing right-wing"></span>
+
+            <span class="body"></span>
+
+        `;
+
+
+        const width =
+            window.innerWidth;
+
+        const height =
+            window.innerHeight;
+
+
+        /*
+         * Choose one of the four edges.
+         */
+
+        const edge =
+            Math.floor(
+                Math.random() * 4
+            );
+
+
+        let sx, sy, fx, fy;
+
+
+        if (edge === 0) {
+
+            /* left → right */
+
+            sx = -55;
+
+            sy =
+                70 +
+                Math.random() *
+                (height - 140);
+
+            fx =
+                width + 55;
+
+            fy =
+                70 +
+                Math.random() *
+                (height - 140);
+
+        } else if (edge === 1) {
+
+            /* right → left */
+
+            sx =
+                width + 55;
+
+            sy =
+                70 +
+                Math.random() *
+                (height - 140);
+
+            fx = -55;
+
+            fy =
+                70 +
+                Math.random() *
+                (height - 140);
+
+        } else if (edge === 2) {
+
+            /* top → bottom */
+
+            sx =
+                50 +
+                Math.random() *
+                (width - 100);
+
+            sy = -55;
+
+            fx =
+                50 +
+                Math.random() *
+                (width - 100);
+
+            fy =
+                height + 55;
+
+        } else {
+
+            /* bottom → top */
+
+            sx =
+                50 +
+                Math.random() *
+                (width - 100);
+
+            sy =
+                height + 55;
+
+            fx =
+                50 +
+                Math.random() *
+                (width - 100);
+
+            fy = -55;
+        }
+
+
+        /*
+         * Generate two large intermediate points.
+         * This creates a wandering flight path.
+         */
+
+        const mx1 =
+            (sx + fx) / 3 +
+            (-180 + Math.random() * 360);
+
+        const my1 =
+            (sy + fy) / 3 +
+            (-150 + Math.random() * 300);
+
+
+        const mx2 =
+            (sx + fx) * 2 / 3 +
+            (-180 + Math.random() * 360);
+
+        const my2 =
+            (sy + fy) * 2 / 3 +
+            (-150 + Math.random() * 300);
+
+
+        butterfly.style.setProperty(
+            "--sx",
+            sx + "px"
+        );
+
+        butterfly.style.setProperty(
+            "--sy",
+            sy + "px"
+        );
+
+        butterfly.style.setProperty(
+            "--mx1",
+            mx1 + "px"
+        );
+
+        butterfly.style.setProperty(
+            "--my1",
+            my1 + "px"
+        );
+
+        butterfly.style.setProperty(
+            "--mx2",
+            mx2 + "px"
+        );
+
+        butterfly.style.setProperty(
+            "--my2",
+            my2 + "px"
+        );
+
+        butterfly.style.setProperty(
+            "--ex",
+            fx + "px"
+        );
+
+        butterfly.style.setProperty(
+            "--ey",
+            fy + "px"
+        );
+
+
+        /*
+         * Final point extends slightly beyond
+         * the screen so the butterfly disappears
+         * naturally rather than stopping.
+         */
+
+        butterfly.style.setProperty(
+            "--fx",
+            (
+                fx +
+                (fx > width / 2 ? 80 : -80)
+            ) + "px"
+        );
+
+        butterfly.style.setProperty(
+            "--fy",
+            (
+                fy +
+                (fy > height / 2 ? 80 : -80)
+            ) + "px"
+        );
+
+
+        /*
+         * Gentle random body rotation.
+         */
+
+        butterfly.style.setProperty(
+            "--a1",
+            (-18 + Math.random() * 36)
+            + "deg"
+        );
+
+        butterfly.style.setProperty(
+            "--a2",
+            (-28 + Math.random() * 56)
+            + "deg"
+        );
+
+        butterfly.style.setProperty(
+            "--a3",
+            (-20 + Math.random() * 40)
+            + "deg"
+        );
+
+        butterfly.style.setProperty(
+            "--a4",
+            (-30 + Math.random() * 60)
+            + "deg"
+        );
+
+        butterfly.style.setProperty(
+            "--a5",
+            (-25 + Math.random() * 50)
+            + "deg"
+        );
+
+
+        const flightTime =
+            7 +
+            Math.random() * 4;
+
+        butterfly.style.setProperty(
+            "--flight-time",
+            flightTime + "s"
+        );
+
+
+        document.body.appendChild(
+            butterfly
+        );
+
+
+        butterfly.addEventListener(
+            "animationend",
+            function () {
+
+                butterfly.remove();
+
+            },
+            {
+                once: true
+            }
+        );
+    }
+
+
+    /*
+     * Wait a little after page load.
+     */
+
+    setTimeout(
+        spawnButterfly,
+        2500
+    );
+
+
+    /*
+     * New butterfly approximately every 5 seconds.
+     * Random delay prevents robotic timing.
+     */
+
+    setInterval(
+        function () {
+
+            setTimeout(
+                spawnButterfly,
+                500 +
+                Math.random() * 1800
+            );
+
+        },
+        5000
+    );
+
+
+})();
+

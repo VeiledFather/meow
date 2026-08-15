@@ -2,6 +2,21 @@
 
 {% block title %}
 Login — CampusHub
+
+<style>
+.auth-forgot-link {
+    color: #cdb6ff;
+    font-size: .82rem;
+    text-decoration: none;
+    transition: color .2s ease, text-shadow .2s ease;
+}
+
+.auth-forgot-link:hover {
+    color: #eee6ff;
+    text-shadow: 0 0 14px rgba(181,140,255,.45);
+}
+</style>
+
 {% endblock %}
 
 
@@ -115,6 +130,16 @@ Login — CampusHub
                 </button>
 
             </form>
+
+
+            <div style="text-align:right; margin-top:12px;">
+                <a
+                    href="{{ url_for('auth.forgot_password') }}"
+                    class="auth-forgot-link"
+                >
+                    Forgot password?
+                </a>
+            </div>
 
 
             <div class="auth-divider">

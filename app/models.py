@@ -51,6 +51,47 @@ class User(UserMixin, db.Model):
         )
 
 
+
+# =========================================================
+# PASSWORD RESET TOKEN
+# =========================================================
+
+class PasswordResetToken(db.Model):
+
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
+
+    user_id = db.Column(
+        db.Integer,
+        db.ForeignKey("user.id"),
+        nullable=False
+    )
+
+    token = db.Column(
+        db.String(128),
+        unique=True,
+        nullable=False
+    )
+
+    expires_at = db.Column(
+        db.DateTime,
+        nullable=False
+    )
+
+    used = db.Column(
+        db.Boolean,
+        default=False,
+        nullable=False
+    )
+
+    created_at = db.Column(
+        db.DateTime,
+        default=db.func.now()
+    )
+
+
 # =========================================================
 # EVENT
 # =========================================================
@@ -562,6 +603,67 @@ class RoleApplication(db.Model):
         "User",
         backref=db.backref(
             "role_applications",
+            lazy=True,
+            cascade="all, delete-orphan"
+        )
+    )
+
+
+# =========================================================
+# CAMPUSHUB IDENTITY SYSTEM
+# =========================================================
+
+class CampusIdentity(db.Model):
+
+    __tablename__ = "campus_identity"
+
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
+
+    user_id = db.Column(
+        db.Integer,
+        db.ForeignKey("user.id"),
+        nullable=False
+    )
+
+    campus_id = db.Column(
+        db.String(30),
+        unique=True,
+        nullable=False
+    )
+
+    identity_type = db.Column(
+        db.String(20),
+        nullable=False
+    )
+
+    status = db.Column(
+        db.String(20),
+        nullable=False,
+        default="pending"
+    )
+
+    created_at = db.Column(
+        db.DateTime,
+        server_default=db.func.now()
+    )
+
+    activated_at = db.Column(
+        db.DateTime,
+        nullable=True
+    )
+
+    suspended_at = db.Column(
+        db.DateTime,
+        nullable=True
+    )
+
+    user = db.relationship(
+        "User",
+        backref=db.backref(
+            "campus_identities",
             lazy=True,
             cascade="all, delete-orphan"
         )

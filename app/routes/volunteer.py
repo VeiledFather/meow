@@ -9,6 +9,7 @@ from flask import (
 )
 
 from flask_login import login_required, current_user
+from flask import session
 
 from app import db
 
@@ -16,7 +17,8 @@ from app.models import (
     Event,
     User,
     VolunteerApplication,
-    Registration
+    Registration,
+    CampusIdentity
 )
 
 
@@ -35,7 +37,28 @@ def volunteer_required():
     if not current_user.is_authenticated:
         return False
 
-    return current_user.role == "volunteer"
+    active_identity_id = session.get(
+        "active_identity_id"
+    )
+
+    identity = None
+
+    if active_identity_id:
+        identity = db.session.get(
+            CampusIdentity,
+            active_identity_id
+        )
+
+    if identity is None:
+        return False
+
+    if identity.user_id != current_user.id:
+        return False
+
+    if identity.identity_type != "volunteer":
+        return False
+
+    return identity.status == "active"
 
 
 def get_approved_assignment(event_id):

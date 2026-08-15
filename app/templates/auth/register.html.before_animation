@@ -1,0 +1,192 @@
+{% extends "base.html" %}
+
+{% block title %}
+Create Account — CampusHub
+{% endblock %}
+
+{% block content %}
+
+<div class="auth-page">
+
+    <div class="auth-glow"></div>
+
+    <div class="auth-container">
+
+        <div class="auth-brand">
+
+            <div class="brand-mark large">
+                C
+            </div>
+
+            <div>
+                Campus<span>Hub</span>
+            </div>
+
+        </div>
+
+
+        <div class="auth-card">
+
+            <div class="auth-heading">
+
+                <span class="eyebrow">
+                    UNIVERSITY EVENT NETWORK
+                </span>
+
+                <h1>
+                    Create your account.
+                </h1>
+
+                <p>
+                    Join CampusHub and discover what's
+                    happening around your campus.
+                </p>
+
+            </div>
+
+
+            {% with messages =
+                get_flashed_messages(
+                    with_categories=true
+                )
+            %}
+
+                {% for category, message in messages %}
+
+                    <div class="alert {{ category }}">
+                        {{ message }}
+                    </div>
+
+                {% endfor %}
+
+            {% endwith %}
+
+
+            <form method="POST">
+
+                <div class="form-group">
+
+                    <label>
+                        Name
+                    </label>
+
+                    <input
+                        type="text"
+                        name="name"
+                        placeholder="Your full name"
+                        autocomplete="name"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        College ID
+                    </label>
+
+                    <input
+                        type="text"
+                        name="college_id"
+                        placeholder="Your college ID"
+                        autocomplete="off"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Date of birth
+                    </label>
+
+                    <input
+                        type="date"
+                        name="date_of_birth"
+                        autocomplete="bday"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Email
+                    </label>
+
+                    <input
+                        type="email"
+                        name="email"
+                        placeholder="you@university.edu"
+                        autocomplete="email"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Password
+                    </label>
+
+                    <input
+                        type="password"
+                        name="password"
+                        placeholder="Create a password"
+                        autocomplete="new-password"
+                        required
+                    >
+
+                </div>
+
+
+                <button
+                    type="submit"
+                    class="primary-button"
+                >
+                    Create account
+                    <span>→</span>
+                </button>
+
+            </form>
+
+
+            <div class="auth-divider">
+
+                <span>
+                    ALREADY REGISTERED?
+                </span>
+
+            </div>
+
+
+            <p class="auth-footer">
+
+                Already have a CampusHub account?
+
+                <a href="{{ url_for('auth.login') }}">
+                    Sign in →
+                </a>
+
+            </p>
+
+
+            <p class="auth-footer">
+                Your campus. Your events. One hub.
+            </p>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

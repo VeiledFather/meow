@@ -1,0 +1,256 @@
+{% extends "base.html" %}
+
+{% block title %}
+Choose CampusHub Identity — CampusHub
+{% endblock %}
+
+{% block content %}
+
+<div class="auth-page identity-selection-page">
+
+    <div class="auth-glow"></div>
+
+    <div class="auth-container">
+
+        <div class="auth-brand">
+
+            <div class="brand-mark large">
+                C
+            </div>
+
+            <div>
+                Campus<span>Hub</span>
+            </div>
+
+        </div>
+
+
+        <div class="auth-card identity-selector-card">
+
+            <div class="auth-heading">
+
+                <span class="eyebrow">
+                    IDENTITY SELECT
+                </span>
+
+                <h1>
+                    Choose your CampusHub ID.
+                </h1>
+
+                <p>
+                    You have multiple active identities.
+                    Choose which CampusHub portal you want to enter.
+                </p>
+
+            </div>
+
+
+            <div class="identity-choice-list">
+
+                {% for identity in identities %}
+
+                <form
+                    method="POST"
+                    action="{{ url_for(
+                        'auth.select_identity',
+                        identity_id=identity.id
+                    ) }}"
+                >
+
+                    <button
+                        type="submit"
+                        class="identity-choice"
+                    >
+
+                        <span class="identity-choice-icon">
+
+                            {% if identity.identity_type == "student" %}
+                                🎓
+                            {% elif identity.identity_type == "volunteer" %}
+                                🤝
+                            {% elif identity.identity_type == "organizer" %}
+                                ✦
+                            {% elif identity.identity_type == "admin" %}
+                                ◈
+                            {% endif %}
+
+                        </span>
+
+
+                        <span class="identity-choice-info">
+
+                            <strong>
+                                {{ identity.campus_id }}
+                            </strong>
+
+                            <span>
+                                {{ identity.identity_type|title }}
+                            </span>
+
+                        </span>
+
+
+                        <span class="identity-choice-arrow">
+                            →
+                        </span>
+
+                    </button>
+
+                </form>
+
+                {% endfor %}
+
+            </div>
+
+
+            <form
+                method="POST"
+                action="{{ url_for('auth.cancel_identity_selection') }}"
+                class="identity-cancel-form"
+            >
+
+                <button
+                    type="submit"
+                    class="secondary-btn"
+                >
+                    ← Back to sign in
+                </button>
+
+            </form>
+
+
+            <p class="auth-footer">
+                Signed in as
+                <strong>{{ user.email }}</strong>
+            </p>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<style>
+
+.identity-selector-card {
+    max-width: 560px;
+}
+
+.identity-choice-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 25px;
+}
+
+.identity-choice-list form {
+    margin: 0;
+}
+
+.identity-choice {
+    width: 100%;
+
+    display: flex;
+    align-items: center;
+    gap: 15px;
+
+    padding: 16px;
+
+    text-align: left;
+
+    border: 1px solid rgba(181,140,255,.12);
+    border-radius: 14px;
+
+    background:
+        linear-gradient(
+            110deg,
+            rgba(181,140,255,.055),
+            rgba(255,255,255,.018)
+        );
+
+    color: inherit;
+
+    cursor: pointer;
+
+    transition:
+        transform .22s ease,
+        border-color .22s ease,
+        box-shadow .22s ease,
+        background .22s ease;
+}
+
+.identity-choice:hover {
+    transform: translateY(-2px);
+
+    border-color: rgba(181,140,255,.30);
+
+    background:
+        linear-gradient(
+            110deg,
+            rgba(181,140,255,.10),
+            rgba(255,255,255,.025)
+        );
+
+    box-shadow:
+        0 8px 30px rgba(181,140,255,.08),
+        0 0 24px rgba(181,140,255,.05);
+}
+
+.identity-choice-icon {
+    width: 42px;
+    height: 42px;
+
+    display: grid;
+    place-items: center;
+
+    flex-shrink: 0;
+
+    border-radius: 12px;
+
+    background: rgba(181,140,255,.08);
+
+    font-size: 1.1rem;
+}
+
+.identity-choice-info {
+    min-width: 0;
+
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.identity-choice-info strong {
+    color: #dccaff;
+    letter-spacing: .04em;
+}
+
+.identity-choice-info span {
+    font-size: .78rem;
+    opacity: .62;
+}
+
+.identity-choice-arrow {
+    margin-left: auto;
+    font-size: 1.25rem;
+    opacity: .55;
+    transition: transform .2s ease;
+}
+
+.identity-choice:hover .identity-choice-arrow {
+    transform: translateX(4px);
+    opacity: .9;
+}
+
+.identity-cancel-form {
+    margin-top: 18px;
+}
+
+.identity-cancel-form .secondary-btn {
+    width: 100%;
+}
+
+</style>
+
+{% endblock %}

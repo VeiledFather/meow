@@ -239,6 +239,112 @@ Certificate Management — CampusHub
 
                     </div>
 
+                    {% if item.checked_in > item.certificates %}
+
+                    <div class="certificate-issue-panel">
+
+                        <div class="certificate-issue-heading">
+
+                            <div>
+                                <span class="eyebrow">
+                                    CERTIFICATE ELIGIBILITY
+                                </span>
+
+                                <strong>
+                                    {{ item.checked_in - item.certificates }}
+                                    certificate{{ "s" if (item.checked_in - item.certificates) != 1 else "" }}
+                                    ready to issue
+                                </strong>
+
+                                <p>
+                                    Certificates can only be issued
+                                    to students who checked in.
+                                </p>
+                            </div>
+
+                        </div>
+
+                        <form
+                            method="POST"
+                            action="{{ url_for(
+                                'organizer.issue_certificates_for_event',
+                                event_id=item.event.id
+                            ) }}"
+                        >
+
+                            <div class="certificate-student-selection">
+
+                                {% for registration in item.event.registrations %}
+
+                                    {% if registration.checked_in %}
+
+                                        {% set already = namespace(found=false) %}
+
+                                        {% for certificate in item.event.certificates %}
+
+                                            {% if certificate.student_id == registration.student_id %}
+                                                {% set already.found = true %}
+                                            {% endif %}
+
+                                        {% endfor %}
+
+                                        {% if not already.found %}
+
+                                        <label class="certificate-student-row">
+
+                                            <input
+                                                type="checkbox"
+                                                name="student_ids"
+                                                value="{{ registration.student_id }}"
+                                            >
+
+                                            <span class="certificate-student-check"></span>
+
+                                            <span class="certificate-student-info">
+
+                                                <strong>
+                                                    {{ registration.student.name }}
+                                                </strong>
+
+                                                <small>
+                                                    {{ registration.student.email }}
+                                                </small>
+
+                                            </span>
+
+                                            <span class="checked-in-badge">
+                                                ✓ CHECKED IN
+                                            </span>
+
+                                        </label>
+
+                                        {% endif %}
+
+                                    {% endif %}
+
+                                {% endfor %}
+
+                            </div>
+
+                            <button
+                                type="submit"
+                                class="primary-btn certificate-issue-btn"
+                            >
+                                ✦ Issue Selected Certificates
+                            </button>
+
+                        </form>
+
+                    </div>
+
+                    {% elif item.checked_in == item.certificates and item.checked_in > 0 %}
+
+                    <div class="certificate-complete-panel">
+                        ✓ All checked-in participants have received certificates.
+                    </div>
+
+                    {% endif %}
+
                 </div>
 
             {% endfor %}

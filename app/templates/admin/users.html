@@ -9,7 +9,6 @@ User Management — CampusHub
 <div class="page-header">
 
     <div>
-
         <div class="eyebrow">
             COLLEGE MANAGEMENT
         </div>
@@ -21,16 +20,29 @@ User Management — CampusHub
         <p>
             View students, organizers, volunteers and administrators.
         </p>
-
     </div>
 
+    <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
 
-    <a
-        href="{{ url_for('admin.dashboard') }}"
-        class="secondary-btn"
-    >
-        ← Dashboard
-    </a>
+        {% if current_user.email|lower == "admin@campus.com" %}
+
+        <a
+            href="{{ url_for('admin.create_college_admin') }}"
+            class="primary-button"
+        >
+            ＋ Create CHC Administrator
+        </a>
+
+        {% endif %}
+
+        <a
+            href="{{ url_for('admin.dashboard') }}"
+            class="secondary-btn"
+        >
+            ← Dashboard
+        </a>
+
+    </div>
 
 </div>
 
@@ -42,54 +54,23 @@ User Management — CampusHub
 <div class="stats-grid">
 
     <div class="stat-card">
-
-        <span>
-            TOTAL USERS
-        </span>
-
-        <strong>
-            {{ all_users|length }}
-        </strong>
-
+        <span>TOTAL USERS</span>
+        <strong>{{ all_users|length }}</strong>
     </div>
 
-
     <div class="stat-card">
-
-        <span>
-            STUDENTS
-        </span>
-
-        <strong>
-            {{ students|length }}
-        </strong>
-
+        <span>STUDENTS</span>
+        <strong>{{ students|length }}</strong>
     </div>
 
-
     <div class="stat-card">
-
-        <span>
-            ORGANIZERS
-        </span>
-
-        <strong>
-            {{ organizers|length }}
-        </strong>
-
+        <span>ORGANIZERS</span>
+        <strong>{{ organizers|length }}</strong>
     </div>
 
-
     <div class="stat-card">
-
-        <span>
-            VOLUNTEERS
-        </span>
-
-        <strong>
-            {{ volunteers|length }}
-        </strong>
-
+        <span>VOLUNTEERS</span>
+        <strong>{{ volunteers|length }}</strong>
     </div>
 
 </div>
@@ -104,7 +85,6 @@ User Management — CampusHub
     <div class="section-heading">
 
         <div>
-
             <span class="eyebrow">
                 CAMPUSHUB DIRECTORY
             </span>
@@ -116,7 +96,6 @@ User Management — CampusHub
             <p>
                 Registered CampusHub accounts and identity information.
             </p>
-
         </div>
 
     </div>
@@ -126,6 +105,13 @@ User Management — CampusHub
 
         {% for user in all_users %}
 
+        {% set permanent_demo = user.email|lower in [
+            "admin@campus.com",
+            "organizer@campus.com",
+            "volunteer@campus.com",
+            "student@campus.com"
+        ] %}
+
         <div class="approval-card">
 
             <div class="approval-info">
@@ -134,11 +120,9 @@ User Management — CampusHub
                     USER #{{ user.id }}
                 </div>
 
-
                 <h3>
                     {{ user.name }}
                 </h3>
-
 
                 <p>
                     {{ user.email }}
@@ -146,7 +130,150 @@ User Management — CampusHub
 
 
                 <!-- =====================================
-                     CAMPUSHUB ID
+                     CAMPUSHUB IDENTITIES
+                ====================================== -->
+
+                {% if user.campus_identities %}
+
+                    <div class="identity-section">
+
+                        <div class="event-meta">
+                            🪪
+                            <strong>
+                                CampusHub Identities
+                            </strong>
+                        </div>
+
+
+                        <div class="campushub-identities">
+
+                            {% for identity in user.campus_identities %}
+
+                            <div class="campus-identity-row">
+
+                                <div class="campus-identity-main">
+
+                                    <strong class="campus-id-value">
+                                        {{ identity.campus_id }}
+                                    </strong>
+
+                                    <span class="identity-type">
+                                        {{ identity.identity_type|title }}
+                                    </span>
+
+                                    {% if identity.status == "active" %}
+
+                                        <span class="approved-badge">
+                                            ACTIVE
+                                        </span>
+
+                                    {% elif identity.status == "suspended" %}
+
+                                        <span class="rejected-badge">
+                                            SUSPENDED
+                                        </span>
+
+                                    {% else %}
+
+                                        <span class="pending-badge">
+                                            {{ identity.status|upper }}
+                                        </span>
+
+                                    {% endif %}
+
+                                </div>
+
+
+                                <div class="campus-identity-actions">
+
+                                    {% if current_user.email|lower == "admin@campus.com"
+                                          or user.email|lower != "admin@campus.com" %}
+
+                                        <a
+                                            href="{{ url_for(
+                                                'admin.reset_user_password',
+                                                user_id=user.id
+                                            ) }}"
+                                            class="secondary-btn identity-action-btn"
+                                        >
+                                            🔑 Reset Password
+                                        </a>
+
+                                    {% endif %}
+
+                                    {% if permanent_demo %}
+
+                                        <span
+                                            class="identity-protected"
+                                            title="Permanent CampusHub demo identity"
+                                        >
+                                            🔒 PERMANENT
+                                        </span>
+
+                                    {% elif identity.status == "suspended" %}
+
+                                        <form
+                                            method="POST"
+                                            action="{{ url_for(
+                                                'admin.activate_identity',
+                                                identity_id=identity.id
+                                            ) }}"
+                                        >
+
+                                            <button
+                                                type="submit"
+                                                class="secondary-btn identity-action-btn"
+                                            >
+                                                ✓ Activate
+                                            </button>
+
+                                        </form>
+
+                                    {% else %}
+
+                                        <form
+                                            method="POST"
+                                            action="{{ url_for(
+                                                'admin.suspend_identity',
+                                                identity_id=identity.id
+                                            ) }}"
+                                            onsubmit="return confirm(
+                                                'Suspend {{ identity.campus_id }}? This will prevent access through this identity.'
+                                            );"
+                                        >
+
+                                            <button
+                                                type="submit"
+                                                class="danger-btn identity-action-btn"
+                                            >
+                                                Suspend
+                                            </button>
+
+                                        </form>
+
+                                    {% endif %}
+
+                                </div>
+
+                            </div>
+
+                            {% endfor %}
+
+                        </div>
+
+                    </div>
+
+                {% else %}
+
+                    <div class="event-meta">
+                        🪪 No CampusHub identity records yet.
+                    </div>
+
+                {% endif %}
+
+
+                <!-- =====================================
+                     LEGACY / REGISTRATION INFORMATION
                 ====================================== -->
 
                 {% if user.registration_profile %}
@@ -154,13 +281,12 @@ User Management — CampusHub
                 <div class="event-meta">
 
                     🪪
-                    CampusHub ID:
+                    Original CampusHub ID:
                     <strong>
                         {{ user.registration_profile.campus_id }}
                     </strong>
 
                 </div>
-
 
                 <div class="event-meta">
 
@@ -180,7 +306,7 @@ User Management — CampusHub
 
 
                 <!-- =====================================
-                     ROLE APPLICATION INFORMATION
+                     ROLE APPLICATION
                 ====================================== -->
 
                 {% if user.role_applications %}
@@ -243,7 +369,7 @@ User Management — CampusHub
 
 
             <!-- =========================================
-                 ROLE
+                 CURRENT ACCOUNT ROLE
             ========================================== -->
 
             <div class="approval-actions">
@@ -280,6 +406,15 @@ User Management — CampusHub
 
                 {% endif %}
 
+
+                {% if permanent_demo %}
+
+                    <span class="identity-protected">
+                        🔒 Demo Protected
+                    </span>
+
+                {% endif %}
+
             </div>
 
         </div>
@@ -307,5 +442,128 @@ User Management — CampusHub
     {% endif %}
 
 </div>
+
+
+<style>
+
+/* =========================================================
+   CAMPUSHUB IDENTITY MANAGEMENT UI
+========================================================= */
+
+.identity-section {
+    margin-top: 18px;
+}
+
+.campushub-identities {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.campus-identity-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+
+    padding: 11px 13px;
+
+    border: 1px solid rgba(181, 140, 255, .10);
+    border-radius: 12px;
+
+    background:
+        linear-gradient(
+            90deg,
+            rgba(181,140,255,.035),
+            rgba(255,255,255,.018)
+        );
+
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.025);
+}
+
+.campus-identity-main {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    min-width: 0;
+}
+
+.campus-id-value {
+    color: #d8c6ff;
+    letter-spacing: .04em;
+    white-space: nowrap;
+}
+
+.identity-type {
+    font-size: .78rem;
+    opacity: .72;
+}
+
+.campus-identity-actions {
+    flex-shrink: 0;
+}
+
+.campus-identity-actions form {
+    margin: 0;
+}
+
+.identity-action-btn {
+    min-height: 34px;
+    padding: 7px 13px;
+    white-space: nowrap;
+}
+
+.danger-btn {
+    border: 1px solid rgba(255, 100, 125, .22);
+    background: rgba(255, 80, 110, .07);
+    color: #ff9aaa;
+    border-radius: 9px;
+    padding: 7px 13px;
+    cursor: pointer;
+    transition:
+        .2s ease;
+}
+
+.danger-btn:hover {
+    background: rgba(255, 80, 110, .13);
+    border-color: rgba(255, 100, 125, .38);
+    box-shadow:
+        0 0 18px rgba(255, 80, 110, .10);
+}
+
+.identity-protected {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+
+    font-size: .72rem;
+    font-weight: 700;
+    letter-spacing: .04em;
+
+    color: rgba(216,198,255,.70);
+    white-space: nowrap;
+}
+
+@media (max-width: 700px) {
+
+    .campus-identity-row {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .campus-identity-actions {
+        width: 100%;
+    }
+
+    .identity-action-btn {
+        width: 100%;
+    }
+
+}
+
+</style>
 
 {% endblock %}

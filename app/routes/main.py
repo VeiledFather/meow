@@ -1,8 +1,14 @@
-from flask import Blueprint, render_template, redirect, url_for
+from flask import Blueprint, render_template, redirect, url_for, session
 
 from flask_login import login_required, current_user
 
-from app.models import Event, Registration
+from app import db
+
+from app.models import (
+    Event,
+    Registration,
+    CampusIdentity
+)
 
 
 main_bp = Blueprint(
@@ -28,20 +34,79 @@ def index():
 @login_required
 def dashboard():
 
-    if current_user.role == "admin":
+    # =====================================================
+    # ACTIVE CAMPUSHUB IDENTITY
+    # =====================================================
+
+    active_identity_id = session.get(
+        "active_identity_id"
+    )
+
+    identity = None
+
+    if active_identity_id:
+        identity = db.session.get(
+            CampusIdentity,
+            active_identity_id
+        )
+
+    # If no valid active identity exists, choose from
+    # currently active identities.
+    if (
+        identity is None
+        or identity.user_id != current_user.id
+        or identity.status != "active"
+    ):
+
+        identities = (
+            CampusIdentity.query
+            .filter_by(
+                user_id=current_user.id,
+                status="active"
+            )
+            .order_by(
+                CampusIdentity.id.asc()
+            )
+            .all()
+        )
+
+        if not identities:
+            return "No active CampusHub identity is available.", 403
+
+        if len(identities) > 1:
+            return redirect(
+                url_for("auth.login")
+            )
+
+        identity = identities[0]
+
+        session["active_identity_id"] = identity.id
+        session["active_identity_type"] = identity.identity_type
+
+    identity_type = identity.identity_type
+
+    # =====================================================
+    # PORTAL ROUTING
+    # =====================================================
+
+    if identity_type == "admin":
         return redirect(
             url_for("admin.dashboard")
         )
 
-    if current_user.role == "organizer":
+    if identity_type == "organizer":
         return redirect(
             url_for("organizer.dashboard")
         )
 
-    if current_user.role == "volunteer":
+    if identity_type == "volunteer":
         return redirect(
             url_for("volunteer.dashboard")
         )
+
+    # =====================================================
+    # STUDENT DASHBOARD
+    # =====================================================
 
     upcoming_events = Event.query.filter_by(
         status="approved"
@@ -73,7 +138,6 @@ def dashboard():
         attended_count=attended_count,
         review_count=review_count
     )
-
 
 @main_bp.route("/profile")
 @login_required
