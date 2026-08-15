@@ -155,5 +155,43 @@ def create_app():
 
         db.create_all()
 
+        # Temporary Render SQLite diagnostic
+        try:
+            from app.models import User, CampusIdentity
+
+            print("=" * 70)
+            print("CAMPUSHUB POST-CREATE DATABASE CHECK")
+            print("=" * 70)
+            print(
+                "DATABASE:",
+                "POSTGRESQL"
+                if os.getenv("DATABASE_URL")
+                else "SQLITE"
+            )
+            print("DRIVER:", db.engine.url.drivername)
+            print("USERS:", User.query.count())
+            print("IDENTITIES:", CampusIdentity.query.count())
+
+            for identity in CampusIdentity.query.all():
+                print(
+                    "IDENTITY:",
+                    identity.id,
+                    identity.campus_id,
+                    "user=",
+                    identity.user_id,
+                    "type=",
+                    identity.identity_type,
+                    "status=",
+                    identity.status
+                )
+
+            print("=" * 70)
+
+        except Exception as e:
+            print("=" * 70)
+            print("POST-CREATE DATABASE CHECK FAILED")
+            print(type(e).__name__ + ":", str(e))
+            print("=" * 70)
+
 
     return app
