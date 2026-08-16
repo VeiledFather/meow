@@ -1,3 +1,4 @@
+from datetime import datetime
 from flask import (
     session,
     Blueprint,
@@ -368,6 +369,81 @@ def create_event():
                 "equipment_requirements",
                 ""
             ).strip()
+
+
+            try:
+                event_date = datetime.strptime(
+                    date,
+                    "%Y-%m-%d"
+                ).date()
+
+                event_start = datetime.strptime(
+                    start,
+                    "%H:%M"
+                ).time()
+
+            except ValueError:
+                flash(
+                    "Please enter a valid event date and time.",
+                    "error"
+                )
+
+                return render_template(
+                    "organizer/create_event.html"
+                )
+
+
+            now = datetime.now()
+
+            event_datetime = datetime.combine(
+                event_date,
+                event_start
+            )
+
+
+            if event_datetime <= now:
+                flash(
+                    "Event date and start time must be in the future.",
+                    "error"
+                )
+
+                return render_template(
+                    "organizer/create_event.html"
+                )
+
+
+            event_date = datetime.strptime(
+                date,
+                "%Y-%m-%d"
+            ).date()
+
+            event_start = datetime.strptime(
+                start,
+                "%H:%M"
+            ).time()
+
+            from zoneinfo import ZoneInfo
+
+            now = datetime.now(
+                ZoneInfo("Asia/Kolkata")
+            )
+
+            event_datetime = datetime.combine(
+                event_date,
+                event_start
+            ).replace(
+                tzinfo=ZoneInfo("Asia/Kolkata")
+            )
+
+            if event_datetime <= now:
+                flash(
+                    "Event date and start time must be in the future.",
+                    "error"
+                )
+
+                return render_template(
+                    "organizer/create_event.html"
+                )
 
 
             if start >= end:
