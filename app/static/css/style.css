@@ -17004,3 +17004,2578 @@ body.ch-cursor-active .ch-cursor-aura {
 
 }
 
+
+
+/* =========================================================
+   CAMPUSHUB — LIGHTWEIGHT WATER RIPPLE
+========================================================= */
+
+#campus-water-canvas {
+    position: fixed;
+    inset: 0;
+
+    width: 100%;
+    height: 100%;
+
+    pointer-events: none;
+
+    z-index: 999998;
+
+    opacity: 1;
+
+    contain: strict;
+}
+
+@media (max-width: 700px) {
+
+    #campus-water-canvas {
+        /*
+         * Keep the effect extremely cheap on phones.
+         */
+        opacity: .72;
+    }
+
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    #campus-water-canvas {
+        display: none;
+    }
+
+}
+
+
+/* =========================================================
+   CAMPUSHUB — PREMIUM INTERACTION PACK
+   3. Cursor trail
+   4. Press compression
+   6. Card spotlight
+   7. Ambient navbar shimmer
+   8. Traveling card border
+   10. Long-press Easter egg
+========================================================= */
+
+
+/* =========================================================
+   4 — PRESS COMPRESSION
+========================================================= */
+
+button,
+a,
+.btn,
+.primary-btn,
+.secondary-btn,
+.dashboard-action,
+.nav-item,
+.card,
+.stat-card,
+.student-event-card,
+.volunteer-event-card,
+.content-card,
+.panel {
+
+    -webkit-tap-highlight-color: transparent;
+
+}
+
+button:active,
+a:active,
+.btn:active,
+.primary-btn:active,
+.secondary-btn:active,
+.dashboard-action:active {
+
+    transform:
+        scale(.975);
+
+    transition:
+        transform .08s ease;
+
+}
+
+
+/* =========================================================
+   6 — CARD SPOTLIGHT
+========================================================= */
+
+.stat-card,
+.student-event-card,
+.volunteer-event-card,
+.content-card,
+.panel,
+.card {
+
+    --spot-x: 50%;
+    --spot-y: 50%;
+
+    position: relative;
+
+    overflow: hidden;
+
+}
+
+
+/*
+ * The spotlight is deliberately very subtle.
+ * It only exists while hovering.
+ */
+
+.stat-card::after,
+.student-event-card::after,
+.volunteer-event-card::after,
+.content-card::after,
+.panel::after,
+.card::after {
+
+    content: "";
+
+    position: absolute;
+
+    width: 190px;
+    height: 190px;
+
+    left:
+        var(--spot-x);
+
+    top:
+        var(--spot-y);
+
+    transform:
+        translate(-50%, -50%);
+
+    pointer-events: none;
+
+    border-radius: 50%;
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(205,175,255,.11),
+            rgba(205,175,255,.045) 32%,
+            transparent 72%
+        );
+
+    opacity: 0;
+
+    transition:
+        opacity .25s ease;
+
+}
+
+@media (hover: hover) {
+
+    .stat-card:hover::after,
+    .student-event-card:hover::after,
+    .volunteer-event-card:hover::after,
+    .content-card:hover::after,
+    .panel:hover::after,
+    .card:hover::after {
+
+        opacity: 1;
+
+    }
+
+}
+
+
+/* =========================================================
+   8 — TRAVELING CARD BORDER
+========================================================= */
+
+@media (hover: hover) {
+
+    .campus-border-flow {
+
+        position: relative;
+
+    }
+
+    .campus-border-flow::before {
+
+        content: "";
+
+        position: absolute;
+
+        inset: 0;
+
+        border-radius: inherit;
+
+        padding: 1px;
+
+        background:
+            conic-gradient(
+                from 0deg,
+                transparent 0deg,
+                transparent 280deg,
+                rgba(216,190,255,.08) 300deg,
+                rgba(220,195,255,.75) 330deg,
+                rgba(216,190,255,.08) 350deg,
+                transparent 360deg
+            );
+
+        -webkit-mask:
+            linear-gradient(#000 0 0)
+            content-box,
+            linear-gradient(#000 0 0);
+
+        -webkit-mask-composite: xor;
+
+        mask-composite: exclude;
+
+        opacity: 0;
+
+        pointer-events: none;
+
+    }
+
+    .campus-border-flow:hover::before {
+
+        opacity: 1;
+
+        animation:
+            campus-border-orbit
+            2.4s
+            linear
+            infinite;
+
+    }
+
+}
+
+
+@keyframes campus-border-orbit {
+
+    from {
+
+        transform:
+            rotate(0deg);
+
+    }
+
+    to {
+
+        transform:
+            rotate(360deg);
+
+    }
+
+}
+
+
+/* =========================================================
+   7 — AMBIENT NAVBAR / SIDEBAR SHIMMER
+========================================================= */
+
+.sidebar::after {
+
+    content: "";
+
+    position: absolute;
+
+    top: -20%;
+    left: -35%;
+
+    width: 25%;
+    height: 140%;
+
+    pointer-events: none;
+
+    background:
+        linear-gradient(
+            90deg,
+            transparent,
+            rgba(220,195,255,.055),
+            transparent
+        );
+
+    transform:
+        skewX(-14deg)
+        translateX(-300%);
+
+    opacity: 0;
+
+}
+
+.sidebar.campus-shimmer::after {
+
+    animation:
+        campus-sidebar-shimmer
+        1.7s
+        ease-out
+        forwards;
+
+}
+
+
+@keyframes campus-sidebar-shimmer {
+
+    0% {
+
+        opacity: 0;
+
+        transform:
+            skewX(-14deg)
+            translateX(-300%);
+
+    }
+
+    20% {
+
+        opacity: 1;
+
+    }
+
+    100% {
+
+        opacity: 0;
+
+        transform:
+            skewX(-14deg)
+            translateX(650%);
+
+    }
+
+}
+
+
+/* =========================================================
+   10 — LONG PRESS EASTER EGG
+========================================================= */
+
+.campus-longpress-glow {
+
+    animation:
+        campus-longpress-pulse
+        .8s
+        ease-out
+        forwards;
+
+}
+
+
+@keyframes campus-longpress-pulse {
+
+    0% {
+
+        box-shadow:
+            0 0 0
+            rgba(210,180,255,0);
+
+    }
+
+    35% {
+
+        box-shadow:
+            0 0 18px
+            rgba(210,180,255,.35),
+            0 0 45px
+            rgba(190,150,255,.12);
+
+    }
+
+    100% {
+
+        box-shadow:
+            0 0 0
+            rgba(210,180,255,0);
+
+    }
+
+}
+
+
+/* =========================================================
+   MOBILE PERFORMANCE
+========================================================= */
+
+@media (max-width: 700px) {
+
+    /*
+     * No cursor effects on touch devices.
+     */
+
+    .campus-cursor-particle {
+
+        display: none !important;
+
+    }
+
+    /*
+     * Remove expensive spotlight
+     * rendering from phones.
+     */
+
+    .stat-card::after,
+    .student-event-card::after,
+    .volunteer-event-card::after,
+    .content-card::after,
+    .panel::after,
+    .card::after {
+
+        display: none;
+
+    }
+
+    /*
+     * Traveling borders are desktop-only.
+     */
+
+    .campus-border-flow::before {
+
+        display: none;
+
+    }
+
+}
+
+
+
+@media (max-width: 700px) {
+}
+
+@media (prefers-reduced-motion: reduce) {
+}
+
+/* =========================================================
+   CAMPUSHUB — RESPONSIVE + PERFORMANCE SYSTEM
+   Desktop remains unchanged.
+========================================================= */
+
+
+/* =========================================================
+   TABLET / SMALL LAPTOP
+   701px — 1100px
+========================================================= */
+
+@media (max-width: 1100px) {
+
+    .app-shell {
+        grid-template-columns:
+            210px minmax(0, 1fr) !important;
+
+        width: 100%;
+
+        overflow-x: hidden;
+    }
+
+
+    .sidebar {
+        width: 210px !important;
+        min-width: 210px !important;
+    }
+
+
+    .main-content {
+        min-width: 0 !important;
+        width: 100% !important;
+
+        overflow-x: hidden;
+    }
+
+
+    .dashboard-page,
+    .dashboard {
+        min-width: 0 !important;
+        width: 100% !important;
+    }
+
+
+    /*
+     * Stop large decorative layers from
+     * overflowing smaller screens.
+     */
+
+    body:has(.dashboard-page)::before,
+    body:has(.dashboard)::before {
+
+        max-width: 100vw;
+
+        width: 90vw !important;
+        height: 45vh !important;
+
+        filter: blur(14px);
+    }
+
+
+    body:has(.dashboard-page)::after,
+    body:has(.dashboard)::after {
+
+        max-width: 100vw;
+
+    }
+
+
+    /*
+     * Prevent horizontal overflow from
+     * wide tables/content.
+     */
+
+    .main-content table,
+    .content-card table,
+    .panel table {
+
+        max-width: 100%;
+
+    }
+
+}
+
+
+/* =========================================================
+   TABLET / LARGE PHONE
+   701px and below
+========================================================= */
+
+@media (max-width: 700px) {
+
+    html,
+    body {
+
+        width: 100%;
+
+        max-width: 100%;
+
+        overflow-x: hidden;
+
+        overscroll-behavior-x: none;
+    }
+
+
+    body {
+
+        min-width: 0 !important;
+    }
+
+
+    .app-shell {
+
+        display: block !important;
+
+        width: 100% !important;
+
+        min-width: 0 !important;
+
+        max-width: 100vw !important;
+
+        overflow-x: hidden;
+    }
+
+
+    /* =====================================================
+       MOBILE SIDEBAR
+    ===================================================== */
+
+    .sidebar {
+
+        position: fixed !important;
+
+        left: 0;
+        top: 0;
+        bottom: 0;
+
+        width: min(82vw, 310px) !important;
+
+        min-width: 0 !important;
+
+        height: 100dvh;
+
+        z-index: 10000;
+
+        transform:
+            translateX(-105%);
+
+        transition:
+            transform .28s
+            cubic-bezier(.16,1,.3,1);
+
+        overflow-y: auto;
+
+        overflow-x: hidden;
+
+        box-shadow:
+            12px 0 35px
+            rgba(0,0,0,.35);
+
+        will-change:
+            transform;
+    }
+
+
+    .sidebar.mobile-open {
+
+        transform:
+            translateX(0);
+
+    }
+
+
+    /*
+     * Mobile sidebar backdrop.
+     */
+
+    .campus-mobile-backdrop {
+
+        position: fixed;
+
+        inset: 0;
+
+        z-index: 9999;
+
+        background:
+            rgba(5,3,10,.58);
+
+        backdrop-filter:
+            blur(3px);
+
+        -webkit-backdrop-filter:
+            blur(3px);
+
+        opacity: 0;
+
+        pointer-events: none;
+
+        transition:
+            opacity .2s ease;
+    }
+
+
+    .campus-mobile-backdrop.active {
+
+        opacity: 1;
+
+        pointer-events: auto;
+
+    }
+
+
+    /*
+     * Hamburger.
+     */
+
+    .campus-mobile-menu {
+
+        position: fixed;
+
+        top: max(12px, env(safe-area-inset-top));
+
+        left: 12px;
+
+        width: 44px;
+
+        height: 44px;
+
+        display: flex;
+
+        align-items: center;
+
+        justify-content: center;
+
+        z-index: 9998;
+
+        border: 1px solid
+            rgba(181,140,255,.24);
+
+        border-radius: 12px;
+
+        background:
+            rgba(15,12,22,.88);
+
+        color:
+            #e8dcff;
+
+        font-size: 20px;
+
+        cursor: pointer;
+
+        box-shadow:
+            0 0 18px
+            rgba(181,140,255,.10);
+
+        -webkit-tap-highlight-color:
+            transparent;
+    }
+
+
+    .campus-mobile-menu:active {
+
+        transform:
+            scale(.94);
+
+    }
+
+
+    /* =====================================================
+       MAIN CONTENT
+    ===================================================== */
+
+    .main-content {
+
+        width: 100% !important;
+
+        min-width: 0 !important;
+
+        max-width: 100vw !important;
+
+        margin: 0 !important;
+
+        padding:
+            68px 14px
+            max(20px, env(safe-area-inset-bottom))
+            14px !important;
+
+        overflow-x: hidden;
+    }
+
+
+    .dashboard-page {
+
+        width: 100% !important;
+
+        max-width: 100% !important;
+
+        min-width: 0 !important;
+
+        margin: 0 !important;
+
+        padding: 0 !important;
+    }
+
+
+    .dashboard-header,
+    .page-header {
+
+        width: 100% !important;
+
+        max-width: 100% !important;
+
+        min-width: 0 !important;
+
+        margin-left: 0 !important;
+
+        margin-right: 0 !important;
+
+    }
+
+
+    /*
+     * Keep headings from forcing
+     * horizontal overflow.
+     */
+
+    h1,
+    h2,
+    h3,
+    h4 {
+
+        max-width: 100%;
+
+        overflow-wrap: anywhere;
+
+    }
+
+
+    /* =====================================================
+       GRIDS
+    ===================================================== */
+
+    .stats-grid,
+    .stat-grid,
+    .dashboard-grid,
+    .card-grid,
+    .events-grid,
+    .event-grid,
+    .content-grid {
+
+        grid-template-columns:
+            minmax(0, 1fr) !important;
+
+        width: 100% !important;
+
+        min-width: 0 !important;
+
+        gap: 12px !important;
+    }
+
+
+    /*
+     * Two-column layouts become one column.
+     */
+
+    .dashboard-main,
+    .dashboard-layout,
+    .content-layout,
+    .two-column,
+    .split-layout {
+
+        grid-template-columns:
+            minmax(0, 1fr) !important;
+
+        width: 100% !important;
+
+        min-width: 0 !important;
+    }
+
+
+    /* =====================================================
+       CARDS
+    ===================================================== */
+
+    .stat-card,
+    .student-event-card,
+    .volunteer-event-card,
+    .content-card,
+    .panel,
+    .card {
+
+        width: 100% !important;
+
+        max-width: 100% !important;
+
+        min-width: 0 !important;
+
+        box-sizing: border-box;
+
+        overflow: hidden;
+
+    }
+
+
+    /*
+     * Prevent long event titles/text
+     * from breaking the viewport.
+     */
+
+    .event-title,
+    .event-name,
+    .card-title {
+
+        overflow-wrap:
+            anywhere;
+
+        word-break:
+            break-word;
+
+    }
+
+
+    /* =====================================================
+       BUTTONS
+    ===================================================== */
+
+    .dashboard-actions,
+    .action-row,
+    .header-actions,
+    .page-actions {
+
+        display: flex;
+
+        flex-wrap: wrap;
+
+        width: 100%;
+
+        gap: 8px;
+
+    }
+
+
+    .dashboard-action,
+    .primary-button,
+    .secondary-button,
+    .primary-btn,
+    .secondary-btn {
+
+        max-width: 100%;
+
+        min-height: 44px;
+
+        touch-action: manipulation;
+
+    }
+
+
+    /* =====================================================
+       TABLES
+    ===================================================== */
+
+    .table-container,
+    .table-wrapper,
+    .content-table {
+
+        width: 100% !important;
+
+        max-width: 100% !important;
+
+        overflow-x: auto;
+
+        -webkit-overflow-scrolling:
+            touch;
+
+    }
+
+
+    table {
+
+        min-width: 600px;
+
+    }
+
+
+    /* =====================================================
+       FORMS
+    ===================================================== */
+
+    input,
+    select,
+    textarea {
+
+        max-width: 100%;
+
+        box-sizing: border-box;
+
+        font-size: 16px !important;
+
+    }
+
+
+    form {
+
+        max-width: 100%;
+
+    }
+
+
+    /* =====================================================
+       PERFORMANCE MODE
+    ===================================================== */
+
+    /*
+     * Touch devices don't need desktop
+     * cursor effects.
+     */
+
+    .campus-cursor-particle {
+
+        display: none !important;
+
+    }
+
+
+    /*
+     * Disable card spotlight.
+     * This is desktop-only anyway.
+     */
+
+    .stat-card::after,
+    .student-event-card::after,
+    .volunteer-event-card::after,
+    .content-card::after,
+    .panel::after,
+    .card::after {
+
+        display: none !important;
+
+    }
+
+
+    /*
+     * Disable traveling card borders.
+     */
+
+    .campus-border-flow::before {
+
+        display: none !important;
+
+    }
+
+
+    /*
+     * Remove expensive dashboard activation
+     * effects on phones.
+     */
+
+    body:has(.dashboard-page)::before,
+    body:has(.dashboard)::before {
+
+        width: 100vw !important;
+
+        height: 55vh !important;
+
+        filter: blur(12px) !important;
+
+        animation: none !important;
+
+        opacity: .65 !important;
+
+    }
+
+
+    body:has(.dashboard-page)::after,
+    body:has(.dashboard)::after {
+
+        display: none !important;
+
+    }
+
+
+    /*
+     * Don't animate every dashboard card
+     * on low-power devices.
+     */
+
+    body:has(.dashboard-page) .stat-card,
+    body:has(.dashboard-page) .student-event-card,
+    body:has(.dashboard-page) .volunteer-event-card,
+    body:has(.dashboard-page) .content-card,
+    body:has(.dashboard-page) .panel,
+    body:has(.dashboard) .stat-card,
+    body:has(.dashboard) .student-event-card,
+    body:has(.dashboard) .volunteer-event-card,
+    body:has(.dashboard) .content-card,
+    body:has(.dashboard) .panel {
+
+        animation:
+            none !important;
+
+        opacity:
+            1 !important;
+
+        transform:
+            none !important;
+
+    }
+
+
+    /*
+     * Sidebar still gets a simple slide,
+     * because that one is useful on mobile.
+     */
+
+    body:has(.dashboard-page) .sidebar,
+    body:has(.dashboard) .sidebar {
+
+        animation:
+            none !important;
+
+    }
+
+
+    body:has(.dashboard-page) .main-content,
+    body:has(.dashboard) .main-content {
+
+        animation:
+            none !important;
+
+    }
+
+
+    body:has(.dashboard-page) .dashboard-header,
+    body:has(.dashboard) .dashboard-header,
+    body:has(.dashboard-page) .page-header,
+    body:has(.dashboard) .page-header {
+
+        animation:
+            none !important;
+
+    }
+
+
+    /*
+     * Reduce excessive hover shadows on touch.
+     */
+
+    .dashboard-action:hover {
+
+        box-shadow:
+            none !important;
+
+    }
+
+
+    /*
+     * Remove expensive backdrop filters
+     * from large elements where possible.
+     */
+
+    .sidebar {
+
+        -webkit-backdrop-filter:
+            none !important;
+
+        backdrop-filter:
+            none !important;
+
+    }
+
+}
+
+
+/* =========================================================
+   VERY SMALL PHONES
+   400px and below
+========================================================= */
+
+@media (max-width: 400px) {
+
+    .main-content {
+
+        padding-left: 10px !important;
+
+        padding-right: 10px !important;
+
+    }
+
+
+    .campus-mobile-menu {
+
+        width: 42px;
+
+        height: 42px;
+
+    }
+
+
+    .dashboard-header h1,
+    .page-header h1 {
+
+        font-size:
+            clamp(
+                1.45rem,
+                8vw,
+                2rem
+            );
+
+    }
+
+
+    .stat-card,
+    .student-event-card,
+    .volunteer-event-card,
+    .content-card,
+    .panel {
+
+        padding:
+            12px !important;
+
+    }
+
+}
+
+
+/* =========================================================
+   LANDSCAPE PHONES
+========================================================= */
+
+@media (
+    max-width: 900px
+) and (
+    orientation: landscape
+) {
+
+    .main-content {
+
+        padding-top:
+            60px !important;
+
+    }
+
+
+    .sidebar {
+
+        width:
+            min(55vw, 300px) !important;
+
+    }
+
+}
+
+
+/* =========================================================
+   LOW-MOTION / LOW-POWER DEVICE SAFETY
+========================================================= */
+
+@media (
+    max-width: 1100px
+) and (
+    prefers-reduced-motion: no-preference
+) {
+
+    /*
+     * Keep normal transitions, but eliminate
+     * long entrance sequences.
+     */
+
+    .sidebar,
+    .main-content,
+    .dashboard-header,
+    .page-header {
+
+        transition:
+            transform .25s ease,
+            opacity .2s ease;
+
+    }
+
+}
+
+
+/* =========================================================
+   WINDOW RESIZE / HALF-SCREEN SAFETY
+========================================================= */
+
+@media (min-width: 701px) and (max-width: 850px) {
+
+    .app-shell {
+
+        grid-template-columns:
+            180px minmax(0, 1fr) !important;
+
+    }
+
+
+    .sidebar {
+
+        width: 180px !important;
+
+        min-width: 180px !important;
+
+    }
+
+
+    .sidebar .brand > span:last-child {
+
+        font-size:
+            .92rem;
+
+    }
+
+
+    .nav-item {
+
+        padding-left:
+            10px !important;
+
+        padding-right:
+            10px !important;
+
+        font-size:
+            .82rem;
+
+    }
+
+
+    .main-content {
+
+        min-width:
+            0 !important;
+
+        padding-left:
+            18px !important;
+
+        padding-right:
+            18px !important;
+
+    }
+
+
+    /*
+     * Action buttons are allowed to wrap.
+     */
+
+    .dashboard-actions,
+    .header-actions,
+    .page-actions {
+
+        flex-wrap:
+            wrap !important;
+
+    }
+
+}
+
+
+
+/* =========================================================
+   CAMPUSHUB MOBILE REBUILD
+   This intentionally overrides the older mobile patches.
+   Desktop is NOT affected.
+========================================================= */
+
+.mobile-menu-toggle,
+.mobile-nav-backdrop {
+    display: none;
+}
+
+
+@media (max-width: 700px) {
+
+    /* -----------------------------------------------------
+       GLOBAL MOBILE BASE
+    ----------------------------------------------------- */
+
+    html,
+    body {
+        width: 100%;
+        max-width: 100%;
+        overflow-x: hidden;
+    }
+
+    body {
+        min-width: 0;
+        -webkit-text-size-adjust: 100%;
+    }
+
+    .app-shell {
+        width: 100%;
+        min-height: 100vh;
+        min-height: 100dvh;
+        display: block;
+    }
+
+
+    /* -----------------------------------------------------
+       MOBILE MENU BUTTON
+    ----------------------------------------------------- */
+
+    .mobile-menu-toggle {
+        position: fixed;
+
+        top: max(12px, env(safe-area-inset-top));
+        left: 12px;
+
+        width: 46px;
+        height: 46px;
+
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+
+        gap: 5px;
+
+        padding: 0;
+
+        border: 1px solid rgba(185,156,255,.25);
+        border-radius: 13px;
+
+        background: rgba(13,11,17,.88);
+
+        color: var(--white);
+
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+
+        box-shadow:
+            0 8px 30px rgba(0,0,0,.28),
+            0 0 20px rgba(181,140,255,.06);
+
+        z-index: 10001;
+
+        cursor: pointer;
+
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    .mobile-menu-toggle span {
+        display: block;
+
+        width: 19px;
+        height: 2px;
+
+        border-radius: 99px;
+
+        background: var(--white);
+
+        transition:
+            transform .2s ease,
+            opacity .2s ease;
+    }
+
+    body.mobile-nav-open .mobile-menu-toggle span:nth-child(1) {
+        transform: translateY(7px) rotate(45deg);
+    }
+
+    body.mobile-nav-open .mobile-menu-toggle span:nth-child(2) {
+        opacity: 0;
+    }
+
+    body.mobile-nav-open .mobile-menu-toggle span:nth-child(3) {
+        transform: translateY(-7px) rotate(-45deg);
+    }
+
+
+    /* -----------------------------------------------------
+       BACKDROP
+    ----------------------------------------------------- */
+
+    .mobile-nav-backdrop {
+        position: fixed;
+
+        inset: 0;
+
+        display: block;
+
+        background: rgba(0,0,0,.55);
+
+        backdrop-filter: blur(2px);
+        -webkit-backdrop-filter: blur(2px);
+
+        opacity: 0;
+        visibility: hidden;
+
+        pointer-events: none;
+
+        transition:
+            opacity .22s ease,
+            visibility .22s ease;
+
+        z-index: 9998;
+    }
+
+    body.mobile-nav-open .mobile-nav-backdrop {
+        opacity: 1;
+        visibility: visible;
+        pointer-events: auto;
+    }
+
+
+    /* -----------------------------------------------------
+       SIDEBAR = REAL MOBILE DRAWER
+    ----------------------------------------------------- */
+
+    .sidebar {
+        position: fixed !important;
+
+        inset:
+            0 auto 0 0 !important;
+
+        width: min(290px, 84vw) !important;
+        height: 100dvh !important;
+
+        min-height: 100dvh;
+
+        padding:
+            calc(18px + env(safe-area-inset-top))
+            16px
+            calc(18px + env(safe-area-inset-bottom));
+
+        display: flex !important;
+        flex-direction: column !important;
+
+        overflow-y: auto;
+        overflow-x: hidden;
+
+        background: rgba(13,11,17,.97);
+
+        border-right: 1px solid var(--border);
+
+        transform: translateX(-105%);
+
+        transition:
+            transform .25s cubic-bezier(.16,1,.3,1);
+
+        box-shadow:
+            18px 0 50px rgba(0,0,0,.38);
+
+        z-index: 10000;
+
+        will-change: transform;
+    }
+
+    body.mobile-nav-open .sidebar {
+        transform: translateX(0) !important;
+    }
+
+
+    /* Don't let the old mobile-horizontal-nav rules
+       interfere with the drawer. */
+
+    .sidebar .brand {
+        flex-shrink: 0;
+
+        margin-bottom: 30px;
+
+        padding: 6px 8px;
+    }
+
+    .sidebar .nav-section {
+        width: 100%;
+
+        display: block;
+    }
+
+    .sidebar .nav-label {
+        display: block;
+
+        margin: 0 8px 9px;
+    }
+
+    .sidebar .nav-item {
+        width: 100%;
+
+        display: flex !important;
+
+        align-items: center;
+        justify-content: flex-start;
+
+        margin: 3px 0;
+        padding: 12px 11px;
+
+        white-space: normal;
+
+        flex-shrink: 0;
+    }
+
+    .sidebar .nav-item span {
+        flex-shrink: 0;
+    }
+
+    .sidebar-bottom {
+        display: block !important;
+
+        width: 100%;
+
+        margin-top: auto;
+    }
+
+
+    /* -----------------------------------------------------
+       MAIN CONTENT
+    ----------------------------------------------------- */
+
+    .main-content {
+        width: 100% !important;
+        max-width: 100% !important;
+
+        min-width: 0 !important;
+
+        margin-left: 0 !important;
+
+        padding:
+            calc(76px + env(safe-area-inset-top))
+            14px
+            calc(90px + env(safe-area-inset-bottom));
+
+        overflow-x: clip;
+    }
+
+    .full-page {
+        margin-left: 0 !important;
+        width: 100%;
+    }
+
+
+    /* -----------------------------------------------------
+       ALL COMMON CONTAINERS
+    ----------------------------------------------------- */
+
+    .dashboard-page,
+    .dashboard,
+    .page-header,
+    .dashboard-header,
+    .content-card,
+    .panel,
+    .form-card,
+    .mini-panel,
+    .detail-card,
+    .ai-recommendation,
+    .evai-card,
+    .security-panel,
+    .scanner-security,
+    .approval-card,
+    .registration-cta {
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+        box-sizing: border-box;
+    }
+
+    img,
+    video,
+    canvas,
+    svg {
+        max-width: 100%;
+    }
+
+
+    /* -----------------------------------------------------
+       HEADERS
+    ----------------------------------------------------- */
+
+    .page-header,
+    .dashboard-header {
+        width: 100%;
+
+        align-items: flex-start;
+
+        flex-direction: column;
+
+        gap: 13px;
+
+        margin-bottom: 22px;
+    }
+
+    .page-header h1,
+    .dashboard-header h1 {
+        max-width: 100%;
+
+        font-size: clamp(25px, 8vw, 32px);
+
+        line-height: 1.1;
+
+        overflow-wrap: anywhere;
+    }
+
+    .page-header p,
+    .dashboard-header p {
+        max-width: 100%;
+
+        line-height: 1.5;
+    }
+
+
+    /* -----------------------------------------------------
+       GRIDS
+    ----------------------------------------------------- */
+
+    .student-stats,
+    .student-event-grid,
+    .dashboard-lower-grid,
+    .stats-grid,
+    .form-grid,
+    .detail-grid,
+    .recommendation-details {
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+
+        grid-template-columns: minmax(0, 1fr) !important;
+    }
+
+    .student-event-card,
+    .student-stat,
+    .stat-card,
+    .content-card,
+    .panel {
+        min-width: 0;
+        max-width: 100%;
+    }
+
+
+    /* -----------------------------------------------------
+       FLEX ROWS THAT OTHERWISE OVERFLOW
+    ----------------------------------------------------- */
+
+    .approval-card,
+    .approval-row,
+    .registration-cta,
+    .application-card,
+    .volunteer-application-card,
+    .organizer-overview,
+    .organizer-event-actions,
+    .application-side {
+        min-width: 0;
+        max-width: 100%;
+
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .approval-info,
+    .application-info,
+    .application-side {
+        width: 100%;
+        min-width: 0;
+    }
+
+
+    /* -----------------------------------------------------
+       BUTTONS
+    ----------------------------------------------------- */
+
+    .primary-btn,
+    .secondary-btn,
+    .dashboard-action,
+    .approve-btn,
+    .reject-btn {
+        min-height: 44px;
+
+        max-width: 100%;
+
+        box-sizing: border-box;
+    }
+
+    .primary-btn,
+    .secondary-btn {
+        width: 100%;
+    }
+
+
+    /* -----------------------------------------------------
+       TABLES
+    ----------------------------------------------------- */
+
+    .table-container,
+    .table-wrapper,
+    .data-table-wrapper {
+        width: 100%;
+        max-width: 100%;
+
+        overflow-x: auto;
+
+        -webkit-overflow-scrolling: touch;
+    }
+
+
+    /* -----------------------------------------------------
+       EVAI
+    ----------------------------------------------------- */
+
+    .evai-widget {
+        right: 10px !important;
+        bottom: calc(10px + env(safe-area-inset-bottom)) !important;
+
+        max-width: calc(100vw - 20px);
+    }
+
+    .evai-chat {
+        right: 10px !important;
+        left: 10px !important;
+
+        width: auto !important;
+        max-width: none !important;
+    }
+
+
+    /* -----------------------------------------------------
+       REMOVE EXPENSIVE DESKTOP DECORATION ON PHONES
+    ----------------------------------------------------- */
+
+    body:has(.dashboard-page)::before,
+    body:has(.dashboard-page)::after,
+    body:has(.dashboard)::before,
+    body:has(.dashboard)::after {
+        display: none !important;
+        animation: none !important;
+        filter: none !important;
+    }
+
+
+    /* -----------------------------------------------------
+       KILL HEAVY ENTRANCE ANIMATIONS ON MOBILE
+       This is important for the lag you described.
+    ----------------------------------------------------- */
+
+    body:has(.dashboard-page) .sidebar,
+    body:has(.dashboard) .sidebar,
+    body:has(.dashboard-page) .main-content,
+    body:has(.dashboard) .main-content,
+    body:has(.dashboard-page) .dashboard-header,
+    body:has(.dashboard) .dashboard-header,
+    body:has(.dashboard-page) .page-header,
+    body:has(.dashboard) .page-header,
+    body:has(.dashboard-page) .stat-card,
+    body:has(.dashboard-page) .student-event-card,
+    body:has(.dashboard-page) .volunteer-event-card,
+    body:has(.dashboard-page) .content-card,
+    body:has(.dashboard-page) .panel,
+    body:has(.dashboard) .stat-card,
+    body:has(.dashboard) .student-event-card,
+    body:has(.dashboard) .volunteer-event-card,
+    body:has(.dashboard) .content-card,
+    body:has(.dashboard) .panel {
+        animation: none !important;
+    }
+
+    body:has(.dashboard-page) .stat-card,
+    body:has(.dashboard-page) .student-event-card,
+    body:has(.dashboard-page) .volunteer-event-card,
+    body:has(.dashboard-page) .content-card,
+    body:has(.dashboard-page) .panel,
+    body:has(.dashboard) .stat-card,
+    body:has(.dashboard) .student-event-card,
+    body:has(.dashboard) .volunteer-event-card,
+    body:has(.dashboard) .content-card,
+    body:has(.dashboard) .panel {
+        opacity: 1 !important;
+        transform: none !important;
+        filter: none !important;
+    }
+
+
+    /* -----------------------------------------------------
+       DISABLE HOVER-STYLE MOVEMENT ON TOUCH DEVICES
+    ----------------------------------------------------- */
+
+    .student-event-card:hover,
+    .dashboard-action:hover,
+    .check-in-btn:hover {
+        transform: none;
+    }
+}
+
+
+/* =========================================================
+   SMALL PHONES
+========================================================= */
+
+@media (max-width: 430px) {
+
+    .main-content {
+        padding-left: 12px;
+        padding-right: 12px;
+    }
+
+    .content-card,
+    .panel,
+    .form-card,
+    .mini-panel,
+    .student-event-card,
+    .stat-card {
+        border-radius: 13px;
+    }
+
+    .student-event-card {
+        padding: 15px;
+    }
+
+    .dashboard-header h1,
+    .page-header h1 {
+        font-size: 26px;
+    }
+
+    .evai-float-button {
+        max-width: calc(100vw - 24px);
+    }
+}
+
+
+/* =========================================================
+   VERY LOW POWER / REDUCED MOTION
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+    *,
+    *::before,
+    *::after {
+        scroll-behavior: auto !important;
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: .01ms !important;
+    }
+}
+
+
+/* =========================================================
+   ADMIN DASHBOARD — MOBILE REBUILD
+   This targets dashboard/admin.html specifically.
+========================================================= */
+
+.admin-mobile-menu,
+.admin-mobile-backdrop {
+    display: none;
+}
+
+
+@media (max-width: 700px) {
+
+    /* Prevent the old admin dashboard from creating
+       a desktop-width mobile page. */
+
+    html,
+    body {
+        width: 100%;
+        max-width: 100%;
+        overflow-x: hidden;
+    }
+
+    .dashboard {
+        width: 100% !important;
+        min-width: 0 !important;
+        min-height: 100vh;
+        min-height: 100dvh;
+        overflow-x: clip;
+    }
+
+
+    /* =====================================================
+       HAMBURGER
+    ===================================================== */
+
+    .admin-mobile-menu {
+        position: fixed;
+
+        top: max(12px, env(safe-area-inset-top));
+        left: 12px;
+
+        width: 46px;
+        height: 46px;
+
+        display: flex;
+        flex-direction: column;
+
+        align-items: center;
+        justify-content: center;
+
+        gap: 5px;
+
+        padding: 0;
+
+        border: 1px solid rgba(185,156,255,.28);
+        border-radius: 13px;
+
+        background: rgba(13,11,17,.94);
+
+        box-shadow:
+            0 8px 30px rgba(0,0,0,.35),
+            0 0 20px rgba(181,140,255,.08);
+
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+
+        z-index: 20001;
+
+        cursor: pointer;
+
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    .admin-mobile-menu span {
+        width: 19px;
+        height: 2px;
+
+        border-radius: 99px;
+
+        background: #fff;
+
+        transition:
+            transform .2s ease,
+            opacity .2s ease;
+    }
+
+    body.admin-nav-open
+    .admin-mobile-menu span:nth-child(1) {
+        transform: translateY(7px) rotate(45deg);
+    }
+
+    body.admin-nav-open
+    .admin-mobile-menu span:nth-child(2) {
+        opacity: 0;
+    }
+
+    body.admin-nav-open
+    .admin-mobile-menu span:nth-child(3) {
+        transform: translateY(-7px) rotate(-45deg);
+    }
+
+
+    /* =====================================================
+       BACKDROP
+    ===================================================== */
+
+    .admin-mobile-backdrop {
+        position: fixed;
+
+        inset: 0;
+
+        display: block;
+
+        background: rgba(0,0,0,.58);
+
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+
+        z-index: 19998;
+
+        transition:
+            opacity .22s ease,
+            visibility .22s ease;
+    }
+
+    body.admin-nav-open .admin-mobile-backdrop {
+        opacity: 1;
+        visibility: visible;
+        pointer-events: auto;
+    }
+
+
+    /* =====================================================
+       ACTUAL ADMIN SIDEBAR
+    ===================================================== */
+
+    .dashboard > .sidebar {
+        position: fixed !important;
+
+        top: 0 !important;
+        left: 0 !important;
+        bottom: 0 !important;
+
+        width: min(285px, 84vw) !important;
+        height: 100dvh !important;
+
+        min-height: 100dvh;
+
+        box-sizing: border-box;
+
+        z-index: 20000;
+
+        overflow-y: auto;
+        overflow-x: hidden;
+
+        transform: translateX(-110%);
+
+        transition:
+            transform .25s cubic-bezier(.16,1,.3,1);
+
+        box-shadow:
+            18px 0 55px rgba(0,0,0,.45);
+
+        will-change: transform;
+    }
+
+    body.admin-nav-open
+    .dashboard > .sidebar {
+        transform: translateX(0) !important;
+    }
+
+
+    /* =====================================================
+       ADMIN NAVIGATION
+    ===================================================== */
+
+    .dashboard > .sidebar .sidebar-brand {
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .dashboard > .sidebar .sidebar-nav {
+        width: 100%;
+
+        display: flex;
+        flex-direction: column;
+
+        gap: 5px;
+    }
+
+    .dashboard > .sidebar .sidebar-nav a {
+        width: 100%;
+
+        box-sizing: border-box;
+
+        display: flex;
+
+        align-items: center;
+
+        min-height: 46px;
+
+        white-space: nowrap;
+    }
+
+
+    /* =====================================================
+       ACTUAL ADMIN MAIN CONTENT
+    ===================================================== */
+
+    .dashboard > .main {
+        width: 100% !important;
+        max-width: 100% !important;
+
+        min-width: 0 !important;
+
+        margin-left: 0 !important;
+
+        box-sizing: border-box;
+
+        padding:
+            calc(76px + env(safe-area-inset-top))
+            14px
+            calc(30px + env(safe-area-inset-bottom));
+
+        overflow-x: clip;
+    }
+
+
+    /* =====================================================
+       TOPBAR
+    ===================================================== */
+
+    .dashboard > .main .topbar {
+        width: 100%;
+        max-width: 100%;
+
+        box-sizing: border-box;
+
+        flex-wrap: wrap;
+
+        gap: 12px;
+    }
+
+    .dashboard > .main .topbar h1 {
+        max-width: 100%;
+
+        font-size: clamp(25px, 8vw, 32px);
+
+        line-height: 1.1;
+
+        overflow-wrap: anywhere;
+    }
+
+
+    /* =====================================================
+       ADMIN STATS
+    ===================================================== */
+
+    .dashboard .stats {
+        width: 100%;
+        max-width: 100%;
+
+        min-width: 0;
+
+        grid-template-columns:
+            minmax(0, 1fr) !important;
+    }
+
+    .dashboard .stat-card {
+        min-width: 0;
+        max-width: 100%;
+
+        box-sizing: border-box;
+    }
+
+
+    /* =====================================================
+       ALL ADMIN CARDS
+    ===================================================== */
+
+    .dashboard .card,
+    .dashboard .panel,
+    .dashboard .content-card {
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+
+        box-sizing: border-box;
+    }
+
+
+    /* =====================================================
+       MOBILE PERFORMANCE
+    ===================================================== */
+
+    .dashboard .sidebar,
+    .dashboard .main,
+    .dashboard .topbar,
+    .dashboard .stat-card {
+        animation: none !important;
+    }
+
+}
+
+
+/* =========================================================
+   ADMIN MOBILE JS FALLBACK
+========================================================= */
+
+
+/* =========================================================
+   CAMPUSHUB — FINAL RESPONSIVE LAYOUT
+   Applies to the actual base.html sidebar.
+========================================================= */
+
+@media screen and (max-width: 700px) {
+
+    html,
+    body {
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+        overflow-x: hidden;
+    }
+
+    body {
+        -webkit-text-size-adjust: 100%;
+    }
+
+
+    /* =====================================================
+       REAL BASE SIDEBAR
+       Hide it completely off-screen on phones.
+    ===================================================== */
+
+    body .app-shell > .sidebar {
+
+        position: fixed !important;
+
+        top: 0 !important;
+        left: 0 !important;
+        bottom: 0 !important;
+
+        width: min(285px, 82vw) !important;
+
+        height: 100dvh !important;
+
+        margin: 0 !important;
+
+        box-sizing: border-box !important;
+
+        z-index: 10000 !important;
+
+        transform:
+            translate3d(-110%, 0, 0) !important;
+
+        transition:
+            transform .25s
+            cubic-bezier(.16, 1, .3, 1) !important;
+
+        overflow-y: auto !important;
+
+        overflow-x: hidden !important;
+
+        background:
+            rgba(13, 11, 17, .98) !important;
+
+        will-change: transform;
+    }
+
+
+    body.mobile-nav-open
+    .app-shell > .sidebar {
+
+        transform:
+            translate3d(0, 0, 0) !important;
+
+    }
+
+
+    /* =====================================================
+       MAIN CONTENT — NO 245PX DESKTOP OFFSET
+    ===================================================== */
+
+    body .app-shell > .main-content {
+
+        width: 100% !important;
+
+        max-width: 100vw !important;
+
+        min-width: 0 !important;
+
+        margin-left: 0 !important;
+
+        box-sizing: border-box !important;
+
+        padding:
+            70px 14px 30px !important;
+
+        overflow-x: hidden !important;
+    }
+
+
+    /* =====================================================
+       MOBILE MENU BUTTON
+    ===================================================== */
+
+    body .mobile-menu-toggle {
+
+        position: fixed !important;
+
+        display: flex !important;
+
+        top: 12px !important;
+
+        left: 12px !important;
+
+        width: 44px !important;
+
+        height: 44px !important;
+
+        padding: 0 !important;
+
+        margin: 0 !important;
+
+        flex-direction: column !important;
+
+        align-items: center !important;
+
+        justify-content: center !important;
+
+        gap: 5px !important;
+
+        border:
+            1px solid rgba(190,160,255,.3) !important;
+
+        border-radius: 12px !important;
+
+        background:
+            rgba(13,11,17,.95) !important;
+
+        z-index: 10001 !important;
+
+        cursor: pointer !important;
+    }
+
+    body .mobile-menu-toggle span {
+
+        display: block !important;
+
+        width: 19px !important;
+
+        height: 2px !important;
+
+        background: #fff !important;
+
+        border-radius: 99px !important;
+    }
+
+
+    /* =====================================================
+       BACKDROP
+    ===================================================== */
+
+    body .mobile-nav-backdrop {
+
+        display: block !important;
+
+        position: fixed !important;
+
+        inset: 0 !important;
+
+        width: 100vw !important;
+
+        height: 100vh !important;
+
+        z-index: 9999 !important;
+
+        background:
+            rgba(0,0,0,.55) !important;
+
+        opacity: 0 !important;
+
+        visibility: hidden !important;
+
+        pointer-events: none !important;
+
+        transition:
+            opacity .2s ease,
+            visibility .2s ease !important;
+    }
+
+
+    body.mobile-nav-open
+    .mobile-nav-backdrop {
+
+        opacity: 1 !important;
+
+        visibility: visible !important;
+
+        pointer-events: auto !important;
+    }
+
+
+    /* =====================================================
+       ACTUAL DASHBOARD GRIDS
+    ===================================================== */
+
+    .stats-grid,
+    .student-stats,
+    .student-event-grid,
+    .dashboard-lower-grid {
+
+        width: 100% !important;
+
+        max-width: 100% !important;
+
+        min-width: 0 !important;
+
+        grid-template-columns:
+            minmax(0, 1fr) !important;
+    }
+
+
+    .stat-card,
+    .student-event-card,
+    .content-card,
+    .panel {
+
+        min-width: 0 !important;
+
+        max-width: 100% !important;
+
+        box-sizing: border-box !important;
+    }
+
+
+    /* =====================================================
+       PAGE HEADER
+    ===================================================== */
+
+    .page-header,
+    .dashboard-header {
+
+        width: 100% !important;
+
+        min-width: 0 !important;
+
+        max-width: 100% !important;
+
+        flex-wrap: wrap !important;
+
+        align-items: flex-start !important;
+    }
+
+
+    .page-header > *,
+    .dashboard-header > * {
+
+        max-width: 100%;
+
+    }
+
+
+    .page-header h1,
+    .dashboard-header h1 {
+
+        font-size:
+            clamp(25px, 8vw, 32px) !important;
+
+        line-height: 1.12;
+
+        overflow-wrap: anywhere;
+    }
+
+
+    /* =====================================================
+       MANAGEMENT BUTTONS
+    ===================================================== */
+
+    .page-header .secondary-btn {
+
+        width: 100% !important;
+
+        box-sizing: border-box !important;
+
+        min-height: 44px;
+
+        text-align: center;
+    }
+
+
+    /* =====================================================
+       PERFORMANCE MODE
+    ===================================================== */
+
+    body .campus-cursor-particle {
+
+        display: none !important;
+
+    }
+
+
+    body:has(.dashboard-page)::before,
+    body:has(.dashboard-page)::after,
+    body:has(.dashboard)::before,
+    body:has(.dashboard)::after {
+
+        display: none !important;
+
+        animation: none !important;
+
+        filter: none !important;
+    }
+
+
+    /*
+     * Cards don't need entrance animations on
+     * a low-power touch device.
+     */
+
+    body .stat-card,
+    body .student-event-card,
+    body .volunteer-event-card,
+    body .content-card,
+    body .panel {
+
+        animation: none !important;
+
+        transform: none !important;
+
+        opacity: 1 !important;
+    }
+
+
+    /* =====================================================
+       TABLES
+    ===================================================== */
+
+    .table-container,
+    .table-wrapper {
+
+        max-width: 100% !important;
+
+        overflow-x: auto !important;
+
+        -webkit-overflow-scrolling: touch;
+    }
+
+
+    /* =====================================================
+       FORMS
+    ===================================================== */
+
+    input,
+    select,
+    textarea {
+
+        max-width: 100% !important;
+
+        box-sizing: border-box !important;
+
+        font-size: 16px !important;
+    }
+
+}
+
+
+/* =========================================================
+   SMALL PHONE
+========================================================= */
+
+@media screen and (max-width: 430px) {
+
+    body .app-shell > .main-content {
+
+        padding-left: 11px !important;
+
+        padding-right: 11px !important;
+    }
+
+    .page-header h1,
+    .dashboard-header h1 {
+
+        font-size: 26px !important;
+
+    }
+
+}
+
+
+/* =========================================================
+   REDUCED MOTION
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+    *,
+    *::before,
+    *::after {
+
+        animation-duration: .01ms !important;
+
+        animation-iteration-count: 1 !important;
+
+        transition-duration: .01ms !important;
+    }
+
+}
+

@@ -7539,3 +7539,1385 @@ document.addEventListener(
 
 })();
 
+/* =========================================================
+   CAMPUSHUB — RELIABLE TRAVELING WATER RIPPLE
+========================================================= */
+
+(function () {
+
+    if (window.__CampusHubRipple) return;
+    window.__CampusHubRipple = true;
+
+    const canvas = document.createElement("canvas");
+
+    canvas.id = "campushub-ripple-layer";
+
+    canvas.style.cssText = `
+        position: fixed;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 999999;
+    `;
+
+    document.body.appendChild(canvas);
+
+    const ctx = canvas.getContext("2d", {
+        alpha: true
+    });
+
+    if (!ctx) return;
+
+    let W = 0;
+    let H = 0;
+    let DPR = 1;
+
+    let waves = [];
+
+    let raf = null;
+
+    let lastTouch = 0;
+
+
+    function resize() {
+
+        W = window.innerWidth;
+        H = window.innerHeight;
+
+        const phone = W <= 700;
+
+        DPR = Math.min(
+            window.devicePixelRatio || 1,
+            phone ? 1 : 1.25
+        );
+
+        canvas.width =
+            Math.round(W * DPR);
+
+        canvas.height =
+            Math.round(H * DPR);
+
+        ctx.setTransform(
+            DPR,
+            0,
+            0,
+            DPR,
+            0,
+            0
+        );
+    }
+
+
+    resize();
+
+    window.addEventListener(
+        "resize",
+        resize,
+        { passive: true }
+    );
+
+
+    function createWave(x, y) {
+
+        const farthest = Math.max(
+            Math.hypot(x, y),
+            Math.hypot(W - x, y),
+            Math.hypot(x, H - y),
+            Math.hypot(W - x, H - y)
+        );
+
+
+        waves.push({
+
+            x: x,
+            y: y,
+
+            radius: 0,
+
+            maxRadius:
+                farthest + 30,
+
+            start:
+                performance.now(),
+
+            duration:
+                W <= 700
+                    ? 1150
+                    : 1550
+        });
+
+
+        /*
+         * Never allow an unlimited number
+         * of animations to accumulate.
+         */
+
+        if (waves.length > 3) {
+            waves.shift();
+        }
+
+
+        if (!raf) {
+            raf =
+                requestAnimationFrame(draw);
+        }
+    }
+
+
+    function draw(now) {
+
+        ctx.clearRect(
+            0,
+            0,
+            W,
+            H
+        );
+
+
+        if (!waves.length) {
+
+            raf = null;
+
+            return;
+        }
+
+
+        const phone =
+            W <= 700;
+
+
+        const remaining = [];
+
+
+        for (
+            let i = 0;
+            i < waves.length;
+            i++
+        ) {
+
+            const wave =
+                waves[i];
+
+
+            const elapsed =
+                now -
+                wave.start;
+
+
+            const raw =
+                Math.min(
+                    elapsed /
+                    wave.duration,
+                    1
+                );
+
+
+            /*
+             * This is the actual travelling
+             * motion of the wavefront.
+             */
+
+            const progress =
+                1 -
+                Math.pow(
+                    1 - raw,
+                    2.1
+                );
+
+
+            wave.radius =
+                wave.maxRadius *
+                progress;
+
+
+            /*
+             * Fade with distance.
+             */
+
+            const fade =
+                Math.pow(
+                    1 - raw,
+                    1.2
+                );
+
+
+            /*
+             * MAIN TRAVELING FRONT
+             */
+
+            ctx.beginPath();
+
+            ctx.arc(
+                wave.x,
+                wave.y,
+                wave.radius,
+                0,
+                Math.PI * 2
+            );
+
+
+            ctx.lineWidth =
+                phone ? 1 : 1.35;
+
+
+            ctx.strokeStyle =
+                `rgba(
+                    218,
+                    194,
+                    255,
+                    ${0.58 * fade}
+                )`;
+
+
+            ctx.shadowBlur =
+                phone ? 2 : 5;
+
+
+            ctx.shadowColor =
+                `rgba(
+                    190,
+                    150,
+                    255,
+                    ${0.28 * fade}
+                )`;
+
+
+            ctx.stroke();
+
+
+            /*
+             * SOFT TRAILING FRONT
+             */
+
+            const trail =
+                wave.radius -
+                (phone ? 8 : 12);
+
+
+            if (trail > 0) {
+
+                ctx.beginPath();
+
+                ctx.arc(
+                    wave.x,
+                    wave.y,
+                    trail,
+                    0,
+                    Math.PI * 2
+                );
+
+
+                ctx.lineWidth =
+                    .7;
+
+                ctx.shadowBlur = 0;
+
+                ctx.strokeStyle =
+                    `rgba(
+                        185,
+                        150,
+                        255,
+                        ${0.15 * fade}
+                    )`;
+
+                ctx.stroke();
+            }
+
+
+            if (raw < 1) {
+
+                remaining.push(
+                    wave
+                );
+            }
+        }
+
+
+        waves =
+            remaining;
+
+
+        ctx.shadowBlur = 0;
+
+
+        if (waves.length) {
+
+            raf =
+                requestAnimationFrame(
+                    draw
+                );
+
+        } else {
+
+            raf = null;
+
+            ctx.clearRect(
+                0,
+                0,
+                W,
+                H
+            );
+        }
+    }
+
+
+    document.addEventListener(
+        "pointerdown",
+        function (event) {
+
+            if (
+                event.pointerType === "mouse" &&
+                event.button !== 0
+            ) {
+                return;
+            }
+
+
+            /*
+             * Ignore synthetic mouse events
+             * generated after touch.
+             */
+
+            if (
+                event.pointerType === "mouse" &&
+                performance.now() -
+                lastTouch <
+                500
+            ) {
+                return;
+            }
+
+
+            if (
+                event.pointerType === "touch"
+            ) {
+
+                lastTouch =
+                    performance.now();
+            }
+
+
+            createWave(
+                event.clientX,
+                event.clientY
+            );
+
+        },
+        {
+            passive: true,
+            capture: true
+        }
+    );
+
+})();
+
+/* =========================================================
+   CAMPUSHUB — PREMIUM INTERACTION ENGINE
+========================================================= */
+
+(() => {
+
+    if (window.__CampusHubInteractionPack) {
+        return;
+    }
+
+    window.__CampusHubInteractionPack = true;
+
+
+    const desktop =
+        window.matchMedia(
+            "(hover: hover) and (pointer: fine)"
+        );
+
+
+    /* =====================================================
+       3 — LAVENDER CURSOR TRAIL
+    ===================================================== */
+
+    if (desktop.matches) {
+
+        let lastX = 0;
+        let lastY = 0;
+
+        let lastTime = 0;
+
+        let particleBudget = 0;
+
+
+        document.addEventListener(
+            "pointermove",
+            event => {
+
+                const now =
+                    performance.now();
+
+
+                /*
+                 * Very aggressively throttle
+                 * particle creation.
+                 */
+
+                if (
+                    now - lastTime < 65
+                ) {
+                    return;
+                }
+
+
+                const dx =
+                    event.clientX - lastX;
+
+                const dy =
+                    event.clientY - lastY;
+
+
+                /*
+                 * Don't create particles if
+                 * the cursor barely moved.
+                 */
+
+                if (
+                    Math.hypot(dx, dy) < 10
+                ) {
+                    return;
+                }
+
+
+                lastX =
+                    event.clientX;
+
+                lastY =
+                    event.clientY;
+
+                lastTime =
+                    now;
+
+
+                const particle =
+                    document.createElement(
+                        "span"
+                    );
+
+
+                particle.className =
+                    "campus-cursor-particle";
+
+
+                particle.style.cssText = `
+                    position:fixed;
+                    left:${event.clientX}px;
+                    top:${event.clientY}px;
+                    width:3px;
+                    height:3px;
+                    border-radius:50%;
+                    pointer-events:none;
+                    z-index:999997;
+                    background:rgba(215,190,255,.65);
+                    box-shadow:0 0 7px rgba(190,150,255,.4);
+                    transform:translate(-50%,-50%);
+                    transition:
+                        opacity .45s ease,
+                        transform .45s ease;
+                `;
+
+
+                document.body.appendChild(
+                    particle
+                );
+
+
+                requestAnimationFrame(
+                    () => {
+
+                        particle.style.opacity =
+                            "0";
+
+                        particle.style.transform =
+                            "translate(-50%,-50%) scale(.2)";
+
+                    }
+                );
+
+
+                window.setTimeout(
+                    () => particle.remove(),
+                    500
+                );
+
+            },
+            {
+                passive: true
+            }
+        );
+
+    }
+
+
+    /* =====================================================
+       6 — CARD SPOTLIGHT
+    ===================================================== */
+
+    if (desktop.matches) {
+
+        const cards =
+            document.querySelectorAll(
+                ".stat-card, " +
+                ".student-event-card, " +
+                ".volunteer-event-card, " +
+                ".content-card, " +
+                ".panel, " +
+                ".card"
+            );
+
+
+        cards.forEach(card => {
+
+            card.addEventListener(
+                "pointermove",
+                event => {
+
+                    const rect =
+                        card.getBoundingClientRect();
+
+
+                    const x =
+                        event.clientX -
+                        rect.left;
+
+
+                    const y =
+                        event.clientY -
+                        rect.top;
+
+
+                    card.style.setProperty(
+                        "--spot-x",
+                        `${x}px`
+                    );
+
+
+                    card.style.setProperty(
+                        "--spot-y",
+                        `${y}px`
+                    );
+
+                },
+                {
+                    passive: true
+                }
+            );
+
+        });
+
+    }
+
+
+    /* =====================================================
+       7 — OCCASIONAL SIDEBAR SHIMMER
+    ===================================================== */
+
+    function sidebarShimmer() {
+
+        const sidebar =
+            document.querySelector(
+                ".sidebar"
+            );
+
+
+        if (!sidebar) {
+            return;
+        }
+
+
+        sidebar.classList.remove(
+            "campus-shimmer"
+        );
+
+
+        /*
+         * Force animation restart.
+         */
+
+        void sidebar.offsetWidth;
+
+
+        sidebar.classList.add(
+            "campus-shimmer"
+        );
+
+    }
+
+
+    /*
+     * First shimmer after a random delay.
+     */
+
+    function scheduleShimmer() {
+
+        const delay =
+            14000 +
+            Math.random() * 10000;
+
+
+        window.setTimeout(
+            () => {
+
+                if (
+                    document.visibilityState ===
+                    "visible"
+                ) {
+
+                    sidebarShimmer();
+
+                }
+
+
+                scheduleShimmer();
+
+            },
+            delay
+        );
+
+    }
+
+
+    scheduleShimmer();
+
+
+    /* =====================================================
+       10 — LONG PRESS EASTER EGG
+    ===================================================== */
+
+    let pressTimer = null;
+
+
+    function findEasterEggTarget() {
+
+        /*
+         * Prefer existing decorative elements.
+         * Nothing new needs to be displayed.
+         */
+
+        return (
+            document.querySelector(
+                ".sidebar .brand"
+            ) ||
+            document.querySelector(
+                ".dashboard-header h1"
+            ) ||
+            document.querySelector(
+                ".sidebar"
+            )
+        );
+
+    }
+
+
+    function startLongPress(event) {
+
+        if (
+            event.pointerType !== "touch"
+        ) {
+            return;
+        }
+
+
+        const target =
+            findEasterEggTarget();
+
+
+        if (!target) {
+            return;
+        }
+
+
+        clearTimeout(
+            pressTimer
+        );
+
+
+        pressTimer =
+            window.setTimeout(
+                () => {
+
+                    target.classList.add(
+                        "campus-longpress-glow"
+                    );
+
+
+                    window.setTimeout(
+                        () => {
+
+                            target.classList.remove(
+                                "campus-longpress-glow"
+                            );
+
+                        },
+                        850
+                    );
+
+
+                    /*
+                     * Tiny haptic feedback
+                     * when supported.
+                     */
+
+                    if (
+                        navigator.vibrate
+                    ) {
+
+                        navigator.vibrate(
+                            [18, 25, 28]
+                        );
+
+                    }
+
+                },
+                1200
+            );
+
+    }
+
+
+    function cancelLongPress() {
+
+        clearTimeout(
+            pressTimer
+        );
+
+    }
+
+
+    document.addEventListener(
+        "pointerdown",
+        startLongPress,
+        {
+            passive: true
+        }
+    );
+
+
+    document.addEventListener(
+        "pointerup",
+        cancelLongPress,
+        {
+            passive: true
+        }
+    );
+
+
+    document.addEventListener(
+        "pointercancel",
+        cancelLongPress,
+        {
+            passive: true
+        }
+    );
+
+
+    document.addEventListener(
+        "pointermove",
+        cancelLongPress,
+        {
+            passive: true
+        }
+    );
+
+
+})();
+
+
+/* =========================================================
+   APPLY PREMIUM BORDER TO EXISTING CARDS
+========================================================= */
+
+document.addEventListener(
+    "DOMContentLoaded",
+    () => {
+
+        document
+            .querySelectorAll(
+                ".stat-card, " +
+                ".student-event-card, " +
+                ".volunteer-event-card, " +
+                ".content-card, " +
+                ".panel"
+            )
+            .forEach(
+                card =>
+                    card.classList.add(
+                        "campus-border-flow"
+                    )
+            );
+
+    }
+);
+
+/* =========================================================
+   CAMPUSHUB — LAVENDER EDGE LIGHT
+========================================================= */
+
+
+
+/* =========================================================
+   CAMPUSHUB — MOBILE NAVIGATION
+========================================================= */
+
+(() => {
+
+    if (
+        window.__CampusHubMobileNavigation
+    ) {
+        return;
+    }
+
+    window.__CampusHubMobileNavigation = true;
+
+
+    const mobile =
+        window.matchMedia(
+            "(max-width: 700px)"
+        );
+
+
+    function install() {
+
+        if (!mobile.matches) {
+            return;
+        }
+
+
+        const sidebar =
+            document.querySelector(
+                ".sidebar"
+            );
+
+
+        if (!sidebar) {
+            return;
+        }
+
+
+        if (
+            document.querySelector(
+                ".campus-mobile-menu"
+            )
+        ) {
+            return;
+        }
+
+
+        const backdrop =
+            document.createElement(
+                "div"
+            );
+
+        backdrop.className =
+            "campus-mobile-backdrop";
+
+
+        const button =
+            document.createElement(
+                "button"
+            );
+
+        button.type =
+            "button";
+
+        button.className =
+            "campus-mobile-menu";
+
+        button.setAttribute(
+            "aria-label",
+            "Open navigation"
+        );
+
+        button.setAttribute(
+            "aria-expanded",
+            "false"
+        );
+
+        button.innerHTML =
+            "☰";
+
+
+        document.body.appendChild(
+            backdrop
+        );
+
+        document.body.appendChild(
+            button
+        );
+
+
+        function closeMenu() {
+
+            sidebar.classList.remove(
+                "mobile-open"
+            );
+
+            backdrop.classList.remove(
+                "active"
+            );
+
+            button.setAttribute(
+                "aria-expanded",
+                "false"
+            );
+
+            button.innerHTML =
+                "☰";
+
+        }
+
+
+        function openMenu() {
+
+            sidebar.classList.add(
+                "mobile-open"
+            );
+
+            backdrop.classList.add(
+                "active"
+            );
+
+            button.setAttribute(
+                "aria-expanded",
+                "true"
+            );
+
+            button.innerHTML =
+                "×";
+
+        }
+
+
+        button.addEventListener(
+            "click",
+            () => {
+
+                if (
+                    sidebar.classList.contains(
+                        "mobile-open"
+                    )
+                ) {
+
+                    closeMenu();
+
+                } else {
+
+                    openMenu();
+
+                }
+
+            }
+        );
+
+
+        backdrop.addEventListener(
+            "click",
+            closeMenu
+        );
+
+
+        /*
+         * Close after navigation.
+         */
+
+        sidebar.addEventListener(
+            "click",
+            event => {
+
+                const link =
+                    event.target.closest(
+                        "a"
+                    );
+
+                if (link) {
+                    closeMenu();
+                }
+
+            }
+        );
+
+
+        /*
+         * Escape closes the drawer.
+         */
+
+        document.addEventListener(
+            "keydown",
+            event => {
+
+                if (
+                    event.key === "Escape"
+                ) {
+
+                    closeMenu();
+
+                }
+
+            }
+        );
+
+    }
+
+
+    if (
+        document.readyState ===
+        "loading"
+    ) {
+
+        document.addEventListener(
+            "DOMContentLoaded",
+            install,
+            {
+                once: true
+            }
+        );
+
+    } else {
+
+        install();
+
+    }
+
+})();
+
+
+
+/* =========================================================
+   CAMPUSHUB MOBILE NAVIGATION
+========================================================= */
+
+(function () {
+
+    function initCampusMobileNav() {
+
+        const button =
+            document.querySelector(".mobile-menu-toggle");
+
+        const sidebar =
+            document.querySelector(".sidebar");
+
+        const backdrop =
+            document.querySelector(".mobile-nav-backdrop");
+
+        if (!button || !sidebar || !backdrop) {
+            return;
+        }
+
+        function closeMenu() {
+
+            document.body.classList.remove(
+                "mobile-nav-open"
+            );
+
+            button.setAttribute(
+                "aria-expanded",
+                "false"
+            );
+        }
+
+        function toggleMenu() {
+
+            const open =
+                document.body.classList.toggle(
+                    "mobile-nav-open"
+                );
+
+            button.setAttribute(
+                "aria-expanded",
+                open ? "true" : "false"
+            );
+        }
+
+        button.addEventListener(
+            "click",
+            toggleMenu
+        );
+
+        backdrop.addEventListener(
+            "click",
+            closeMenu
+        );
+
+        sidebar.querySelectorAll("a").forEach(
+            function (link) {
+
+                link.addEventListener(
+                    "click",
+                    function () {
+
+                        if (
+                            window.innerWidth <= 700
+                        ) {
+                            closeMenu();
+                        }
+
+                    }
+                );
+
+            }
+        );
+
+        window.addEventListener(
+            "resize",
+            function () {
+
+                if (window.innerWidth > 700) {
+                    closeMenu();
+                }
+
+            },
+            { passive: true }
+        );
+
+        document.addEventListener(
+            "keydown",
+            function (event) {
+
+                if (event.key === "Escape") {
+                    closeMenu();
+                }
+
+            }
+        );
+    }
+
+    if (
+        document.readyState === "loading"
+    ) {
+        document.addEventListener(
+            "DOMContentLoaded",
+            initCampusMobileNav
+        );
+    } else {
+        initCampusMobileNav();
+    }
+
+})();
+
+
+(function () {
+
+    function initAdminMobileNav() {
+
+        const button =
+            document.querySelector(".admin-mobile-menu");
+
+        const sidebar =
+            document.querySelector(".dashboard > .sidebar");
+
+        const backdrop =
+            document.querySelector(".admin-mobile-backdrop");
+
+        if (!button || !sidebar || !backdrop) {
+            return;
+        }
+
+        function closeAdminMenu() {
+
+            document.body.classList.remove(
+                "admin-nav-open"
+            );
+
+            button.setAttribute(
+                "aria-expanded",
+                "false"
+            );
+        }
+
+        button.addEventListener(
+            "click",
+            function () {
+
+                const open =
+                    document.body.classList.toggle(
+                        "admin-nav-open"
+                    );
+
+                button.setAttribute(
+                    "aria-expanded",
+                    open ? "true" : "false"
+                );
+            }
+        );
+
+        backdrop.addEventListener(
+            "click",
+            closeAdminMenu
+        );
+
+        sidebar.querySelectorAll("a").forEach(
+            function (link) {
+
+                link.addEventListener(
+                    "click",
+                    function () {
+
+                        if (
+                            window.innerWidth <= 700
+                        ) {
+                            closeAdminMenu();
+                        }
+
+                    }
+                );
+
+            }
+        );
+
+        document.addEventListener(
+            "keydown",
+            function (event) {
+
+                if (event.key === "Escape") {
+                    closeAdminMenu();
+                }
+
+            }
+        );
+
+        window.addEventListener(
+            "resize",
+            function () {
+
+                if (window.innerWidth > 700) {
+                    closeAdminMenu();
+                }
+
+            },
+            { passive: true }
+        );
+    }
+
+    if (
+        document.readyState === "loading"
+    ) {
+        document.addEventListener(
+            "DOMContentLoaded",
+            initAdminMobileNav
+        );
+    } else {
+        initAdminMobileNav();
+    }
+
+})();
+
+/* =========================================================
+   CAMPUSHUB — BASE MOBILE NAVIGATION
+========================================================= */
+
+(function () {
+
+    function initCampusBaseMobile() {
+
+        const button =
+            document.querySelector(
+                ".mobile-menu-toggle"
+            );
+
+        const sidebar =
+            document.querySelector(
+                ".app-shell > .sidebar"
+            );
+
+        const backdrop =
+            document.querySelector(
+                ".mobile-nav-backdrop"
+            );
+
+        if (!button || !sidebar || !backdrop) {
+            return;
+        }
+
+        function closeMenu() {
+
+            document.body.classList.remove(
+                "mobile-nav-open"
+            );
+
+            button.setAttribute(
+                "aria-expanded",
+                "false"
+            );
+        }
+
+        function toggleMenu() {
+
+            const open =
+                document.body.classList.toggle(
+                    "mobile-nav-open"
+                );
+
+            button.setAttribute(
+                "aria-expanded",
+                open ? "true" : "false"
+            );
+        }
+
+        button.addEventListener(
+            "click",
+            toggleMenu
+        );
+
+        backdrop.addEventListener(
+            "click",
+            closeMenu
+        );
+
+        sidebar
+            .querySelectorAll("a")
+            .forEach(function (link) {
+
+                link.addEventListener(
+                    "click",
+                    closeMenu
+                );
+
+            });
+
+        document.addEventListener(
+            "keydown",
+            function (event) {
+
+                if (event.key === "Escape") {
+                    closeMenu();
+                }
+
+            }
+        );
+
+        window.addEventListener(
+            "resize",
+            function () {
+
+                if (window.innerWidth > 700) {
+                    closeMenu();
+                }
+
+            },
+            { passive: true }
+        );
+
+    }
+
+    if (
+        document.readyState ===
+        "loading"
+    ) {
+
+        document.addEventListener(
+            "DOMContentLoaded",
+            initCampusBaseMobile
+        );
+
+    } else {
+
+        initCampusBaseMobile();
+
+    }
+
+})();
